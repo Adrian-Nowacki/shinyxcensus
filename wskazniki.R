@@ -73,30 +73,39 @@ list_race <- c("white", "black", "american", "asian", "other", "latin")
     #h
     
       #count2 <- block_1990[block_1990$COUNTYA == "61",]
-x <- block_1990 %>% group_by(COUNTYA) %>% arrange(COUNTYA)
-    
+x <- block_1990 %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
 a <- group_split(x)
-
 races <- lapply(a, function(a) a[!(names(a) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
 
 h_indexes <- lapply(races, hindex)
 
-class(h_indexes)
 h_indexes <- do.call(rbind.data.frame, h_indexes)
 colnames(h_indexes) <- "H"
-View(h_indexes)
+h_indexes <- round(h_indexes, 4)
+county_num <- group_keys(x)
+H_ind <- cbind(county_num, h_indexes)
+
+
+
+
           # for (i in races){
           #   print(hindex(i))
           #  
           #   
           #   #b <<- lapply(races[1:i], hindex(races[1:i]))
           # }
+          
+          # 
+          # i <- as.data.frame(races[1])
+          # h <- hindex(i)
+          # apply(races, hindex(races[1]))
+          # pomiary = lapply(races, FUN = hindex)
+          # 
+          # as.data.frame(pomiary)
 
 
-# 
-# i <- as.data.frame(races[1])
-# h <- hindex(i)
-# apply(races, hindex(races[1]))
-# pomiary = lapply(races, FUN = hindex)
-# 
-# as.data.frame(pomiary)
+
+
+
+
+
