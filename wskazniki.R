@@ -68,25 +68,33 @@ list_race <- c("white", "black", "american", "asian", "other", "latin")
     
     
     # obliczenei H
-   # races = count2[, list_race]
-    #h = hindex(races)
-    #h
-    
-      #count2 <- block_1990[block_1990$COUNTYA == "61",]
-x <- block_1990 %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
-a <- group_split(x)
-races <- lapply(a, function(a) a[!(names(a) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
+    # count2 <- block_1990[block_1990$COUNTYA == "47",]
+    # races = count2[, list_race]
+    # h = hindex(races)
+    # h
+ #  #  #  #  #  #  #  INDEKS H   
+   
+index_H <- function(){
+      x <- grp_blocks_1990 %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
+      a <- group_split(x)
+      races <- lapply(a, function(a) a[!(names(a) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
+      
+      h_indexes <- lapply(races, hindex)
+      
+      h_indexes <- do.call(rbind.data.frame, h_indexes)
+      colnames(h_indexes) <- "H"
+      h_indexes <- round(h_indexes, 4)
+      county_num <- group_keys(x)
+      H_ind <<- cbind(county_num, h_indexes)
+      }
+index_H()
 
-h_indexes <- lapply(races, hindex)
 
-h_indexes <- do.call(rbind.data.frame, h_indexes)
-colnames(h_indexes) <- "H"
-h_indexes <- round(h_indexes, 4)
-county_num <- group_keys(x)
-H_ind <- cbind(county_num, h_indexes)
-
-
-
+# d <- 5
+# for(i in 1:10) { 
+#   nam <- paste("A", i, sep = "")
+#   assign(nam, rnorm(3))
+# }
 
           # for (i in races){
           #   print(hindex(i))
@@ -102,10 +110,51 @@ H_ind <- cbind(county_num, h_indexes)
           # pomiary = lapply(races, FUN = hindex)
           # 
           # as.data.frame(pomiary)
+# # probne
+blocks <- list(block_1990, block_2000, block_2010)
 
+index_H <- function(x){
+    grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
+    splt <- group_split(grpd)
+    races <- lapply(splt, function(splt) splt[!(names(splt) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
+    
+    h_indexes <- lapply(races, hindex)
+    
+    h_indexes <- do.call(rbind.data.frame, h_indexes)
+    colnames(h_indexes) <- "H"
+    h_indexes <- round(h_indexes, 4)
+    county_num <- group_keys(grpd)
+    H_ind <<- cbind(county_num, h_indexes)
+}
+index_H()
 
+index_entropia <- function(x){
+  h_indexes <- lapply(races, hindex)
+  
+  
+      x <- grp_blocks_1990 %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
+      a <- group_split(x)
+      races <- lapply(a, function(a) a[!(names(a) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
+      races_all <- lapply(races, colSums, na.rm = TRUE)
+      pop = lapply(races_all, sum)
+      perc <- Map("/", races_all, pop)
+      ent  <<- lapply(perc, entropy_fnc)
+      print(ent)
+}
+index_entropia(block_2020)
 
+ent_std <- entropy_std_fnc(perc)
 
+      # funct_H <- function(){
+      #   for (i in length(blocks)){
+      #     empty <- lapply(blocks[1:3], index_H)
+      #     block_1990 <<- as.data.frame(empty[1])
+      #     block_2000 <<- as.data.frame(empty[2])
+      #     block_2010 <<- as.data.frame(empty[3])
+      #   }
+      # }
+      # 
+      # funct_H()
 
 
 
