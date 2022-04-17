@@ -1,13 +1,13 @@
 #  #  #  #  #  #  #  FUNCTIONS CALCULATING INDICATORS 
 
-    # # # entropia
+    # # # entropy
     entropy_fnc = function(proportions, base = exp(1)) {
       entr = -sum(ifelse(proportions > 0, proportions * log(proportions, base = base), 0))
       return(entr)
     } 
     
     
-    # # # entropia standaryzowana
+    # # # entropy std
     entropy_std_fnc = function(proportions, base = exp(1)) {
       entr = -sum(ifelse(proportions > 0, proportions * log(proportions, base = base), 0)) #obliczenie entropii
       entr_std = entr/log(length(proportions), base = base) #standaryzacja
@@ -43,47 +43,11 @@
       return(hind)
     }
 
+    
+    
+    
 list_race <- c("white", "black", "american", "asian", "other", "latin")
     
-index_H <- function(){
-      x <- grp_blocks_1990 %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
-      a <- group_split(x)
-      races <- lapply(a, function(a) a[!(names(a) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
-      
-      h_indexes <- lapply(races, hindex)
-      
-      h_indexes <- do.call(rbind.data.frame, h_indexes)
-      colnames(h_indexes) <- "H"
-      h_indexes <- round(h_indexes, 4)
-      county_num <- group_keys(x)
-      H_ind <<- cbind(county_num, h_indexes)
-      }
-index_H()
-
-
-# d <- 5
-# for(i in 1:10) { 
-#   nam <- paste("A", i, sep = "")
-#   assign(nam, rnorm(3))
-# }
-
-          # for (i in races){
-          #   print(hindex(i))
-          #  
-          #   
-          #   #b <<- lapply(races[1:i], hindex(races[1:i]))
-          # }
-          
-          # 
-          # i <- as.data.frame(races[1])
-          # h <- hindex(i)
-          # apply(races, hindex(races[1]))
-          # pomiary = lapply(races, FUN = hindex)
-          # 
-          # as.data.frame(pomiary)
-# # probne
-# blocks <- list(block_1990, block_2000, block_2010)
-
 index_entropia <- function(x){
       grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
       splt <- group_split(grpd )
@@ -105,8 +69,6 @@ index_entropia <- function(x){
       county_num <- group_keys(grpd)
       Ent_index <<- cbind(county_num, Ent_index)
 }
-index_entropia(block_2020)
-
 
 index_H <- function(x){
     grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
@@ -121,10 +83,9 @@ index_H <- function(x){
     #county_num <- group_keys(grpd)
     #H_ind <<- cbind(county_num, h_indexes)
 }
-index_H(block_2020)
 
-index_D <- function(){
-  grpd <- block_2020 %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
+index_D <- function(x){
+  grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
   splt <- group_split(grpd)
   races <- lapply(splt, function(splt) splt[!(names(splt) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
 
@@ -144,25 +105,61 @@ index_D <- function(){
   D_indexes <- cbind(D_wb, D_wa, D_wl, D_bl, D_ba, D_la)
   colnames(D_indexes) <- c("D_wb", "D_wa", "D_wl", "D_bl", "D_ba", "D_la")
   D_indexes <<- round(D_indexes, 4)
-  county_num <- group_keys(grpd)
-  D_ind <<- cbind(county_num, D_indexes)
+  #county_num <- group_keys(grpd)
+  #D_ind <<- cbind(county_num, D_indexes)
 }
-index_H(block_2020)
 
 
-indeksy <- cbind(Ent_index, h_indexes)
+ all_files <- list(block_1990, block_2000, block_2010, block_2020, grp_blocks_1990, grp_blocks_2000, 
+                grp_blocks_2010, grp_blocks_2000, tract_1990, tract_2000, tract_2010, tract_2000)
+
+       indexes <- function(){
+         for (i in length(all_files)){
+           ent_list <- lapply(all_files[1:i], index_entropia)
+           H_list <- lapply(all_files[1:i], index_H)
+           D_list <- lapply(all_files[1:i], index_D)
+           list<- mapply(function(a, b, c) {
+             out <- cbind(a, b, c)
+             out
+           }, ent_list, H_list, D_list, SIMPLIFY = FALSE)
+           
+           block_1990 <<- as.data.frame(list[1])
+           block_2000 <<- as.data.frame(list[2])
+           block_2010 <<- as.data.frame(list[3])
+           block_2020 <<- as.data.frame(list[4])
+           grp_blocks_1990 <<- as.data.frame(list[5])
+           grp_blocks_2000 <<- as.data.frame(list[6])
+           grp_blocks_2010 <<- as.data.frame(list[7])
+           grp_blocks_2020 <<- as.data.frame(list[8])
+           tract_1990 <<- as.data.frame(list[9])
+           tract_2000 <<- as.data.frame(list[10])
+           tract_2010 <<- as.data.frame(list[11])
+           tract_2020 <<- as.data.frame(list[12])
+         }
+       }
+indexes()       
 
 
-      # funct_H <- function(){
-      #   for (i in length(blocks)){
-      #     empty <- lapply(blocks[1:3], index_H)
-      #     block_1990 <<- as.data.frame(empty[1])
-      #     block_2000 <<- as.data.frame(empty[2])
-      #     block_2010 <<- as.data.frame(empty[3])
-      #   }
-      # }
-      # 
-      # funct_H()
-
-
-
+#  #  #  #  #  #  POLACZENIE DANYCH Z SHP
+    
+    shp <- read_sf("../dane_shp/przyciete.gpkg")
+    
+    shp$COUNTYFP <- as.numeric(substring(shp$COUNTYFP, 2))
+    
+    shp1 <- left_join(shp, block_1990 , by = c("COUNTYFP" = "COUNTYA"))
+    shp2 <- left_join(shp, block_2000 , by = c("COUNTYFP" = "COUNTYA"))
+    tmap_mode("view")
+    tm_shape(shp1) + tm_fill(col = "Entropia", 
+                             interactive = TRUE,
+                             id = "NAME",
+                             popup.vars = c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
+                                            "H: " = "H", "D (white-black)" = "D_wb"),
+                             popup.format=list(growth=list(digits=3))) + tm_borders()
+      
+      
+      # tm_shape(shp2) + tm_polygons(col = "Entropia") +
+      # tm_shape(shp3) + tm_polygons(col = "Entropia") +
+      # tm_shape(shp4) + tm_polygons(col = "Entropia")
+      
+    
+    
