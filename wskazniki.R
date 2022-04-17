@@ -111,7 +111,7 @@ index_H()
           # 
           # as.data.frame(pomiary)
 # # probne
-blocks <- list(block_1990, block_2000, block_2010)
+# blocks <- list(block_1990, block_2000, block_2010)
 
 index_H <- function(x){
     grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
@@ -129,21 +129,27 @@ index_H <- function(x){
 index_H()
 
 index_entropia <- function(x){
-  h_indexes <- lapply(races, hindex)
-  
-  
-      x <- grp_blocks_1990 %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
-      a <- group_split(x)
-      races <- lapply(a, function(a) a[!(names(a) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
+      grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
+      splt <- group_split(grpd )
+      races <- lapply(splt, function(splt) splt[!(names(splt) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
       races_all <- lapply(races, colSums, na.rm = TRUE)
       pop = lapply(races_all, sum)
       perc <- Map("/", races_all, pop)
-      ent  <<- lapply(perc, entropy_fnc)
-      print(ent)
+      ent  <- lapply(perc, entropy_fnc)
+      
+      #entropia standaryzowana
+      Ent_std_index <- lapply(perc, entropy_std_fnc)
+      ent_std_table <- do.call(rbind.data.frame, Ent_std_index)
+      
+      #tabela
+      ent_table <- do.call(rbind.data.frame, ent)
+      Ent_index <<- cbind(ent_table, ent_std_table)
+      colnames(Ent_index) <- c("Entropia", "Entropia_std")
+      Ent_index <- round(Ent_index, 4)
+      county_num <- group_keys(grpd)
+      Ent_index <<- cbind(county_num, Ent_index)
 }
 index_entropia(block_2020)
-
-ent_std <- entropy_std_fnc(perc)
 
       # funct_H <- function(){
       #   for (i in length(blocks)){
