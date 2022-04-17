@@ -45,35 +45,6 @@
 
 list_race <- c("white", "black", "american", "asian", "other", "latin")
     
-    # races_all  <- apply(block_1990[,list_race], 2, sum, na.rm = TRUE)
-    # pop = sum(races_all)
-    # perc <- races_all/pop
-    # 
-    # ent  <- entropy_fnc(perc)
-    # ent_std <- entropy_std_fnc(perc)
-    # 
-    # # obliczenei H
-    # races = block_1990[, list_race]
-    # h = hindex(races)
-    # 
-    # # wskaznik D
-    # d_wb <- d_ind(hamilton1990$white, hamilton1990$black)
-    # d_wa <- d_ind(hamilton1990$white, hamilton1990$asian)
-    # d_wl <- d_ind(hamilton1990$white, hamilton1990$latin)
-    # d_bl <- d_ind(hamilton1990$black, hamilton1990$latin)
-    # d_al <- d_ind(hamilton1990$asian, hamilton1990$latin)
-    # d_ab <- d_ind(hamilton1990$asian, hamilton1990$black)
-    # 
-    # 
-    
-    
-    # obliczenei H
-    # count2 <- block_1990[block_1990$COUNTYA == "47",]
-    # races = count2[, list_race]
-    # h = hindex(races)
-    # h
- #  #  #  #  #  #  #  INDEKS H   
-   
 index_H <- function(){
       x <- grp_blocks_1990 %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)
       a <- group_split(x)
@@ -170,12 +141,11 @@ index_D <- function(){
   D_ba <- as.data.frame(mapply(d_ind, black, asian))
   D_la <- as.data.frame(mapply(d_ind, latin, asian))
   
-  
-  h_indexes <- do.call(rbind.data.frame, h_indexes)
-  colnames(h_indexes) <- "H"
-  h_indexes <<- round(h_indexes, 4)
-  #county_num <- group_keys(grpd)
-  #H_ind <<- cbind(county_num, h_indexes)
+  D_indexes <- cbind(D_wb, D_wa, D_wl, D_bl, D_ba, D_la)
+  colnames(D_indexes) <- c("D_wb", "D_wa", "D_wl", "D_bl", "D_ba", "D_la")
+  D_indexes <<- round(D_indexes, 4)
+  county_num <- group_keys(grpd)
+  D_ind <<- cbind(county_num, D_indexes)
 }
 index_H(block_2020)
 
