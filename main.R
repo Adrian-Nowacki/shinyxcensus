@@ -1,26 +1,29 @@
+
+# PRACA INŻYNIERSKA - ADRIAN NOWACKI
+
+
+#  #  #  #  #  #  #  #  #  #  #  #  #  #  WCZYTANIE DANYCH I PAKIETÓW
+
 library(dplyr)
 library(sf)
 library(tmap)
-library(ggplot2)
 
-#  #  #  #  FILES
-
-    # # # YEAR 1990
+    # # # ROK 1990
     block_1990 = read.csv("../1990/nhgis0105_ds120_1990_block.csv")
     grp_blocks_1990 = read.csv("../1990/nhgis0105_ds120_1990_blck_grp.csv")
     tract_1990 = read.csv("../1990/nhgis0105_ds120_1990_tract.csv") 
     
-    # # # YEAR 2000 
+    # # # ROK 2000 
     block_2000 = read.csv("../2000/nhgis0106_ds147_2000_block.csv")
     grp_blocks_2000 = read.csv("../2000/nhgis0106_ds147_2000_blck_grp.csv")
     tract_2000 = read.csv("../2000/nhgis0107_ds146_2000_tract.csv")
     
-    # # # YEAR 2010
+    # # # ROK 2010
     block_2010 = read.csv("../2010/nhgis0105_ds172_2010_block.csv")
     grp_blocks_2010 = read.csv("../2010/nhgis0105_ds172_2010_blck_grp.csv")
     tract_2010 = read.csv("../2010/nhgis0105_ds172_2010_tract.csv")
     
-    # # # YEAR 2020 
+    # # # ROK 2020 
     
     block_2020 = read.csv("../2020/nhgis0105_ds248_2020_block.csv")
     grp_blocks_2020 = read.csv("../2020/nhgis0105_ds248_2020_blck_grp.csv")
@@ -28,7 +31,7 @@ library(ggplot2)
     
     
     
-   # change of column names from "FMS" to "FYF"
+# zmiana nazw kolumn z "FMS" do "FYF"
 # names(tract_2000)[31:39]<- paste0("FYF00", 1:9)
 # names(tract_2000)[40:44]<- paste0("FYF0", 10:14)
 
@@ -37,11 +40,11 @@ library(ggplot2)
                      tract_2000, block_2010, grp_blocks_2010, tract_2010, block_2020, 
                      grp_blocks_2020, tract_2020)
     
-# shp data 
-   #  county <- read_sf("dane_shp/US_county_2020.shp")
+    
+    
+    
 
-
-#  #  #  #  #  #  #  #  #  #  #  #  #  #  RECLASSIFICATION
+#  #  #  #  #  #  #  #  #  #  #  #  #  #  REKLASYFIKACJA
 
 
 reclass <- function(x) { 
@@ -93,6 +96,7 @@ reclass <- function(x) {
   
 }
 
+
 reclassify <- function(){
   for (i in length(all_files)){
     empty <- lapply(all_files[1:i], reclass)
@@ -114,147 +118,155 @@ reclassify <- function(){
 reclassify()
 
 
-#  #  #  #  #  #  #  #  #  #  #  #  #  #  
+#  #  #  #  #  #  #  #  #  #  #  #  #  #  WCZYTANIE FUNKCJI OBLICZAJĄCYCH WSKAŹNIKI
 
+#  #  # ENTROPIA
+entropy_funct = function(proc) {
+  entropy = -sum(ifelse(proc > 0, proc * log(proc, base = exp(1)), 0)) # obliczenie entropii
+  return(entropy)
+} 
 
-
-
-#  #  #  #  #  #  #  #  #  #  #  #  #  #  CALCULATION OF INDICATORS
-#dane = dane1990[1:250, 27:36]
-
-funct <- function(){
-  dane =  mutate(dane, suma = dane$white + dane$black + dane$american + dane$asian + dane$other + dane$latin)
-  
-  white = dane$white
-  black = dane$black
-  american = dane$american
-  asian = dane$asian
-  other = dane$other
-  latin = dane$latin
-  suma = dane$suma
-  
-  
-  w_suma = dane$white/dane$suma
-  b_suma = dane$black/dane$suma
-  am_suma = dane$american/dane$suma
-  a_suma = dane$asian/dane$suma
-  o_suma = dane$other/dane$suma
-  l_suma = dane$latin/dane$suma
-  
-  w_suma = replace(w_suma, w_suma == 0, 1)
-  b_suma = replace(b_suma, b_suma == 0, 1)
-  am_suma = replace(am_suma, am_suma == 0, 1)
-  a_suma = replace(a_suma, a_suma == 0, 1)
-  o_suma = replace(o_suma, o_suma == 0, 1)
-  l_suma = replace(l_suma, l_suma == 0, 1)
-  
-  # obliczenie entropii
-  dane <- mutate(dane, "entropia" = -(white/suma * log(w_suma) + black/suma * log(b_suma) + 
-                                   american/suma * log(am_suma) + asian/suma * log(a_suma) +
-                                   other/suma * log(o_suma) + latin/suma * log(l_suma)))
-  
-  # obliczenie wskaznika niepodobienstwa D
-  dane <<- mutate(dane, "D (w-b)" = round(sum(1/2 * abs(white/sum(white) - black/sum(black))), 3),
-                  "D [w-a]" = round(sum(1/2 * abs(white/sum(white) - asian/sum(asian))), 3),
-                  "D (w-l)" = round(sum(1/2 * abs(white/sum(white) - latin/sum(latin))), 3),
-                  "D (b-l)" = round(sum(1/2 * abs(black/sum(black) - latin/sum(latin))), 3),
-                  "D (b-a)" = round(sum(1/2 * abs(black/sum(black) - asian/sum(asian))), 3),
-                  "D (l-a)" = round(sum(1/2 * abs(latin/sum(latin) - asian/sum(asian))), 3))
-  
-  # obliczanie wskaznika teorii informacji H
-  
-    # entropia obszaru
-     entropia_obszaru = -(sum(white)/sum(suma) * log(sum(white)/sum(suma)) + 
-                          sum(black)/sum(suma) * log(sum(black)/sum(suma)) + 
-                          sum(american)/sum(suma) * log(sum(american)/sum(suma)) + 
-                          sum(asian)/sum(suma) * log(sum(asian)/sum(suma)) +
-                          sum(other)/sum(suma) * log(sum(other)/sum(suma)) + 
-                          sum(latin)/sum(suma) * log(sum(latin)/sum(suma)))
-      
-     
-     # wskaznik H
-     H = sum(dane$suma/sum(dane$suma) * ((entropia_obszaru - dane$entropia)/entropia_obszaru), na.rm = TRUE)
-  
-    
-    # ramka danych zawierajaca skumulowany wskaznik niepodobienstwa D
-  ramka <<- data.frame("Rok" = "1990", 
-                       "D_wb" = round(sum(1/2 * abs(white/sum(white) - black/sum(black))), 3),
-                       "D_wa" = round(sum(1/2 * abs(white/sum(white) - asian/sum(asian))), 3),
-                       "D_wl" = round(sum(1/2 * abs(white/sum(white) - latin/sum(latin))), 3),
-                       "D_bl" = round(sum(1/2 * abs(black/sum(black) - latin/sum(latin))), 3),
-                       "D_ba" = round(sum(1/2 * abs(black/sum(black) - asian/sum(asian))), 3),
-                       "D_la" = round(sum(1/2 * abs(latin/sum(latin) - asian/sum(asian))), 3),
-                       "entropia_obsz" = entropia_obszaru,
-                       "H" = round(H, 3))
-  
-  }
-
-funct()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-df <- data.frame(ID = c("C1", "C2", "C3", "C4", "C5", "C6", "C7"),
-                 white = as.numeric(c("70", "0", "10", "0", "40", "0", "20")),
-                 black = as.numeric(c("0", "10", "20", "50", "0", "0", "20")),
-                 asian = as.numeric(c("10", "40", "30", "0", "40", "0", "20")),
-                 latin = as.numeric(c("0", "30", "20", "30", "0", "80", "20")))
-
-df = df %>% mutate(suma = df$white + df$black + df$asian +df$latin)
-
-##df <- mutate(df, entropia = -(white/suma * log(white/suma) + black/suma * log(black/suma) + 
-##                       asian/suma * log(asian/suma) + latin/suma * log(latin/suma)))
-
-funct <- function(){
-  w_suma = df$white/df$suma
-  b_suma = df$black/df$suma
-  a_suma = df$asian/df$suma
-  l_suma = df$latin/df$suma
-  
-  w_suma = replace(w_suma, w_suma == 0, 1)
-  b_suma = replace(b_suma, b_suma == 0, 1)
-  a_suma = replace(a_suma, a_suma == 0, 1)
-  l_suma = replace(l_suma, l_suma == 0, 1)
-  df <<- mutate(df, entropia = -(white/suma * log(w_suma) + black/suma * log(b_suma) + 
-                                   asian/suma * log(a_suma) + latin/suma * log(l_suma)))
+ 
+#  #  # ENTROPIA STANDARYZOWANA
+entropy_std_funct = function(proc) {
+  entropy = - sum(ifelse(proc > 0, proc * log(proc, base = exp(1)), 0)) # obliczenie entropii
+  entropy_std = entropy / log(length(proc), base = exp(1))              # wykonanie standaryzacji
+  return(entropy_std)
 }
 
-funct()
+
+#  #  # WSKAŹNIK NIEPODOBIEŃSTWA D
+d_index = function(x, y) {                                             # x, y - liczba osob dla 1 i 2 jednostki spisowej
+  d = sum(abs(x / sum(x, na.rm=TRUE) - y / sum(y, na.rm=TRUE))) / 2
+  return(d)
+}
 
 
-#df <- mutate(df, liczba = rowSums(df[2:5] !=0),
-#             entropia = -(white/suma * log(1/liczba) + black/suma * log(1/liczba) + 
-#                            asian/suma * log(1/liczba) + latin/suma * log(1/liczba)))
+#  #  # WSKAŹNIK TEORII INFORMACJI H
+h_index <- function(races) {
+  races_all = apply(races, 2, sum, na.rm=TRUE)                         # liczba osob w calym obszarze w podziale na grupy rasowo-etniczne
+  pop = sum(races_all, na.rm=TRUE)                                     # liczba osob dla calego obszaru
+  pop_i = apply(races, 1, sum, na.rm=TRUE)                             # liczba osob dla kazdej jednostki spisowej
+  proc = races / pop_i                                                 # procent osob dla danej grupy w kazdej jednostce spisowej
+  proc_all = races_all / sum(races_all, na.rm = TRUE)                  # procent osob dla danej grupy dla calego obszaru
+  ent_i = apply(proc, 1, entropy_funct)                                # entropia dla kazdej jednostki spisowej
+  ent = entropy_funct(proc_all)                                        # entropia dla calego obszaru
+  h_ind = sum(pop_i * (ent - ent_i) / (ent * pop), na.rm=TRUE)         # obliczenie wskaznika H
+  return(h_ind)
+}
 
-## dobrze
-dane = read.csv("cw2_dane/przykladowe_dane.csv")
-df <- apply(dane[, -1], 2, sum)
-pop <- sum(df)
-p <- df/pop
-e <- sum(p*log(p))
-sum(dane$BIALI)
 
-x <- cbind(x1 = 3, x2 = c(4:1, 2:5))
-dimnames(x)[[1]] <- letters[1:8]
-apply(x, 1, mean, trim = .2)
-col.sums <- apply(x, 2, sum)
-row.sums <- apply(x, 1, sum)
-rbind(cbind(x, Rtot = row.sums), Ctot = c(col.sums, sum(col.sums)))
 
-stopifnot( apply(x, 2, is.vector))
 
-df <- dane[, "BIALI"]
-summary(dane)
+#  #  #  #  #  #  #  #  #  #  #  #  #  # WCZYTANIE FUNKCJI AGREGUJĄCYCH DANE DLA POSZCZEGÓLNYCH WSKAŹNIKÓW
+
+
+list_race <- c("white", "black", "american", "asian", "other", "latin") # lista ras
+
+index_entropia <- function(x){
+  grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)          # pogrupowanie danych wedlug kodu hrabstwa i stanu
+  splt <- group_split(grpd )                                            # rozdzielenie pogrupowanych danych na ramki danych
+  races <- lapply(splt, function(splt) splt[!(names(splt) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))]) # wyszczegolnienie kolumn tylko z rasami
+  races_all <- lapply(races, colSums, na.rm = TRUE)                     # liczba osob dla kazdego hrabstwa w podziale na grupy rasowo-etniczne
+  pop <- lapply(races_all, sum)                                         # liczba osob dla calego hrabstwa
+  perc <- Map("/", races_all, pop)                                      # procent osob dla danej grupy w hrabstwie
+  ent  <- lapply(perc, entropy_funct)                                   # obliczenie entropii dla kazdego hrabstwa
+  
+  # entropia standaryzowana
+  Ent_std_index <- lapply(perc, entropy_std_funct)                      
+  ent_std_table <- do.call(rbind.data.frame, Ent_std_index)            
+  
+  # tabela
+  ent_table <- do.call(rbind.data.frame, ent)                           
+  Ent_indexes <- cbind(ent_table, ent_std_table)                         
+  colnames(Ent_indexes) <- c("Entropia", "Entropia_std")                  
+  Ent_indexes <- round(Ent_indexes, 4)
+  county_num <- group_keys(grpd)                                        # wyszczegolnienie kodu zlaczenia danych
+  Ent_indexes <<- cbind(county_num, Ent_indexes)                        # ramka danych z kodem stanu, hrabstwa oraz dwoma wskaznikami
+}
+
+index_H <- function(x){
+  grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)          # pogrupowanie danych wedlug kodu hrabstwa i stanu
+  splt <- group_split(grpd)
+  races <- lapply(splt, function(splt) splt[!(names(splt) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
+  
+  h_indexes <- lapply(races, h_index)
+  
+  h_indexes <- do.call(rbind.data.frame, h_indexes)
+  colnames(h_indexes) <- "H"
+  h_indexes <<- round(h_indexes, 4)                                     # ramka danych ze wskaznikiem H dla kazdego hrabstwa
+}
+
+index_D <- function(x){
+  grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)          # pogrupowanie danych wedlug kodu hrabstwa i stanu
+  splt <- group_split(grpd)
+  races <- lapply(splt, function(splt) splt[!(names(splt) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
+  
+  white <- sapply(races, function(x) x%>% select(white))                # zapisanie poszczegolnych grup rasowo-etnicznych do obliczen do nowych obiektow
+  black <- sapply(races, function(x) x%>% select(black))
+  asian <- sapply(races, function(x) x%>% select(asian))
+  other <- sapply(races, function(x) x%>% select(other))
+  latin <- sapply(races, function(x) x%>% select(latin))
+  
+  D_wb <- as.data.frame(mapply(d_index, white, black))
+  D_wa <- as.data.frame(mapply(d_index, white, asian))
+  D_wl <- as.data.frame(mapply(d_index, white, latin))
+  D_bl <- as.data.frame(mapply(d_index, black, latin))
+  D_ba <- as.data.frame(mapply(d_index, black, asian))
+  D_la <- as.data.frame(mapply(d_index, latin, asian))
+  
+  D_indexes <- cbind(D_wb, D_wa, D_wl, D_bl, D_ba, D_la)
+  colnames(D_indexes) <- c("D_wb", "D_wa", "D_wl", "D_bl", "D_ba", "D_la")
+  D_indexes <<- round(D_indexes, 4)                                      # ramka danych ze wskaznikami D dla kazdego hrabstwa
+}
+
+
+
+#  #  #  #  #  #  #  #  #  #  #  #  #  # OBLICZENIE WSKAŹNIKÓW DLA KAŻDEGO PLIKU
+
+
+all_files <- list(block_1990, block_2000, block_2010, block_2020, grp_blocks_1990, grp_blocks_2000, 
+                  grp_blocks_2010, grp_blocks_2000, tract_1990, tract_2000, tract_2010, tract_2000)
+
+
+indexes <- function(){
+  for (i in length(all_files)){
+    ent_list <- lapply(all_files[1:i], index_entropia)                   # utworzenie list z ramkami danych poszczegolnych wskaznikow dla kazdego hrabstwa
+    H_list <- lapply(all_files[1:i], index_H)
+    D_list <- lapply(all_files[1:i], index_D)
+    list<- mapply(function(a, b, c) {                                    # polaczenie kazdej z trzech ramek danych ze wskaznikami w jedna ramke
+      binded <- cbind(a, b, c)
+    }, ent_list, H_list, D_list, SIMPLIFY = FALSE)
+    
+    block_1990 <<- as.data.frame(list[1])                                # przypisanie ramek danych ze wskaznikami do pierwotnych plikow
+    block_2000 <<- as.data.frame(list[2])
+    block_2010 <<- as.data.frame(list[3])
+    block_2020 <<- as.data.frame(list[4])
+    grp_blocks_1990 <<- as.data.frame(list[5])
+    grp_blocks_2000 <<- as.data.frame(list[6])
+    grp_blocks_2010 <<- as.data.frame(list[7])
+    grp_blocks_2020 <<- as.data.frame(list[8])
+    tract_1990 <<- as.data.frame(list[9])
+    tract_2000 <<- as.data.frame(list[10])
+    tract_2010 <<- as.data.frame(list[11])
+    tract_2020 <<- as.data.frame(list[12])
+  }
+}
+indexes()       
+
+
+#  #  #  #  #  #  #  #  #  #  #  #  #  #   POLACZENIE DANYCH Z DANYMI PRZESTRZENNYMI
+
+shp <- read_sf("../dane_shp/przyciete.gpkg")
+
+shp$COUNTYFP <- as.numeric(substring(shp$COUNTYFP, 2))                   # usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
+
+shp_block_1990 <- left_join(shp, block_1990 , by = c("COUNTYFP" = "COUNTYA"))
+tmap_mode("view")
+tm_shape(shp_block_1990) + tm_fill(col = "Entropia", 
+                         id = "NAME",
+                         popup.vars = c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
+                                        "H: " = "H", "D (white-black)" = "D_wb")) + tm_borders()
+
+
+
