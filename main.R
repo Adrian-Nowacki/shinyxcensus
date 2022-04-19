@@ -182,7 +182,7 @@ index_entropia <- function(x){
   colnames(Ent_indexes) <- c("Entropia", "Entropia_std")                  
   Ent_indexes <- round(Ent_indexes, 4)
   county_num <- group_keys(grpd)                                        # wyszczegolnienie kodu zlaczenia danych
-  Ent_indexes <<- cbind(county_num, Ent_indexes)                        # ramka danych z kodem stanu, hrabstwa oraz dwoma wskaznikami
+  Ent_indexes <- cbind(county_num, Ent_indexes)                        # ramka danych z kodem stanu, hrabstwa oraz dwoma wskaznikami
 }
 
 index_H <- function(x){
@@ -194,7 +194,7 @@ index_H <- function(x){
   
   h_indexes <- do.call(rbind.data.frame, h_indexes)
   colnames(h_indexes) <- "H"
-  h_indexes <<- round(h_indexes, 4)                                     # ramka danych ze wskaznikiem H dla kazdego hrabstwa
+  h_indexes <- round(h_indexes, 4)                                     # ramka danych ze wskaznikiem H dla kazdego hrabstwa
 }
 
 index_D <- function(x){
@@ -217,7 +217,7 @@ index_D <- function(x){
   
   D_indexes <- cbind(D_wb, D_wa, D_wl, D_bl, D_ba, D_la)
   colnames(D_indexes) <- c("D_wb", "D_wa", "D_wl", "D_bl", "D_ba", "D_la")
-  D_indexes <<- round(D_indexes, 4)                                      # ramka danych ze wskaznikami D dla kazdego hrabstwa
+  D_indexes <- round(D_indexes, 4)                                      # ramka danych ze wskaznikami D dla kazdego hrabstwa
 }
 
 
@@ -260,13 +260,33 @@ indexes()
 shp <- read_sf("../dane_shp/przyciete.gpkg")
 
 shp$COUNTYFP <- as.numeric(substring(shp$COUNTYFP, 2))                   # usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
+shp <- shp[, -(c(1, 4:5, 8:20))]                                         # usuniecie zbednych kolumn
 
-shp_block_1990 <- left_join(shp, block_1990 , by = c("COUNTYFP" = "COUNTYA"))
+shp_join <- function(){
+  shp_block_1990 <<- left_join(shp, block_1990 , by = c("COUNTYFP" = "COUNTYA"))
+  shp_block_2000 <<- left_join(shp, block_2000 , by = c("COUNTYFP" = "COUNTYA"))
+  shp_block_2010 <<- left_join(shp, block_2010 , by = c("COUNTYFP" = "COUNTYA"))
+  shp_block_2020 <<- left_join(shp, block_2020 , by = c("COUNTYFP" = "COUNTYA"))
+  shp_grp_blocks_1990 <<- left_join(shp, grp_blocks_1990, by = c("COUNTYFP" = "COUNTYA"))
+  shp_grp_blocks_2000 <<- left_join(shp, grp_blocks_2000, by = c("COUNTYFP" = "COUNTYA"))
+  shp_grp_blocks_2010 <<- left_join(shp, grp_blocks_2010, by = c("COUNTYFP" = "COUNTYA"))
+  shp_grp_blocks_2020 <<- left_join(shp, grp_blocks_2020, by = c("COUNTYFP" = "COUNTYA"))
+  shp_tract_1990 <<- left_join(shp, tract_1990 , by = c("COUNTYFP" = "COUNTYA"))
+  shp_tract_2000 <<- left_join(shp, tract_2000 , by = c("COUNTYFP" = "COUNTYA"))
+  shp_tract_2010 <<- left_join(shp, tract_2010 , by = c("COUNTYFP" = "COUNTYA"))
+  shp_tract_2020 <<- left_join(shp, tract_2020 , by = c("COUNTYFP" = "COUNTYA"))
+  
+  
+}
+shp_join()
+
+
 tmap_mode("view")
 tm_shape(shp_block_1990) + tm_fill(col = "Entropia", 
-                         id = "NAME",
+                         id = "NAMELSAD",
                          popup.vars = c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
-                                        "H: " = "H", "D (white-black)" = "D_wb")) + tm_borders()
+                                        "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
+                                        "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
+                                        "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")) + tm_borders()
 
-
-
+##write_sf(shp_block_1990, "../dane_shp/shp_block_1990.gpkg")
