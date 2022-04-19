@@ -182,7 +182,7 @@ index_entropia <- function(x){
   colnames(Ent_indexes) <- c("Entropia", "Entropia_std")                  
   Ent_indexes <- round(Ent_indexes, 4)
   county_num <- group_keys(grpd)                                        # wyszczegolnienie kodu zlaczenia danych
-  Ent_indexes <- cbind(county_num, Ent_indexes)                        # ramka danych z kodem stanu, hrabstwa oraz dwoma wskaznikami
+  Ent_indexes <- cbind(county_num, Ent_indexes)                         # ramka danych z kodem stanu, hrabstwa oraz dwoma wskaznikami
 }
 
 index_H <- function(x){
@@ -194,7 +194,7 @@ index_H <- function(x){
   
   h_indexes <- do.call(rbind.data.frame, h_indexes)
   colnames(h_indexes) <- "H"
-  h_indexes <- round(h_indexes, 4)                                     # ramka danych ze wskaznikiem H dla kazdego hrabstwa
+  h_indexes <- round(h_indexes, 4)                                      # ramka danych ze wskaznikiem H dla kazdego hrabstwa
 }
 
 index_D <- function(x){
