@@ -284,62 +284,9 @@ block_2020 = read.csv("counties_csv/block_2020.csv")
 grp_blocks_2020 = read.csv("counties_csv/grp_blocks_2020.csv")
 tract_2020 = read.csv("counties_csv/tract_2020.csv")
 
-
-
-#  #  #  #  #  #  #  #  #  #  #  #  #  #   POLACZENIE DANYCH Z DANYMI PRZESTRZENNYMI
-
-#shp <- read_sf("../dane_shp/dane_pobrane/dane_2018/cb_2018_us_county_5m.shp")
-shp<- read_sf("../dane_shp/US_county_2020.shp")
-shp<- shp %>%  st_set_geometry(NULL)
-shp <- shp %>% arrange(STATEFP, COUNTYFP)
-shp$STATEFP[0:317] <- as.numeric(substring(shp$STATEFP[0:317], 2)) 
-
-# gotowe
-shp$nazwa <- paste0(shp$NAME, "_", shp$STATEFP)
-tract_1990_surowe$nazwa <- paste0(tract_1990_surowe$COUNTY, "_", tract_1990_surowe$STATEA)
-
-#gsub
-shp$nazwa <- gsub(shp$nazwa, pattern = "\\.", replacement = "") 
-tract_1990_surowe$nazwa <- gsub(tract_1990_surowe$nazwa, pattern = " City", replacement = "") 
-shp$nazwa <- tolower(shp$nazwa)
-tract_1990_surowe$nazwa <- tolower(tract_1990_surowe$nazwa)
-
-a_2 <- anti_join(shp, tract_1990_surowe, by = "nazwa")
-
-shp_agg <- shp_agg[0:51, ]
-roznica <- as.data.frame(shp_agg$ILOSC - tract_agg$ILOSC)
-stany <- as.data.frame(shp_agg$STAN)
-roznica$STAN <- stany
-colnames(roznica) <- c("roznica", "stan")
-#write_sf(a, "../dane_shp/shp_roznica.gpkg")
-shp_agg <- aggregate(shp$STATEFP, by=list(shp$STATEFP), FUN=length)
-colnames(shp_agg) <- c("STAN", "ILOSC")
-colnames(tract_agg) <- c("STAN", "ILOSC")
-shp_agg$STAN<- as.numeric(shp_agg$STAN)
-
-shp_agg <- shp_agg %>% arrange(STAN)
-tract_agg <- tract_agg %>% arrange(STAN)
-tract_agg <- aggregate(tract_1990_surowe$STATEA, by=list(tract_1990_surowe$STATEA), FUN=length)
-
-tract_1990 <- tract_1990 %>% arrange(STATEA, COUNTYA)
-tract_1990_surowe <- tract_1990_surowe %>% arrange(STATEA< COUNTYA)
-tract_1990_surowe <- tract_1990_surowe[, c("STATE", "STATEA", "COUNTY", "COUNTYA")] 
-
-tract_1990_surowe <- aggregate(tract_1990_surowe, list(tract_1990_surowe$STATE, 
-                                                       tract_1990_surowe$COUNTY, 
-                                                       tract_1990_surowe$STATEA, 
-                                                       tract_1990_surowe$COUNTYA),
-                          function(x) length(unique(x)))
-tract_1990_surowe <- tract_1990_surowe[, 0:4] 
-
-colnames(tract_1990_surowe) <- c("STATE", "COUNTY", "STATEA", "COUNTYA")
-
-tract_1990_surowe <- tract_1990_surowe %>% arrange(STATEA< COUNTYA)
-
-
 # # # # # rozdzielenie plikow na wskazniki i lata
 rozdzielenie <- function(){
-    
+    # # # # wskaznik H
     ind_H_2020 <<- data.frame("H_block" = block_2020$H,
                               "H_group_blocks" = grp_blocks_2020$H,
                               "H_tract" = tract_2020$H)
@@ -357,7 +304,7 @@ rozdzielenie <- function(){
                               "H_tract" = tract_1990$H)
     
     
-    # # wskaznik D
+    # # # # wskaznik D
     ind_D_2020 <<- data.frame("D_wb_block" = block_2020$D_wb,
                               "D_wa_block" = block_2020$D_wa,
                               "D_wl_block" = block_2020$D_wl,
@@ -379,19 +326,91 @@ rozdzielenie <- function(){
                               "D_ba_tract" = tract_2020$D_ba,
                               "D_la_tract" = tract_2020$D_la)
     
-    ind_D_2010 <<- data.frame("H_block" = block_2010$H,
-                              "H_group_blocks" = grp_blocks_2010$H,
-                              "H_tract" = tract_2010$H)
+    ind_D_2010 <<- data.frame("D_wb_block" = block_2010$D_wb,
+                              "D_wa_block" = block_2010$D_wa,
+                              "D_wl_block" = block_2010$D_wl,
+                              "D_bl_block" = block_2010$D_bl,
+                              "D_ba_block" = block_2010$D_ba,
+                              "D_la_block" = block_2010$D_la,
+                              
+                              "D_wb_group_blocks" = grp_blocks_2010$D_wb,
+                              "D_wa_group_blocks" = grp_blocks_2010$D_wa,
+                              "D_wl_group_blocks" = grp_blocks_2010$D_wl,
+                              "D_bl_group_blocks" = grp_blocks_2010$D_bl,
+                              "D_ba_group_blocks" = grp_blocks_2010$D_ba,
+                              "D_la_group_blocks" = grp_blocks_2010$D_la,
+                              
+                              "D_wb_tract" = tract_2010$D_wb,
+                              "D_wa_tract" = tract_2010$D_wa,
+                              "D_wl_tract" = tract_2010$D_wl,
+                              "D_bl_tract" = tract_2010$D_bl,
+                              "D_ba_tract" = tract_2010$D_ba,
+                              "D_la_tract" = tract_2010$D_la)
     
-    ind_D_2000 <<- data.frame("H_block" = block_2000$H,
-                              "H_group_blocks" = grp_blocks_2000$H,
-                              "H_tract" = tract_2000$H)
+    ind_D_2000 <<- data.frame("D_wb_block" = block_2000$D_wb,
+                              "D_wa_block" = block_2000$D_wa,
+                              "D_wl_block" = block_2000$D_wl,
+                              "D_bl_block" = block_2000$D_bl,
+                              "D_ba_block" = block_2000$D_ba,
+                              "D_la_block" = block_2000$D_la,
+                              
+                              "D_wb_group_blocks" = grp_blocks_2000$D_wb,
+                              "D_wa_group_blocks" = grp_blocks_2000$D_wa,
+                              "D_wl_group_blocks" = grp_blocks_2000$D_wl,
+                              "D_bl_group_blocks" = grp_blocks_2000$D_bl,
+                              "D_ba_group_blocks" = grp_blocks_2000$D_ba,
+                              "D_la_group_blocks" = grp_blocks_2000$D_la,
+                              
+                              "D_wb_tract" = tract_2000$D_wb,
+                              "D_wa_tract" = tract_2000$D_wa,
+                              "D_wl_tract" = tract_2000$D_wl,
+                              "D_bl_tract" = tract_2000$D_bl,
+                              "D_ba_tract" = tract_2000$D_ba,
+                              "D_la_tract" = tract_2000$D_la)
     
-    ind_D_1990 <<- data.frame("H_block" = block_1990$H,
-                              "H_group_blocks" = grp_blocks_1990$H,
-                              "H_tract" = tract_1990$H)
+    ind_D_1990 <<- data.frame("D_wb_block" = block_1990$D_wb,
+                              "D_wa_block" = block_1990$D_wa,
+                              "D_wl_block" = block_1990$D_wl,
+                              "D_bl_block" = block_1990$D_bl,
+                              "D_ba_block" = block_1990$D_ba,
+                              "D_la_block" = block_1990$D_la,
+                              
+                              "D_wb_group_blocks" = grp_blocks_1990$D_wb,
+                              "D_wa_group_blocks" = grp_blocks_1990$D_wa,
+                              "D_wl_group_blocks" = grp_blocks_1990$D_wl,
+                              "D_bl_group_blocks" = grp_blocks_1990$D_bl,
+                              "D_ba_group_blocks" = grp_blocks_1990$D_ba,
+                              "D_la_group_blocks" = grp_blocks_1990$D_la,
+                              
+                              "D_wb_tract" = tract_1990$D_wb,
+                              "D_wa_tract" = tract_1990$D_wa,
+                              "D_wl_tract" = tract_1990$D_wl,
+                              "D_bl_tract" = tract_1990$D_bl,
+                              "D_ba_tract" = tract_1990$D_ba,
+                              "D_la_tract" = tract_1990$D_la)
 
+    
+    # # # # entropia i entropia std
+    
+    ind_ent_2020 <<- data.frame("Entropy" = block_2020$Entropia,
+                                "Entropy_std" = block_2020$Entropia_std)
+    
+    ind_ent_2010 <<- data.frame("Entropy" = block_2010$Entropia,
+                                "Entropy_std" = block_2010$Entropia_std)
+    
+    ind_ent_2000 <<- data.frame("Entropy" = block_2000$Entropia,
+                                "Entropy_std" = block_2000$Entropia_std)
+    
+    ind_ent_1990 <<- data.frame("Entropy" = block_1990$Entropia,
+                                "Entropy_std" = block_1990$Entropia_std)
 }
+rozdzielenie()
+
+#  #  #  #  #  #  #  #  #  #  #  #  #  #   POLACZENIE DANYCH Z DANYMI PRZESTRZENNYMI
+
+#shp <- read_sf("../dane_shp/dane_pobrane/dane_2018/cb_2018_us_county_5m.shp")
+shp<- read_sf("../dane_shp/US_county_2020.shp")
+
 
 
 
