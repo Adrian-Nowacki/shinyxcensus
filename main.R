@@ -408,28 +408,33 @@ rozdzielenie()
 
 #  #  #  #  #  #  #  #  #  #  #  #  #  #   POLACZENIE DANYCH Z DANYMI PRZESTRZENNYMI
 
-#shp <- read_sf("../dane_shp/dane_pobrane/dane_2018/cb_2018_us_county_5m.shp")
-shp<- read_sf("../dane_shp/US_county_2020.shp")
+shp_1990 <- read_sf("../shp/1990/dane_1990.gpkg")
+shp_2020 <- read_sf("../shp/2020/dane_2020.gpkg")
+
+shp_1990 <- shp_1990 %>% st_set_geometry(NULL)
+shp_2020 <- shp_2020 %>% st_set_geometry(NULL)
+
+shp_1990$state_fips <- as.numeric(shp_1990$state_fips)  
+shp_2020$STATEFP <- as.numeric(shp_2020$STATEFP) 
+
+shp_1990 <- shp_1990[, -c(1:3, 8)]
+shp_2020 <- shp_2020[, -c(3:4, 10:12)]
+
+shp_2020 <- shp_2020 %>% arrange(GEOID)
+shp_1990 <- shp_1990 %>% arrange(county, state_fips)
 
 
-
-
-tmap_mode("view")
-tm_shape(a) + tm_polygons() + tm_shape(b) + tm_polygons()
-
-
-
-
-
-
-
-
-
-
+shp <- read_sf("../shp/1990/co99_d90_aggr.gpkg")
+shp <- shp %>% st_set_geometry(NULL)
+shp <- shp %>% arrange(NAME, ST)
+shp_1990$COUNTYFP <- shp$CO
+shp_1990$NAME <- shp$NAME
+colnames(shp_1990) <- c("STUSPS", "NAMELSAD", "GEOID", "STATEFP", "COUNTYFP", "NAME")
 
 tract_2020$GEOID <- shp_2020$GEOID
-#shp$COUNTYFP <- as.numeric(substring(shp$COUNTYFP, 2))                   # usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
-shp <- shp[, -(c(4:5, 8:20))]                                         # usuniecie zbednych kolumn
+
+shp <- shp[, -(c(4:5, 8:20))]             # usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
+                                        # usuniecie zbednych kolumn
 
 shp_join <- function(){
   #shp_block_1990 <<- left_join(shp, block_1990 , by = c("COUNTYFP" = "COUNTYA"))
