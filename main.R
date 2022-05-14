@@ -9,39 +9,40 @@ library(sf)
 library(tmap)
 
     # # # ROK 1990
-    block_1990 = read.csv("../1990/nhgis0105_ds120_1990_block.csv")
-    grp_blocks_1990 = read.csv("../1990/nhgis0105_ds120_1990_blck_grp.csv")
-    tract_1990 = read.csv("../1990/nhgis0105_ds120_1990_tract.csv") 
+    block_1990 = read.csv("../us_race/1990/nhgis0105_ds120_1990_block.csv")
+    grp_blocks_1990 = read.csv("../us_race/1990/nhgis0105_ds120_1990_blck_grp.csv")
+    tract_1990_surowe = read.csv("../us_race/1990/nhgis0105_ds120_1990_tract.csv") 
     
     # # # ROK 2000 
-    block_2000 = read.csv("../2000/nhgis0106_ds147_2000_block.csv")
-    grp_blocks_2000 = read.csv("../2000/nhgis0106_ds147_2000_blck_grp.csv")
-    tract_2000 = read.csv("../2000/nhgis0107_ds146_2000_tract.csv")
+    block_2000 = read.csv("../us_race/2000/nhgis0106_ds147_2000_block.csv")
+    grp_blocks_2000 = read.csv("../us_race/2000/nhgis0106_ds147_2000_blck_grp.csv")
+    tract_2000 = read.csv("../us_race/2000/nhgis0107_ds146_2000_tract.csv")
     
     # # # ROK 2010
-    block_2010 = read.csv("../2010/nhgis0105_ds172_2010_block.csv")
-    grp_blocks_2010 = read.csv("../2010/nhgis0105_ds172_2010_blck_grp.csv")
-    tract_2010 = read.csv("../2010/nhgis0105_ds172_2010_tract.csv")
+    block_2010 = read.csv("../us_race/2010/nhgis0105_ds172_2010_block.csv")
+    grp_blocks_2010 = read.csv("../us_race/2010/nhgis0105_ds172_2010_blck_grp.csv")
+    tract_2010 = read.csv("../us_race/2010/nhgis0105_ds172_2010_tract.csv")
     
     # # # ROK 2020 
     
-    block_2020 = read.csv("../2020/nhgis0105_ds248_2020_block.csv")
-    grp_blocks_2020 = read.csv("../2020/nhgis0105_ds248_2020_blck_grp.csv")
-    tract_2020 = read.csv("../2020/nhgis0105_ds248_2020_tract.csv")
+    block_2020 = read.csv("../us_race/2020/nhgis0105_ds248_2020_block.csv")
+    grp_blocks_2020 = read.csv("../us_race/2020/nhgis0105_ds248_2020_blck_grp.csv")
+    tract_2020 = read.csv("../us_race/2020/nhgis0105_ds248_2020_tract.csv")
     
-    
+   
     
 # zmiana nazw kolumn z "FMS" do "FYF"
 # names(tract_2000)[31:39]<- paste0("FYF00", 1:9)
 # names(tract_2000)[40:44]<- paste0("FYF0", 10:14)
 
 
-    all_files = list(block_1990, grp_blocks_1990, tract_1990, block_2000, grp_blocks_2000, 
-                     tract_2000, block_2010, grp_blocks_2010, tract_2010, block_2020, 
-                     grp_blocks_2020, tract_2020)
+    # all_files = list(block_1990, grp_blocks_1990, tract_1990, block_2000, grp_blocks_2000, 
+    #                  tract_2000, block_2010, grp_blocks_2010, tract_2010, block_2020, 
+    #                  grp_blocks_2020, tract_2020)
+    # 
+    # all_files <- list(tract_1990, tract_2000, tract_2010, tract_2020)
     
-    
-    
+    all_files <- list(tract_1990, tract_2000, tract_2010, tract_2020)
     
 
 #  #  #  #  #  #  #  #  #  #  #  #  #  #  REKLASYFIKACJA
@@ -100,18 +101,18 @@ reclass <- function(x) {
 reclassify <- function(){
   for (i in length(all_files)){
     empty <- lapply(all_files[1:i], reclass)
-    block_1990 <<- as.data.frame(empty[1])
-    grp_blocks_1990 <<- as.data.frame(empty[2])
-    tract_1990 <<- as.data.frame(empty[3])
-    block_2000 <<- as.data.frame(empty[4])
-    grp_blocks_2000 <<- as.data.frame(empty[5])
-    tract_2000 <<- as.data.frame(empty[6])
-    block_2010 <<- as.data.frame(empty[7])
-    grp_blocks_2010 <<- as.data.frame(empty[8])
-    tract_2010 <<- as.data.frame(empty[9])
-    block_2020 <<- as.data.frame(empty[10])
-    grp_blocks_2020 <<- as.data.frame(empty[11])
-    tract_2020 <<- as.data.frame(empty[12])
+    #block_1990 <<- as.data.frame(empty[1])
+    #grp_blocks_1990 <<- as.data.frame(empty[1])
+    tract_1990 <<- as.data.frame(empty[1])
+    #block_2000 <<- as.data.frame(empty[1])
+    #grp_blocks_2000 <<- as.data.frame(empty[2])
+    tract_2000 <<- as.data.frame(empty[2])
+    #block_2010 <<- as.data.frame(empty[1])
+    #grp_blocks_2010 <<- as.data.frame(empty[3])
+    tract_2010 <<- as.data.frame(empty[3])
+    #block_2020 <<- as.data.frame(empty[1])
+    #grp_blocks_2020 <<- as.data.frame(empty[4])
+    tract_2020 <<- as.data.frame(empty[4])
   }
 }
 
@@ -221,12 +222,12 @@ index_D <- function(x){
 }
 
 
-
+all_files <- list(tract_1990, tract_2000, tract_2010, tract_2020)
 #  #  #  #  #  #  #  #  #  #  #  #  #  # OBLICZENIE WSKAŹNIKÓW DLA KAŻDEGO PLIKU
 
 
-all_files <- list(block_1990, block_2000, block_2010, block_2020, grp_blocks_1990, grp_blocks_2000, 
-                  grp_blocks_2010, grp_blocks_2000, tract_1990, tract_2000, tract_2010, tract_2000)
+#all_files <- list(block_1990, block_2000, block_2010, block_2020, grp_blocks_1990, grp_blocks_2000, 
+#                  grp_blocks_2010, grp_blocks_2000, tract_1990, tract_2000, tract_2010, tract_2000)
 
 
 indexes <- function(){
@@ -238,51 +239,204 @@ indexes <- function(){
       binded <- cbind(a, b, c)
     }, ent_list, H_list, D_list, SIMPLIFY = FALSE)
     
-    block_1990 <<- as.data.frame(list[1])                                # przypisanie ramek danych ze wskaznikami do pierwotnych plikow
-    block_2000 <<- as.data.frame(list[2])
-    block_2010 <<- as.data.frame(list[3])
-    block_2020 <<- as.data.frame(list[4])
-    grp_blocks_1990 <<- as.data.frame(list[5])
-    grp_blocks_2000 <<- as.data.frame(list[6])
-    grp_blocks_2010 <<- as.data.frame(list[7])
-    grp_blocks_2020 <<- as.data.frame(list[8])
-    tract_1990 <<- as.data.frame(list[9])
-    tract_2000 <<- as.data.frame(list[10])
-    tract_2010 <<- as.data.frame(list[11])
-    tract_2020 <<- as.data.frame(list[12])
+    #block_1990 <<- as.data.frame(list[1])                                # przypisanie ramek danych ze wskaznikami do pierwotnych plikow
+    #block_2000 <<- as.data.frame(list[1])
+    #block_2010 <<- as.data.frame(list[1])
+    #block_2020<<- as.data.frame(list[1])
+    #grp_blocks_1990 <<- as.data.frame(list[1])
+    #grp_blocks_2000 <<- as.data.frame(list[2])
+    #grp_blocks_2010 <<- as.data.frame(list[3])
+    #grp_blocks_2020 <<- as.data.frame(list[4])
+    tract_1990 <<- as.data.frame(list[1])
+    tract_2000 <<- as.data.frame(list[2])
+    tract_2010 <<- as.data.frame(list[3])
+    tract_2020 <<- as.data.frame(list[4])
   }
 }
 indexes()       
 
+# write.csv(tract_1990, "counties_csv/tract_1990.csv")
+# write.csv(tract_2000, "counties_csv/tract_2000.csv")
+# write.csv(tract_2010, "counties_csv/tract_2010.csv")
+# write.csv(tract_2020, "counties_csv/tract_2020.csv")
+
+
+
+#  #  #  #  #  #  #  #  #  #  #  #  #  #  WCZYTANIE GOTOWYCH DANYCH
+
+# # # ROK 1990
+block_1990 = read.csv("counties_csv/block_1990.csv")
+grp_blocks_1990 = read.csv("counties_csv/grp_blocks_1990.csv")
+tract_1990 = read.csv("counties_csv/tract_1990.csv") 
+
+# # # ROK 2000 
+block_2000 = read.csv("counties_csv/block_2000.csv")
+grp_blocks_2000 = read.csv("counties_csv/grp_blocks_2000.csv")
+tract_2000 = read.csv("counties_csv/tract_2000.csv")
+
+# # # ROK 2010
+block_2010 = read.csv("counties_csv/block_2010.csv")
+grp_blocks_2010 = read.csv("counties_csv/grp_blocks_2010.csv")
+tract_2010 = read.csv("counties_csv/tract_2010.csv")
+
+# # # ROK 2020 
+block_2020 = read.csv("counties_csv/block_2020.csv")
+grp_blocks_2020 = read.csv("counties_csv/grp_blocks_2020.csv")
+tract_2020 = read.csv("counties_csv/tract_2020.csv")
+
+
 
 #  #  #  #  #  #  #  #  #  #  #  #  #  #   POLACZENIE DANYCH Z DANYMI PRZESTRZENNYMI
 
-shp <- read_sf("../dane_shp/przyciete.gpkg")
+#shp <- read_sf("../dane_shp/dane_pobrane/dane_2018/cb_2018_us_county_5m.shp")
+shp<- read_sf("../dane_shp/US_county_2020.shp")
+shp<- shp %>%  st_set_geometry(NULL)
+shp <- shp %>% arrange(STATEFP, COUNTYFP)
+shp$STATEFP[0:317] <- as.numeric(substring(shp$STATEFP[0:317], 2)) 
 
-shp$COUNTYFP <- as.numeric(substring(shp$COUNTYFP, 2))                   # usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
-shp <- shp[, -(c(1, 4:5, 8:20))]                                         # usuniecie zbednych kolumn
+# gotowe
+shp$nazwa <- paste0(shp$NAME, "_", shp$STATEFP)
+tract_1990_surowe$nazwa <- paste0(tract_1990_surowe$COUNTY, "_", tract_1990_surowe$STATEA)
+
+#gsub
+shp$nazwa <- gsub(shp$nazwa, pattern = "\\.", replacement = "") 
+tract_1990_surowe$nazwa <- gsub(tract_1990_surowe$nazwa, pattern = " City", replacement = "") 
+shp$nazwa <- tolower(shp$nazwa)
+tract_1990_surowe$nazwa <- tolower(tract_1990_surowe$nazwa)
+
+a_2 <- anti_join(shp, tract_1990_surowe, by = "nazwa")
+
+shp_agg <- shp_agg[0:51, ]
+roznica <- as.data.frame(shp_agg$ILOSC - tract_agg$ILOSC)
+stany <- as.data.frame(shp_agg$STAN)
+roznica$STAN <- stany
+colnames(roznica) <- c("roznica", "stan")
+#write_sf(a, "../dane_shp/shp_roznica.gpkg")
+shp_agg <- aggregate(shp$STATEFP, by=list(shp$STATEFP), FUN=length)
+colnames(shp_agg) <- c("STAN", "ILOSC")
+colnames(tract_agg) <- c("STAN", "ILOSC")
+shp_agg$STAN<- as.numeric(shp_agg$STAN)
+
+shp_agg <- shp_agg %>% arrange(STAN)
+tract_agg <- tract_agg %>% arrange(STAN)
+tract_agg <- aggregate(tract_1990_surowe$STATEA, by=list(tract_1990_surowe$STATEA), FUN=length)
+
+tract_1990 <- tract_1990 %>% arrange(STATEA, COUNTYA)
+tract_1990_surowe <- tract_1990_surowe %>% arrange(STATEA< COUNTYA)
+tract_1990_surowe <- tract_1990_surowe[, c("STATE", "STATEA", "COUNTY", "COUNTYA")] 
+
+tract_1990_surowe <- aggregate(tract_1990_surowe, list(tract_1990_surowe$STATE, 
+                                                       tract_1990_surowe$COUNTY, 
+                                                       tract_1990_surowe$STATEA, 
+                                                       tract_1990_surowe$COUNTYA),
+                          function(x) length(unique(x)))
+tract_1990_surowe <- tract_1990_surowe[, 0:4] 
+
+colnames(tract_1990_surowe) <- c("STATE", "COUNTY", "STATEA", "COUNTYA")
+
+tract_1990_surowe <- tract_1990_surowe %>% arrange(STATEA< COUNTYA)
+
+
+# # # # # rozdzielenie plikow na wskazniki i lata
+rozdzielenie <- function(){
+    
+    ind_H_2020 <<- data.frame("H_block" = block_2020$H,
+                              "H_group_blocks" = grp_blocks_2020$H,
+                              "H_tract" = tract_2020$H)
+    
+    ind_H_2010 <<- data.frame("H_block" = block_2010$H,
+                              "H_group_blocks" = grp_blocks_2010$H,
+                              "H_tract" = tract_2010$H)
+    
+    ind_H_2000 <<- data.frame("H_block" = block_2000$H,
+                              "H_group_blocks" = grp_blocks_2000$H,
+                              "H_tract" = tract_2000$H)
+     
+    ind_H_1990 <<- data.frame("H_block" = block_1990$H,
+                              "H_group_blocks" = grp_blocks_1990$H,
+                              "H_tract" = tract_1990$H)
+    
+    
+    # # wskaznik D
+    ind_D_2020 <<- data.frame("D_wb_block" = block_2020$D_wb,
+                              "D_wa_block" = block_2020$D_wa,
+                              "D_wl_block" = block_2020$D_wl,
+                              "D_bl_block" = block_2020$D_bl,
+                              "D_ba_block" = block_2020$D_ba,
+                              "D_la_block" = block_2020$D_la,
+                              
+                              "D_wb_group_blocks" = grp_blocks_2020$D_wb,
+                              "D_wa_group_blocks" = grp_blocks_2020$D_wa,
+                              "D_wl_group_blocks" = grp_blocks_2020$D_wl,
+                              "D_bl_group_blocks" = grp_blocks_2020$D_bl,
+                              "D_ba_group_blocks" = grp_blocks_2020$D_ba,
+                              "D_la_group_blocks" = grp_blocks_2020$D_la,
+                              
+                              "D_wb_tract" = tract_2020$D_wb,
+                              "D_wa_tract" = tract_2020$D_wa,
+                              "D_wl_tract" = tract_2020$D_wl,
+                              "D_bl_tract" = tract_2020$D_bl,
+                              "D_ba_tract" = tract_2020$D_ba,
+                              "D_la_tract" = tract_2020$D_la)
+    
+    ind_D_2010 <<- data.frame("H_block" = block_2010$H,
+                              "H_group_blocks" = grp_blocks_2010$H,
+                              "H_tract" = tract_2010$H)
+    
+    ind_D_2000 <<- data.frame("H_block" = block_2000$H,
+                              "H_group_blocks" = grp_blocks_2000$H,
+                              "H_tract" = tract_2000$H)
+    
+    ind_D_1990 <<- data.frame("H_block" = block_1990$H,
+                              "H_group_blocks" = grp_blocks_1990$H,
+                              "H_tract" = tract_1990$H)
+
+}
+
+
+
+tmap_mode("view")
+tm_shape(a) + tm_polygons() + tm_shape(b) + tm_polygons()
+
+
+
+
+
+
+
+
+
+
+
+tract_2020$GEOID <- shp_2020$GEOID
+#shp$COUNTYFP <- as.numeric(substring(shp$COUNTYFP, 2))                   # usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
+shp <- shp[, -(c(4:5, 8:20))]                                         # usuniecie zbednych kolumn
 
 shp_join <- function(){
-  shp_block_1990 <<- left_join(shp, block_1990 , by = c("COUNTYFP" = "COUNTYA"))
-  shp_block_2000 <<- left_join(shp, block_2000 , by = c("COUNTYFP" = "COUNTYA"))
-  shp_block_2010 <<- left_join(shp, block_2010 , by = c("COUNTYFP" = "COUNTYA"))
-  shp_block_2020 <<- left_join(shp, block_2020 , by = c("COUNTYFP" = "COUNTYA"))
-  shp_grp_blocks_1990 <<- left_join(shp, grp_blocks_1990, by = c("COUNTYFP" = "COUNTYA"))
-  shp_grp_blocks_2000 <<- left_join(shp, grp_blocks_2000, by = c("COUNTYFP" = "COUNTYA"))
-  shp_grp_blocks_2010 <<- left_join(shp, grp_blocks_2010, by = c("COUNTYFP" = "COUNTYA"))
-  shp_grp_blocks_2020 <<- left_join(shp, grp_blocks_2020, by = c("COUNTYFP" = "COUNTYA"))
-  shp_tract_1990 <<- left_join(shp, tract_1990 , by = c("COUNTYFP" = "COUNTYA"))
-  shp_tract_2000 <<- left_join(shp, tract_2000 , by = c("COUNTYFP" = "COUNTYA"))
-  shp_tract_2010 <<- left_join(shp, tract_2010 , by = c("COUNTYFP" = "COUNTYA"))
-  shp_tract_2020 <<- left_join(shp, tract_2020 , by = c("COUNTYFP" = "COUNTYA"))
+  #shp_block_1990 <<- left_join(shp, block_1990 , by = c("COUNTYFP" = "COUNTYA"))
+  #shp_block_2000 <<- left_join(shp, block_2000 , by = c("COUNTYFP" = "COUNTYA"))
+  # shp_block_2010 <<- left_join(shp, block_2010 , by = c("COUNTYFP" = "COUNTYA"))
+  # shp_block_2020 <<- left_join(shp, block_2020 , by = c("COUNTYFP" = "COUNTYA"))
+  # shp_grp_blocks_1990 <<- left_join(shp, grp_blocks_1990, by = c("COUNTYFP" = "COUNTYA"))
+  # shp_grp_blocks_2000 <<- left_join(shp, grp_blocks_2000, by = c("COUNTYFP" = "COUNTYA"))
+  # shp_grp_blocks_2010 <<- left_join(shp, grp_blocks_2010, by = c("COUNTYFP" = "COUNTYA"))
+  # shp_grp_blocks_2020 <<- left_join(shp, grp_blocks_2020, by = c("COUNTYFP" = "COUNTYA"))
+  # shp_tract_1990 <<- left_join(shp, tract_1990 , by = c("COUNTYFP" = "COUNTYA"))
+  # shp_tract_2000 <<- left_join(shp, tract_2000 , by = c("COUNTYFP" = "COUNTYA"))
+  # shp_tract_2010 <<- left_join(shp, tract_2010 , by = c("COUNTYFP" = "COUNTYA"))
+  shp_tract_2020 <<- left_join(shp_2020, tract_2020 , by = c("GEOID" = "GEOID"))
   
   
 }
 shp_join()
 
 
+
+
+#  #  #  #  #  #  #  #  #  #  #  #  #  #  WIZUALIZACJA
+
 tmap_mode("view")
-tm_shape(shp_block_1990) + tm_fill(col = "Entropia", 
+tm_shape(shp_tract_2020) + tm_fill(col = "Entropia", 
                          id = "NAMELSAD",
                          popup.vars = c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
                                         "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
@@ -290,3 +444,5 @@ tm_shape(shp_block_1990) + tm_fill(col = "Entropia",
                                         "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")) + tm_borders()
 
 ##write_sf(shp_block_1990, "../dane_shp/shp_block_1990.gpkg")
+
+#write_sf(a, "../dane_shp/dane_rok_1990.gpkg")
