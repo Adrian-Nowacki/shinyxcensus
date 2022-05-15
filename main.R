@@ -411,30 +411,88 @@ rozdzielenie()
 shp_1990 <- read_sf("../shp/1990/dane_1990.gpkg")
 shp_2020 <- read_sf("../shp/2020/dane_2020.gpkg")
 
-shp_1990 <- shp_1990 %>% st_set_geometry(NULL)
-shp_2020 <- shp_2020 %>% st_set_geometry(NULL)
-
+# usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
 shp_1990$state_fips <- as.numeric(shp_1990$state_fips)  
 shp_2020$STATEFP <- as.numeric(shp_2020$STATEFP) 
 
+# usuniecie zbednych kolumn
 shp_1990 <- shp_1990[, -c(1:3, 8)]
 shp_2020 <- shp_2020[, -c(3:4, 10:12)]
 
 shp_2020 <- shp_2020 %>% arrange(GEOID)
 shp_1990 <- shp_1990 %>% arrange(county, state_fips)
 
-
 shp <- read_sf("../shp/1990/co99_d90_aggr.gpkg")
 shp <- shp %>% st_set_geometry(NULL)
 shp <- shp %>% arrange(NAME, ST)
 shp_1990$COUNTYFP <- shp$CO
 shp_1990$NAME <- shp$NAME
-colnames(shp_1990) <- c("STUSPS", "NAMELSAD", "GEOID", "STATEFP", "COUNTYFP", "NAME")
+colnames(shp_1990) <- c("STUSPS", "NAMELSAD", "GEOID", "STATEFP", "geom", "COUNTYFP", "NAME")
+shp_2020 <- shp_2020 %>% arrange(GEOID)
+shp_1990 <- shp_1990 %>% arrange(GEOID)
+shp_1990 <- shp_1990 %>% st_set_geometry(NULL)
+shp_2020 <- shp_2020 %>% st_set_geometry(NULL)
 
-tract_2020$GEOID <- shp_2020$GEOID
-
-shp <- shp[, -(c(4:5, 8:20))]             # usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
-                                        # usuniecie zbednych kolumn
+## dodanie pelnych nazw stanow
+stany <- function(){
+shp_1990 <<- shp_1990 %>%
+  mutate(STATE_NAME = case_when(
+    shp_1990$STUSPS == "AL" ~ "Alabama",
+    shp_1990$STUSPS == "AK" ~ "Alaska",
+    shp_1990$STUSPS == "AZ" ~ "Arizona",
+    shp_1990$STUSPS == "AR" ~ "Arkansas",
+    shp_1990$STUSPS == "CA" ~ "California",
+    shp_1990$STUSPS == "CO" ~ "Colorado",
+    shp_1990$STUSPS == "CT" ~ "Connecticut",
+    shp_1990$STUSPS == "DE" ~ "Delaware",
+    shp_1990$STUSPS == "DC" ~ "District of Columbia",
+    shp_1990$STUSPS == "FL" ~ "Florida",
+    shp_1990$STUSPS == "GA" ~ "Georgia",
+    shp_1990$STUSPS == "HI" ~ "Hawaii",
+    shp_1990$STUSPS == "ID" ~ "Idaho",
+    shp_1990$STUSPS == "IL" ~ "Illinois",
+    shp_1990$STUSPS == "IN" ~ "Indiana",
+    shp_1990$STUSPS == "IA" ~ "Iowa",
+    shp_1990$STUSPS == "KS" ~ "Kansas",
+    shp_1990$STUSPS == "KY" ~ "Kentucky",
+    shp_1990$STUSPS == "LA" ~ "Louisiana",
+    shp_1990$STUSPS == "ME" ~ "Maine",
+    shp_1990$STUSPS == "MD" ~ "Maryland",
+    shp_1990$STUSPS == "MA" ~ "Massachusetts",
+    shp_1990$STUSPS == "MI" ~ "Michigan",
+    shp_1990$STUSPS == "MN" ~ "Minnesota",
+    shp_1990$STUSPS == "MS" ~ "Mississippi",
+    shp_1990$STUSPS == "MO" ~ "Missouri",
+    shp_1990$STUSPS == "MT" ~ "Montana",
+    shp_1990$STUSPS == "NE" ~ "Nebraska",
+    shp_1990$STUSPS == "NV" ~ "Nevada",
+    shp_1990$STUSPS == "NH" ~ "New Hampshire",
+    shp_1990$STUSPS == "NJ" ~ "New Jersey",
+    shp_1990$STUSPS == "NM" ~ "New Mexico",
+    shp_1990$STUSPS == "NY" ~ "New York",
+    shp_1990$STUSPS == "NC" ~ "North Carolina",
+    shp_1990$STUSPS == "ND" ~ "North Dakota",
+    shp_1990$STUSPS == "OH" ~ "Ohio",
+    shp_1990$STUSPS == "OK" ~ "Oklahoma",
+    shp_1990$STUSPS == "OR" ~ "Oregon",
+    shp_1990$STUSPS == "PA" ~ "Pennsylvania",
+    shp_1990$STUSPS == "RI" ~ "Rhode Island",
+    shp_1990$STUSPS == "SC" ~ "South Carolina",
+    shp_1990$STUSPS == "SD" ~ "South Dakota",
+    shp_1990$STUSPS == "TN" ~ "Tennessee",
+    shp_1990$STUSPS == "TX" ~ "Texas",
+    shp_1990$STUSPS == "UT" ~ "Utah",
+    shp_1990$STUSPS == "VT" ~ "Vermont",
+    shp_1990$STUSPS == "VA" ~ "Virginia",
+    shp_1990$STUSPS == "WA" ~ "Washington",
+    shp_1990$STUSPS == "WV" ~ "West Virginia",
+    shp_1990$STUSPS == "WI" ~ "Wisconsin",
+    shp_1990$STUSPS == "WY" ~ "Wyoming"
+  ))
+} 
+stany()
+            
+                                        
 
 shp_join <- function(){
   #shp_block_1990 <<- left_join(shp, block_1990 , by = c("COUNTYFP" = "COUNTYA"))
