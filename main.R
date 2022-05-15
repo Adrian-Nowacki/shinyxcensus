@@ -408,32 +408,35 @@ rozdzielenie()
 
 #  #  #  #  #  #  #  #  #  #  #  #  #  #   POLACZENIE DANYCH Z DANYMI PRZESTRZENNYMI
 
-shp_1990 <- read_sf("../shp/1990/dane_1990.gpkg")
-shp_2020 <- read_sf("../shp/2020/dane_2020.gpkg")
-
-# usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
-shp_1990$state_fips <- as.numeric(shp_1990$state_fips)  
-shp_2020$STATEFP <- as.numeric(shp_2020$STATEFP) 
-
-# usuniecie zbednych kolumn
-shp_1990 <- shp_1990[, -c(1:3, 8)]
-shp_2020 <- shp_2020[, -c(3:4, 10:12)]
-
-shp_2020 <- shp_2020 %>% arrange(GEOID)
-shp_1990 <- shp_1990 %>% arrange(county, state_fips)
-
-shp <- read_sf("../shp/1990/co99_d90_aggr.gpkg")
-shp <- shp %>% st_set_geometry(NULL)
-shp <- shp %>% arrange(NAME, ST)
-shp_1990$COUNTYFP <- shp$CO
-shp_1990$NAME <- shp$NAME
-colnames(shp_1990) <- c("STUSPS", "NAMELSAD", "GEOID", "STATEFP", "geom", "COUNTYFP", "NAME")
-shp_2020 <- shp_2020 %>% arrange(GEOID)
-shp_1990 <- shp_1990 %>% arrange(GEOID)
-shp_1990 <- shp_1990 %>% st_set_geometry(NULL)
-shp_2020 <- shp_2020 %>% st_set_geometry(NULL)
-
+# shp_1990 <- read_sf("../shp/1990/dane_1990.gpkg")
+# shp_2020 <- read_sf("../shp/2020/dane_2020.gpkg")
+# 
+# # usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
+# shp_1990$state_fips <- as.numeric(shp_1990$state_fips)  
+# shp_2020$STATEFP <- as.numeric(shp_2020$STATEFP) 
+# 
+# # usuniecie zbednych kolumn
+# shp_1990 <- shp_1990[, -c(1:3, 8)]
+# shp_2020 <- shp_2020[, -c(3:4, 10:12)]
+# 
+# shp_2020 <- shp_2020 %>% arrange(GEOID)
+# shp_1990 <- shp_1990 %>% arrange(county, state_fips)
+# 
+# shp <- read_sf("../shp/1990/co99_d90_aggr.gpkg")
+# shp <- shp %>% st_set_geometry(NULL)
+# shp <- shp %>% arrange(NAME, ST)
+# shp_1990$COUNTYFP <- shp$CO
+# shp_1990$NAME <- shp$NAME
+# colnames(shp_1990) <- c("STUSPS", "NAMELSAD", "GEOID", "STATEFP", "geom", "COUNTYFP", "NAME")
+# shp_2020 <- shp_2020 %>% arrange(GEOID)
+# shp_1990 <- shp_1990 %>% arrange(GEOID)
+# 
+# st_write(shp_2020, "counties_shp/shp_2020.gpkg")
+# st_write(shp_1990, "counties_shp/shp_1990.gpkg")
 ## dodanie pelnych nazw stanow
+shp_1990 <- read_sf("counties_shp/shp_1990.gpkg")
+shp_2020 <- read_sf("counties_shp/shp_2020.gpkg")
+
 stany <- function(){
 shp_1990 <<- shp_1990 %>%
   mutate(STATE_NAME = case_when(
