@@ -437,6 +437,8 @@ rozdzielenie()
 shp_1990 <- read_sf("counties_shp/shp_1990.gpkg")
 shp_2020 <- read_sf("counties_shp/shp_2020.gpkg")
 
+shp_2020 <- shp_2020 %>% arrange(COUNTYFP, STATEFP)
+shp_1990 <- shp_1990 %>% arrange(COUNTYFP, STATEFP)
 stany <- function(){
 shp_1990 <<- shp_1990 %>%
   mutate(STATE_NAME = case_when(
@@ -494,40 +496,112 @@ shp_1990 <<- shp_1990 %>%
   ))
 } 
 stany()
-            
-                                        
 
 shp_join <- function(){
-  #shp_block_1990 <<- left_join(shp, block_1990 , by = c("COUNTYFP" = "COUNTYA"))
-  #shp_block_2000 <<- left_join(shp, block_2000 , by = c("COUNTYFP" = "COUNTYA"))
-  # shp_block_2010 <<- left_join(shp, block_2010 , by = c("COUNTYFP" = "COUNTYA"))
-  # shp_block_2020 <<- left_join(shp, block_2020 , by = c("COUNTYFP" = "COUNTYA"))
-  # shp_grp_blocks_1990 <<- left_join(shp, grp_blocks_1990, by = c("COUNTYFP" = "COUNTYA"))
-  # shp_grp_blocks_2000 <<- left_join(shp, grp_blocks_2000, by = c("COUNTYFP" = "COUNTYA"))
-  # shp_grp_blocks_2010 <<- left_join(shp, grp_blocks_2010, by = c("COUNTYFP" = "COUNTYA"))
-  # shp_grp_blocks_2020 <<- left_join(shp, grp_blocks_2020, by = c("COUNTYFP" = "COUNTYA"))
-  # shp_tract_1990 <<- left_join(shp, tract_1990 , by = c("COUNTYFP" = "COUNTYA"))
-  # shp_tract_2000 <<- left_join(shp, tract_2000 , by = c("COUNTYFP" = "COUNTYA"))
-  # shp_tract_2010 <<- left_join(shp, tract_2010 , by = c("COUNTYFP" = "COUNTYA"))
+  ##dolaczenie geoid 1990-2000
+  block_1990$GEOID <- shp_1990$GEOID
+  block_2000$GEOID <- shp_1990$GEOID
+  grp_blocks_1990$GEOID <- shp_1990$GEOID
+  grp_blocks_2000$GEOID <- shp_1990$GEOID
+  tract_1990$GEOID <- shp_1990$GEOID
+  tract_2000$GEOID <- shp_1990$GEOID
+  
+  ind_D_1990$GEOID <- shp_1990$GEOID
+  ind_D_2000$GEOID <- shp_1990$GEOID
+  ind_ent_1990$GEOID <- shp_1990$GEOID
+  ind_ent_2000$GEOID <- shp_1990$GEOID
+  ind_H_1990$GEOID <- shp_1990$GEOID
+  ind_H_2000$GEOID <- shp_1990$GEOID
+  #2010-2020
+  block_2010$GEOID <- shp_2020$GEOID
+  block_2020$GEOID <- shp_2020$GEOID
+  grp_blocks_2010$GEOID <- shp_2020$GEOID
+  grp_blocks_2020$GEOID <- shp_2020$GEOID
+  tract_2010$GEOID <- shp_2020$GEOID
+  tract_2020$GEOID <- shp_2020$GEOID
+  
+  ind_D_2010$GEOID <- shp_2020$GEOID
+  ind_D_2020$GEOID <- shp_2020$GEOID
+  ind_ent_2010$GEOID <- shp_2020$GEOID
+  ind_ent_2020$GEOID <- shp_2020$GEOID
+  ind_H_2010$GEOID <- shp_2020$GEOID
+  ind_H_2020$GEOID <- shp_2020$GEOID
+  
+  #utworzenie danych przestrzennych
+  shp_block_1990 <<- left_join(shp_1990, block_1990 , by = c("GEOID" = "GEOID"))
+  shp_block_2000 <<- left_join(shp_1990, block_2000 , by = c("GEOID" = "GEOID"))
+  shp_block_2010 <<- left_join(shp_2020, block_2010 , by = c("GEOID" = "GEOID"))
+  shp_block_2020 <<- left_join(shp_2020, block_2020 , by = c("GEOID" = "GEOID"))
+  shp_grp_blocks_1990 <<- left_join(shp_1990, grp_blocks_1990, by = c("GEOID" = "GEOID"))
+  shp_grp_blocks_2000 <<- left_join(shp_1990, grp_blocks_2000, by = c("GEOID" = "GEOID"))
+  shp_grp_blocks_2010 <<- left_join(shp_2020, grp_blocks_2010, by = c("GEOID" = "GEOID"))
+  shp_grp_blocks_2020 <<- left_join(shp_2020, grp_blocks_2020, by = c("GEOID" = "GEOID"))
+  shp_tract_1990 <<- left_join(shp_1990, tract_1990 , by = c("GEOID" = "GEOID"))
+  shp_tract_2000 <<- left_join(shp_1990, tract_2000 , by = c("GEOID" = "GEOID"))
+  shp_tract_2010 <<- left_join(shp_2020, tract_2010 , by = c("GEOID" = "GEOID"))
   shp_tract_2020 <<- left_join(shp_2020, tract_2020 , by = c("GEOID" = "GEOID"))
   
+  shp_ind_D_1990 <<- left_join(shp_1990, ind_D_1990, by = c("GEOID" = "GEOID"))
+  shp_ind_D_2000 <<- left_join(shp_1990, ind_D_2000, by = c("GEOID" = "GEOID"))
+  shp_ind_D_2010 <<- left_join(shp_2020, ind_D_2010, by = c("GEOID" = "GEOID"))
+  shp_ind_D_2020 <<- left_join(shp_2020, ind_D_2020, by = c("GEOID" = "GEOID"))
   
+  shp_ind_ent_1990 <<- left_join(shp_1990, ind_ent_1990, by = c("GEOID" = "GEOID"))
+  shp_ind_ent_2000 <<- left_join(shp_1990, ind_ent_2000, by = c("GEOID" = "GEOID"))
+  shp_ind_ent_2010 <<- left_join(shp_2020, ind_ent_2010, by = c("GEOID" = "GEOID"))
+  shp_ind_ent_2020 <<- left_join(shp_2020, ind_ent_2020, by = c("GEOID" = "GEOID"))
+  
+  shp_ind_H_1990 <<- left_join(shp_1990, ind_H_1990, by = c("GEOID" = "GEOID"))
+  shp_ind_H_2000 <<- left_join(shp_1990, ind_H_2000, by = c("GEOID" = "GEOID"))
+  shp_ind_H_2010 <<- left_join(shp_2020, ind_H_2010, by = c("GEOID" = "GEOID"))
+  shp_ind_H_2020 <<- left_join(shp_2020, ind_H_2020, by = c("GEOID" = "GEOID"))
 }
 shp_join()
 
-
+zapis_wynikow <- function(){
+  st_write(shp_block_1990, "census_shp/shp_block_1990.gpkg")
+  st_write(shp_block_2000, "census_shp/shp_block_2000.gpkg")
+  st_write(shp_block_2010, "census_shp/shp_block_2010.gpkg")
+  st_write(shp_block_2020, "census_shp/shp_block_2020.gpkg")
+  
+  st_write(shp_grp_blocks_1990, "census_shp/shp_grp_blocks_1990.gpkg")
+  st_write(shp_grp_blocks_2000, "census_shp/shp_grp_blocks_2000.gpkg")
+  st_write(shp_grp_blocks_2010, "census_shp/shp_grp_blocks_2010.gpkg")
+  st_write(shp_grp_blocks_2020, "census_shp/shp_grp_blocks_2020.gpkg")
+  
+  st_write(shp_tract_1990, "census_shp/shp_tract_1990.gpkg")
+  st_write(shp_tract_2000, "census_shp/shp_tract_2000.gpkg")
+  st_write(shp_tract_2010, "census_shp/shp_tract_2010.gpkg")
+  st_write(shp_tract_2020, "census_shp/shp_tract_2020.gpkg")
+  
+  st_write(shp_ind_D_1990, "indexes_shp/shp_ind_D_1990.gpkg")
+  st_write(shp_ind_D_2000, "indexes_shp/shp_ind_D_2000.gpkg")
+  st_write(shp_ind_D_2010, "indexes_shp/shp_ind_D_2010.gpkg")
+  st_write(shp_ind_D_2020, "indexes_shp/shp_ind_D_2020.gpkg")
+  
+  st_write(shp_ind_ent_1990, "indexes_shp/shp_ind_ent_1990.gpkg")
+  st_write(shp_ind_ent_2000, "indexes_shp/shp_ind_ent_2000.gpkg")
+  st_write(shp_ind_ent_2010, "indexes_shp/shp_ind_ent_2010.gpkg")
+  st_write(shp_ind_ent_2020, "indexes_shp/shp_ind_ent_2020.gpkg")
+  
+  st_write(shp_ind_H_1990, "indexes_shp/shp_ind_H_1990.gpkg")
+  st_write(shp_ind_H_2000, "indexes_shp/shp_ind_H_2000.gpkg")
+  st_write(shp_ind_H_2010, "indexes_shp/shp_ind_H_2010.gpkg")
+  st_write(shp_ind_H_2020, "indexes_shp/shp_ind_H_2020.gpkg")
+  
+}
+zapis_wynikow()
 
 
 #  #  #  #  #  #  #  #  #  #  #  #  #  #  WIZUALIZACJA
 
 tmap_mode("view")
-tm_shape(shp_tract_2020) + tm_fill(col = "Entropia", 
+tm_shape(shp_tract_2020) + tm_fill(col = "Entropia_std", 
                          id = "NAMELSAD",
                          popup.vars = c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
                                         "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
                                         "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
                                         "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")) + tm_borders()
-
 ##write_sf(shp_block_1990, "../dane_shp/shp_block_1990.gpkg")
 
 #write_sf(a, "../dane_shp/dane_rok_1990.gpkg")
