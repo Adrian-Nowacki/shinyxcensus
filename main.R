@@ -558,7 +558,7 @@ shp_join <- function(){
 }
 shp_join()
 
-zapis_wynikow <- function(){
+#zapis_wynikow <- function(){
   st_write(shp_block_1990, "census_shp/shp_block_1990.gpkg")
   st_write(shp_block_2000, "census_shp/shp_block_2000.gpkg")
   st_write(shp_block_2010, "census_shp/shp_block_2010.gpkg")
@@ -590,18 +590,25 @@ zapis_wynikow <- function(){
   st_write(shp_ind_H_2020, "indexes_shp/shp_ind_H_2020.gpkg")
   
 }
-zapis_wynikow()
-
+#zapis_wynikow()
+shp_tract_1990 <- st_read("census_shp/shp_tract_1990.gpkg")
+shp_tract_2020 <- st_read("census_shp/shp_tract_2020.gpkg")
+shp_ind_H_1990 <- st_read("indexes_shp/shp_ind_H_1990.gpkg")
+shp_ind_H_2020 <- st_read("indexes_shp/shp_ind_H_2020.gpkg")
 
 #  #  #  #  #  #  #  #  #  #  #  #  #  #  WIZUALIZACJA
-
 tmap_mode("view")
+tm_shape(shp_ind_H_1990) + tm_fill(col = "H_block") + tm_borders() +
+  tm_shape(shp_ind_H_2020) + tm_fill(col = "H_block") + tm_borders()
+
+
 tm_shape(shp_tract_2020) + tm_fill(col = "Entropia_std", 
                          id = "NAMELSAD",
                          popup.vars = c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
                                         "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
                                         "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
                                         "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")) + tm_borders()
-##write_sf(shp_block_1990, "../dane_shp/shp_block_1990.gpkg")
 
-#write_sf(a, "../dane_shp/dane_rok_1990.gpkg")
+
+
+
