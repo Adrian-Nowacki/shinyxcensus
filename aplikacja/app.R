@@ -3,8 +3,8 @@ library(shiny)
 library(dplyr)
 library(sf)
 library(tmap)
-
-shp_tract_1990 <- st_read("dane/counties_shp/census_shp/shp_tract_1990.gpkg")
+library(shinydashboard)
+shp_tract_2020 <- st_read("dane/counties_shp/census_shp/shp_tract_2020.gpkg")
 
 # Define UI ----
 
@@ -47,7 +47,7 @@ ui <- navbarPage("Racial diversity",
             tabsetPanel(
                 tabPanel("Map", tmapOutput("map")), 
                 tabPanel("Plot", verbatimTextOutput("plot")), 
-                tabPanel("Table", tableOutput("table")),
+                tabPanel("Table", tableOutput("table"))
             )
         )
     )
@@ -56,7 +56,7 @@ ui <- navbarPage("Racial diversity",
 server <- function(input, output) {
     tmap_mode("view")
     output$map <- renderTmap({
-        tm_shape(shp_tract_1990) + tm_fill(col = "Entropia_std", 
+        tm_shape(shp_tract_2020) + tm_fill(col = "Entropia_std", 
                                            id = "NAMELSAD",
                                            popup.vars = c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
                                                           "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
