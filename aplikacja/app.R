@@ -20,6 +20,14 @@ shp_tract_2000 <- st_read("dane/counties_shp/census_shp/shp_tract_2000.gpkg")
 shp_tract_2010 <- st_read("dane/counties_shp/census_shp/shp_tract_2010.gpkg")
 shp_tract_2020 <- st_read("dane/counties_shp/census_shp/shp_tract_2020.gpkg")
 
+
+blocks <- list(shp_block_1990, shp_block_2000, shp_block_2010, shp_block_2020)
+grp_blocks <- list(shp_grp_blocks_1990, shp_grp_blocks_2000, shp_grp_blocks_2010, shp_grp_blocks_2020)
+tracts <- list(shp_tract_1990, shp_tract_2000, shp_tract_2010, shp_tract_2020)
+
+obiekty <- list(blocks = blocks, grp_blocks =  grp_blocks, tracts = tracts)
+
+
 # wskazniki
 shp_ind_D_1990 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_1990.gpkg")
 shp_ind_D_2000 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2000.gpkg")
@@ -53,7 +61,7 @@ ui <- navbarPage("Racial diversity",
             selectInput("unit", 
                         label = "Choose an aggregation unit",
                         choices = c("blocks", 
-                                    "groups of blocks",
+                                    "grp_blocks",
                                     "tracts"),
                         selected = "blocks"),
             
@@ -70,7 +78,7 @@ ui <- navbarPage("Racial diversity",
                         choices = c("Entrophy",
                                     "Index of dissimilarity", 
                                     "The information theory index H"),
-                        selected = "Percent White"),
+                        selected = "Entrophy"),
             actionButton("action", "Show")
             
         ),
@@ -84,11 +92,23 @@ ui <- navbarPage("Racial diversity",
         )
     )
 )
+
 # Define server logic ----
 server <- function(input, output) {
     tmap_mode("view")
     output$map <- renderTmap({
-        tm_shape(shp_tract_2020) + tm_fill(col = "Entropia_std", 
+        plik <- switch(input$unit, 
+                       "blocks" = obiekty$blocks,
+                       "grp_blocks" = obiekty$grp_blocks,
+                       "tracts" = obiekty$tracts)
+        
+        rok <- switch(input$year, 
+                       "1990" = plik[1],
+                       "2000" = plik[2],
+                       "2010" = plik[3],
+                       "2020" = plik[4])
+        
+        tm_shape(rok) + tm_fill(col = "Entropia_std", 
                                            id = "NAMELSAD",
                                            popup.vars = c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
                                                           "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
