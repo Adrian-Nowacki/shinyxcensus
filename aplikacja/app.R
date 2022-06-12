@@ -4,7 +4,38 @@ library(dplyr)
 library(sf)
 library(tmap)
 library(shinydashboard)
+# wczytanie danych
+shp_block_1990 <- st_read("dane/counties_shp/census_shp/shp_block_1990.gpkg")
+shp_block_2000 <- st_read("dane/counties_shp/census_shp/shp_block_2000.gpkg")
+shp_block_2010 <- st_read("dane/counties_shp/census_shp/shp_block_2010.gpkg")
+shp_block_2020 <- st_read("dane/counties_shp/census_shp/shp_block_2020.gpkg")
+
+shp_grp_blocks_1990 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_1990.gpkg")
+shp_grp_blocks_2000 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_2000.gpkg")
+shp_grp_blocks_2010 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_2010.gpkg")
+shp_grp_blocks_2020 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_2020.gpkg")
+
+shp_tract_1990 <- st_read("dane/counties_shp/census_shp/shp_tract_1990.gpkg")
+shp_tract_2000 <- st_read("dane/counties_shp/census_shp/shp_tract_2000.gpkg")
+shp_tract_2010 <- st_read("dane/counties_shp/census_shp/shp_tract_2010.gpkg")
 shp_tract_2020 <- st_read("dane/counties_shp/census_shp/shp_tract_2020.gpkg")
+
+# wskazniki
+shp_ind_D_1990 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_1990.gpkg")
+shp_ind_D_2000 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2000.gpkg")
+shp_ind_D_2010 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2010.gpkg")
+shp_ind_D_2020 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2020.gpkg")
+
+shp_ind_ent_1990 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_1990.gpkg")
+shp_ind_ent_2000 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_2000.gpkg")
+shp_ind_ent_2010 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_2010.gpkg")
+shp_ind_ent_2020 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_2020.gpkg")
+
+shp_ind_H_1990 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_1990.gpkg")
+shp_ind_H_2000 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_2000.gpkg")
+shp_ind_H_2010 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_2010.gpkg")
+shp_ind_H_2020 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_2020.gpkg")
+
 
 # Define UI ----
 
@@ -39,7 +70,8 @@ ui <- navbarPage("Racial diversity",
                         choices = c("Entrophy",
                                     "Index of dissimilarity", 
                                     "The information theory index H"),
-                        selected = "Percent White")
+                        selected = "Percent White"),
+            actionButton("action", "Show")
             
         ),
         
