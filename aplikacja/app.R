@@ -52,10 +52,13 @@ ui <- navbarPage("Racial diversity",
                  tabPanel("Data frames"),
                  tabPanel("Author"),
                  
+                 shinyjs::useShinyjs(),
+                 
                  sidebarLayout(
+                     
                      sidebarPanel(
                          tabsetPanel(id = "tabset",
-                                     checkboxInput("aggr_button", "All indicators for individual years", value = TRUE),
+                                     checkboxInput("aggr_button", "All indicators for individual years", value = 1),
                              
                              
                              selectInput("unit", 
@@ -73,7 +76,7 @@ ui <- navbarPage("Racial diversity",
                                                      "2020"),
                                          selected = "1990")),
                          tabsetPanel(id = "tabset2",
-                                     checkboxInput("indicator_button", "Selected indicator for individual aggregation units", value = FALSE),
+                                     checkboxInput("indicator_button", "Selected indicator for individual aggregation units", value = 0),
                              
                              selectInput("index", 
                                          label = "Choose an index",
@@ -95,16 +98,31 @@ ui <- navbarPage("Racial diversity",
 )
 
 # Define server logic ----
-server <- function(input, output) {
+server <- function(input, output,session) {
    
     shinyjs::onclick("advanced2",
                      shinyjs::aggr_button(id = "advanced2", anim = TRUE))
     
     observeEvent(input$aggr_button, {
-        if(input$aggr_button == "1"){
-            shinyjs::disable(id = "tabset2")
-        } else {
-            shinyjs::enable(id = "tabset")
+        if(input$aggr_button == 1){
+            shinyjs::disable(id = "index")
+            shinyjs::enable(id = "unit")
+            shinyjs::enable(id = "year")
+            updateCheckboxInput(
+                session =  session,
+                inputId = "indicator_button", 
+                value = FALSE
+                )
+        } 
+        else if(input$indicator_button == 1) {
+            shinyjs::enable(id = "index")
+            shinyjs::disable(id = "unit")
+            shinyjs::disable(id = "year")
+            updateCheckboxInput(
+                session =  session,
+                inputId = "aggr_button", 
+                value = FALSE
+            )
         }
     })
     
