@@ -4,21 +4,23 @@ library(dplyr)
 library(sf)
 library(tmap)
 library(shinydashboard)
+library(shinyWidgets)
+library(shinyjs)
 # wczytanie danych
-shp_block_1990 <- st_read("../dane/counties_shp/census_shp/shp_block_1990.gpkg")
-shp_block_2000 <- st_read("../dane/counties_shp/census_shp/shp_block_2000.gpkg")
-shp_block_2010 <- st_read("../dane/counties_shp/census_shp/shp_block_2010.gpkg")
-shp_block_2020 <- st_read("../dane/counties_shp/census_shp/shp_block_2020.gpkg")
+shp_block_1990 <- st_read("dane/counties_shp/census_shp/shp_block_1990.gpkg")
+shp_block_2000 <- st_read("dane/counties_shp/census_shp/shp_block_2000.gpkg")
+shp_block_2010 <- st_read("dane/counties_shp/census_shp/shp_block_2010.gpkg")
+shp_block_2020 <- st_read("dane/counties_shp/census_shp/shp_block_2020.gpkg")
 
-shp_grp_blocks_1990 <- st_read("../dane/counties_shp/census_shp/shp_grp_blocks_1990.gpkg")
-shp_grp_blocks_2000 <- st_read("../dane/counties_shp/census_shp/shp_grp_blocks_2000.gpkg")
-shp_grp_blocks_2010 <- st_read("../dane/counties_shp/census_shp/shp_grp_blocks_2010.gpkg")
-shp_grp_blocks_2020 <- st_read("../dane/counties_shp/census_shp/shp_grp_blocks_2020.gpkg")
+shp_grp_blocks_1990 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_1990.gpkg")
+shp_grp_blocks_2000 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_2000.gpkg")
+shp_grp_blocks_2010 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_2010.gpkg")
+shp_grp_blocks_2020 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_2020.gpkg")
 
-shp_tract_1990 <- st_read("../dane/counties_shp/census_shp/shp_tract_1990.gpkg")
-shp_tract_2000 <- st_read("../dane/counties_shp/census_shp/shp_tract_2000.gpkg")
-shp_tract_2010 <- st_read("../dane/counties_shp/census_shp/shp_tract_2010.gpkg")
-shp_tract_2020 <- st_read("../dane/counties_shp/census_shp/shp_tract_2020.gpkg")
+shp_tract_1990 <- st_read("dane/counties_shp/census_shp/shp_tract_1990.gpkg")
+shp_tract_2000 <- st_read("dane/counties_shp/census_shp/shp_tract_2000.gpkg")
+shp_tract_2010 <- st_read("dane/counties_shp/census_shp/shp_tract_2010.gpkg")
+shp_tract_2020 <- st_read("dane/counties_shp/census_shp/shp_tract_2020.gpkg")
 
 
 blocks <- list(shp_block_1990, shp_block_2000, shp_block_2010, shp_block_2020)
@@ -52,32 +54,33 @@ ui <- navbarPage("Racial diversity",
                  
                  sidebarLayout(
                      sidebarPanel(
-                         helpText("All indicators for individual years"),
-                         
-                         
-                         selectInput("unit", 
-                                     label = "Choose an aggregation unit",
-                                     choices = c("blocks", 
-                                                 "grp_blocks",
-                                                 "tracts"),
-                                     selected = "blocks"),
-                         
-                         selectInput("year", 
-                                     label = "Choose a year",
-                                     choices = c("1990", 
-                                                 "2000",
-                                                 "2010", 
-                                                 "2020"),
-                                     selected = "1990"),
-                         
-                         helpText("Selected indicator for individual aggregation units"),
-                         
-                         selectInput("index", 
-                                     label = "Choose an index",
-                                     choices = c("Entrophy",
-                                                 "Index of dissimilarity", 
-                                                 "The information theory index H"),
-                                     selected = "Entrophy"),
+                         tabsetPanel(id = "tabset",
+                                     checkboxInput("aggr_button", "All indicators for individual years", value = TRUE),
+                             
+                             
+                             selectInput("unit", 
+                                         label = "Choose an aggregation unit",
+                                         choices = c("blocks", 
+                                                     "grp_blocks",
+                                                     "tracts"),
+                                         selected = "blocks"),
+                             
+                             selectInput("year", 
+                                         label = "Choose a year",
+                                         choices = c("1990", 
+                                                     "2000",
+                                                     "2010", 
+                                                     "2020"),
+                                         selected = "1990")),
+                         tabsetPanel(id = "tabset2",
+                                     checkboxInput("indicator_button", "Selected indicator for individual aggregation units", value = FALSE),
+                             
+                             selectInput("index", 
+                                         label = "Choose an index",
+                                         choices = c("Entrophy",
+                                                     "Index of dissimilarity", 
+                                                     "The information theory index H"),
+                                         selected = "Entrophy")),
                          actionButton("run", "Dawaj kurwa")
                      ),
                      
@@ -93,6 +96,18 @@ ui <- navbarPage("Racial diversity",
 
 # Define server logic ----
 server <- function(input, output) {
+   
+    shinyjs::onclick("advanced2",
+                     shinyjs::aggr_button(id = "advanced2", anim = TRUE))
+    
+    observeEvent(input$aggr_button, {
+        if(input$aggr_button == "1"){
+            shinyjs::disable(id = "tabset2")
+        } else {
+            shinyjs::enable(id = "tabset")
+        }
+    })
+    
     warstwa <- eventReactive(input$run, {
         
         plik <- switch(input$unit, 
