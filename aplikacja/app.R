@@ -56,11 +56,27 @@ ui <- navbarPage("Racial diversity",
                  tabPanel("Data frames"),
                  tabPanel("Author"),
                  
+                 setBackgroundColor(
+                     color =  "#222222"
+                 ),
+                 
+                 tags$head(tags$style(
+                     HTML('
+                         #sidebar {
+                            background-color: #222222;
+                        }
+                
+                        body, label, input, button, select { 
+                          font-family: "Trebuchet MS";
+                          color: #dddddd;
+                        }')
+                 )),
+                 
                  shinyjs::useShinyjs(),
                  
                  sidebarLayout(
                      
-                     sidebarPanel(
+                     sidebarPanel(id = "sidebar",
                          tabsetPanel(id = "tabset",
                                      checkboxInput("aggr_button", "All indicators for individual years", value = 1),
                              
@@ -72,11 +88,12 @@ ui <- navbarPage("Racial diversity",
                                                      "Tracts"),
                                          selected = "blocks"),
                              
+                             
                              checkboxInput("indicator_button", "Selected indicator for individual aggregation units", value = 0),
                              
                              selectInput("index", 
                                          label = "Choose an index",
-                                         choices = c("Entrophy",
+                                         choices = c("Entropy",
                                                      "Index of dissimilarity", 
                                                      "The information theory index H"),
                                          selected = "Entrophy")),
@@ -89,7 +106,7 @@ ui <- navbarPage("Racial diversity",
                                                              "2010", 
                                                              "2020"),
                                                  selected = "1990")),
-                         actionButton("run", "Dawaj kurwa")
+                         actionButton("run", "Lets goooooooooo")
                      ),
                      
                      mainPanel(
@@ -153,7 +170,7 @@ server <- function(input, output,session) {
                        "Tracts" = aggr_objects[[3]])
         
         indexes <- switch(input$index, 
-                       "Entrophy" = ind_objects[[1]],
+                       "Entropy" = ind_objects[[1]],
                        "Index of dissimilarity" = ind_objects[[2]],
                        "The information theory index H" = ind_objects[[3]])
         
