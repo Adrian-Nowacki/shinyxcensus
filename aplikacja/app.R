@@ -27,24 +27,28 @@ blocks <- list(shp_block_1990, shp_block_2000, shp_block_2010, shp_block_2020)
 grp_blocks <- list(shp_grp_blocks_1990, shp_grp_blocks_2000, shp_grp_blocks_2010, shp_grp_blocks_2020)
 tracts <- list(shp_tract_1990, shp_tract_2000, shp_tract_2010, shp_tract_2020)
 
-obiekty <- list(blocks = blocks, grp_blocks =  grp_blocks, tracts = tracts)
+aggr_objects <- list(blocks = blocks, grp_blocks =  grp_blocks, tracts = tracts)
 # wskazniki
-shp_ind_D_1990 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_1990.gpkg")
-shp_ind_D_2000 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2000.gpkg")
-shp_ind_D_2010 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2010.gpkg")
-shp_ind_D_2020 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2020.gpkg")
-
 shp_ind_ent_1990 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_1990.gpkg")
 shp_ind_ent_2000 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_2000.gpkg")
 shp_ind_ent_2010 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_2010.gpkg")
 shp_ind_ent_2020 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_2020.gpkg")
+
+shp_ind_D_1990 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_1990.gpkg")
+shp_ind_D_2000 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2000.gpkg")
+shp_ind_D_2010 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2010.gpkg")
+shp_ind_D_2020 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2020.gpkg")
 
 shp_ind_H_1990 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_1990.gpkg")
 shp_ind_H_2000 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_2000.gpkg")
 shp_ind_H_2010 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_2010.gpkg")
 shp_ind_H_2020 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_2020.gpkg")
 
+entrophy <- list(shp_ind_ent_1990, shp_ind_ent_2000, shp_ind_ent_2010, shp_ind_ent_2020)
+d_index <- list(shp_ind_D_1990, shp_ind_D_2000, shp_ind_D_2010, shp_ind_D_2020)
+h_index <- list(shp_ind_H_1990 , shp_ind_H_2000 , shp_ind_H_2010 , shp_ind_H_2020 )
 
+ind_objects <- list(entrophy = entrophy, d_index = d_index, h_index = h_index)
 # Define UI ----
 
 ui <- navbarPage("Racial diversity",
@@ -63,20 +67,12 @@ ui <- navbarPage("Racial diversity",
                              
                              selectInput("unit", 
                                          label = "Choose an aggregation unit",
-                                         choices = c("blocks", 
-                                                     "grp_blocks",
-                                                     "tracts"),
+                                         choices = c("Blocks", 
+                                                     "Groups of blocks",
+                                                     "Tracts"),
                                          selected = "blocks"),
                              
-                             selectInput("year", 
-                                         label = "Choose a year",
-                                         choices = c("1990", 
-                                                     "2000",
-                                                     "2010", 
-                                                     "2020"),
-                                         selected = "1990")),
-                         tabsetPanel(id = "tabset2",
-                                     checkboxInput("indicator_button", "Selected indicator for individual aggregation units", value = 0),
+                             checkboxInput("indicator_button", "Selected indicator for individual aggregation units", value = 0),
                              
                              selectInput("index", 
                                          label = "Choose an index",
@@ -84,6 +80,15 @@ ui <- navbarPage("Racial diversity",
                                                      "Index of dissimilarity", 
                                                      "The information theory index H"),
                                          selected = "Entrophy")),
+                             
+                         tabsetPanel(id = "tabset2",
+                                     selectInput("year", 
+                                                 label = "Choose a year",
+                                                 choices = c("1990", 
+                                                             "2000",
+                                                             "2010", 
+                                                             "2020"),
+                                                 selected = "1990")),
                          actionButton("run", "Dawaj kurwa")
                      ),
                      
@@ -100,14 +105,10 @@ ui <- navbarPage("Racial diversity",
 # Define server logic ----
 server <- function(input, output,session) {
    
-    shinyjs::onclick("advanced2",
-                     shinyjs::aggr_button(id = "advanced2", anim = TRUE))
-    
     observeEvent(input$aggr_button, {
         if(input$aggr_button == 1){
             shinyjs::disable(id = "index")
             shinyjs::enable(id = "unit")
-            shinyjs::enable(id = "year")
             updateCheckboxInput(
                  inputId = "indicator_button", 
                  value = FALSE
@@ -115,7 +116,6 @@ server <- function(input, output,session) {
         else {
             shinyjs::enable(id = "index")
             shinyjs::disable(id = "unit")
-            shinyjs::disable(id = "year")
              updateCheckboxInput(
                  inputId = "aggr_button",
                  value = FALSE
@@ -126,7 +126,6 @@ server <- function(input, output,session) {
         if(input$indicator_button == 0){
             shinyjs::disable(id = "index")
             shinyjs::enable(id = "unit")
-            shinyjs::enable(id = "year")
             updateCheckboxInput(
                 inputId = "indicator_button", 
                 value = FALSE
@@ -134,32 +133,53 @@ server <- function(input, output,session) {
         else {
             shinyjs::enable(id = "index")
             shinyjs::disable(id = "unit")
-            shinyjs::disable(id = "year")
             updateCheckboxInput(
                 inputId = "aggr_button",
                 value = FALSE
             )}
     })
+    observeEvent({input$aggr_button
+        input$indicator_button}, {
+        if(input$aggr_button == 0 & input$indicator_button ==0){
+            shinyjs::disable(id = "index")
+            shinyjs::disable(id = "unit")}
+    })
     
     warstwa <- eventReactive(input$run, {
         
-        plik <- switch(input$unit, 
-                       "blocks" = obiekty[[1]],
-                       "grp_blocks" = obiekty[[2]],
-                       "tracts" = obiekty[[3]])
+        aggr <- switch(input$unit, 
+                       "Blocks" = aggr_objects[[1]],
+                       "Groups of blocks" = aggr_objects[[2]],
+                       "Tracts" = aggr_objects[[3]])
         
-        switch(input$year, 
-               "1990" = plik[[1]],
-               "2000" = plik[[2]],
-               "2010" = plik[[3]],
-               "2020" = plik[[4]])
+        indexes <- switch(input$index, 
+                       "Entrophy" = ind_objects[[1]],
+                       "Index of dissimilarity" = ind_objects[[2]],
+                       "The information theory index H" = ind_objects[[3]])
+        
+        #function(){
+            if (input$aggr_button == 1){
+                switch(input$year, 
+                    "1990" = aggr[[1]],
+                    "2000" = aggr[[2]],
+                    "2010" = aggr[[3]],
+                    "2020" = aggr[[4]])
+            }
+            else if (input$indicator_button == 1){
+                switch(input$year, 
+                    "1990" = indexes[[1]],
+                    "2000" = indexes[[2]],
+                    "2010" = indexes[[3]],
+                    "2020" = indexes[[4]])
+            }
+        #}
     })
     tmap_mode("view")
     output$map <- renderTmap({
         warstwa <- warstwa()
         tm_shape(warstwa) + tm_fill(col = "Entropia_std", 
                                     id = "NAMELSAD",
-                                    popup.vars = c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
+                                    popup.vars = c("Nazwa: " = "NAMELSAD", "Entropia std: " = "Entropia_std", 
                                                    "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
                                                    "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
                                                    "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")) + tm_borders()
