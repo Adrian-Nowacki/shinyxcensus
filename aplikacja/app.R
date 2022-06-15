@@ -109,21 +109,36 @@ server <- function(input, output,session) {
             shinyjs::enable(id = "unit")
             shinyjs::enable(id = "year")
             updateCheckboxInput(
-                session =  session,
+                 inputId = "indicator_button", 
+                 value = FALSE
+                 )} 
+        else {
+            shinyjs::enable(id = "index")
+            shinyjs::disable(id = "unit")
+            shinyjs::disable(id = "year")
+             updateCheckboxInput(
+                 inputId = "aggr_button",
+                 value = FALSE
+             )}
+    })
+    
+    observeEvent(input$indicator_button, {
+        if(input$indicator_button == 0){
+            shinyjs::disable(id = "index")
+            shinyjs::enable(id = "unit")
+            shinyjs::enable(id = "year")
+            updateCheckboxInput(
                 inputId = "indicator_button", 
                 value = FALSE
-                )
-        } 
-        else if(input$indicator_button == 1) {
+            )} 
+        else {
             shinyjs::enable(id = "index")
             shinyjs::disable(id = "unit")
             shinyjs::disable(id = "year")
             updateCheckboxInput(
-                session =  session,
-                inputId = "aggr_button", 
+                inputId = "aggr_button",
                 value = FALSE
-            )
-        }
+            )}
     })
     
     warstwa <- eventReactive(input$run, {
