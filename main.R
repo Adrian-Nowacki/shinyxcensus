@@ -596,6 +596,7 @@ shp_tract_2020 <- st_read("census_shp/shp_tract_2020.gpkg")
 shp_ind_H_1990 <- st_read("indexes_shp/shp_ind_H_1990.gpkg")
 shp_ind_H_2020 <- st_read("indexes_shp/shp_ind_H_2020.gpkg")
 
+
 #  #  #  #  #  #  #  #  #  #  #  #  #  #  WIZUALIZACJA
 tmap_mode("view")
 tm_shape(shp_ind_H_1990) + tm_fill(col = "H_block") + tm_borders() +

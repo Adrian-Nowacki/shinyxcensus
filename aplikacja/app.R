@@ -6,6 +6,8 @@ library(tmap)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinyjs)
+library(ggplot2)
+library(plotly)
 # wczytanie danych
 shp_block_1990 <- st_read("dane/counties_shp/census_shp/shp_block_1990.gpkg")
 shp_block_2000 <- st_read("dane/counties_shp/census_shp/shp_block_2000.gpkg")
@@ -51,7 +53,8 @@ h_index <- list(shp_ind_H_1990 , shp_ind_H_2000 , shp_ind_H_2010 , shp_ind_H_202
 ind_objects <- list(entrophy = entrophy, d_index = d_index, h_index = h_index)
 # Define UI ----
 
-ui <- navbarPage("Racial diversity",
+ui <- navbarPage(id = "navbar",
+                          "Racial diversity",
                  tabPanel("Interactive map"),
                  tabPanel("Data frames"),
                  tabPanel("Author"),
@@ -64,6 +67,10 @@ ui <- navbarPage("Racial diversity",
                      HTML('
                          #sidebar {
                             background-color: #222222;
+                         }
+                        #navbar {
+                            background-color: #222222;
+                        
                         }
                 
                         body, label, input, button, select { 
@@ -111,8 +118,8 @@ ui <- navbarPage("Racial diversity",
                      
                      mainPanel(
                          tabsetPanel(
-                             tabPanel("Map", tmapOutput("map")), 
-                             tabPanel("Plot", verbatimTextOutput("plot")), 
+                             tabPanel("Map", tmapOutput("map", height = "600px")), 
+                             tabPanel("Plot", plotlyOutput("plot",  height = "600px")), 
                              tabPanel("Table", tableOutput("table"))
                          )
                      )
@@ -192,17 +199,26 @@ server <- function(input, output,session) {
         #}
     })
     tmap_mode("view")
+    
     output$map <- renderTmap({
-        warstwa <- warstwa()
+       warstwa <- warstwa() 
         tm_shape(warstwa) + tm_fill(col = "Entropia_std", 
                                     id = "NAMELSAD",
                                     popup.vars = c("Nazwa: " = "NAMELSAD", "Entropia std: " = "Entropia_std", 
                                                    "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
                                                    "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
                                                    "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")) + tm_borders()
+       
         
         
     })
+    
+     output$plot <- renderPlotly({
+         warstwa <- warstwa() 
+         g <- ggplot(warstwa, aes(warstwa$H)) + geom_histogram(bins = 80)
+         ggplotly(g)
+     }) 
+    
 }
 
 # Run the app ----
