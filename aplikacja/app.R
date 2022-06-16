@@ -120,7 +120,7 @@ ui <- navbarPage(id = "navbar",
                          tabsetPanel(
                              tabPanel("Map", tmapOutput("map", height = "600px")), 
                              tabPanel("Plot", plotlyOutput("plot",  height = "600px")), 
-                             tabPanel("Table", tableOutput("table"))
+                             tabPanel("Table", dataTableOutput("table"))
                          )
                      )
                  )
@@ -202,7 +202,7 @@ server <- function(input, output,session) {
     
     output$map <- renderTmap({
        warstwa <- warstwa() 
-        tm_shape(warstwa) + tm_fill(col = "Entropia_std", 
+        tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3)) + tm_fill(col = "Entropia_std", 
                                     id = "NAMELSAD",
                                     popup.vars = c("Nazwa: " = "NAMELSAD", "Entropia std: " = "Entropia_std", 
                                                    "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
@@ -218,7 +218,11 @@ server <- function(input, output,session) {
          g <- ggplot(warstwa, aes(warstwa$H)) + geom_histogram(bins = 80)
          ggplotly(g)
      }) 
-    
+     output$table <- renderDataTable(
+         warstwa <- warstwa(),
+         warstwa,
+         #warstwa1 <- warstwa %>% st_drop_geometry(),
+         options = list(pageLength = 100))
 }
 
 # Run the app ----
