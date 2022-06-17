@@ -104,13 +104,16 @@ ui <- navbarPage(id = "navbar",
                           sidebarLayout(
                               sidebarPanel(id = "dt_sidebar",
                                            selectInput("dataset", "Choose a dataset:", 
-                                                       choices = c("Rock", "Pressure", "Cars")),
+                                                       choices = c("Blocks - 1990", "Blocks - 2000", "Blocks - 2010", "Blocks - 2020",
+                                                                   "Groups of blocks - 1990", "Groups of blocks - 2000", "Groups of blocks - 2010", "Groups of blocks - 2020",
+                                                                   "Tracts - 1990", "Tracts - 2000", "Tracts - 2010", "Tracts - 2020")),
                                            radioButtons("filetype", "File type:",
-                                                        choices = c("csv", "shp", "gpkg")),
-                                           downloadButton('downloadData', 'Download')
+                                                        choices = c(".csv", ".shp", ".gpkg")),
+                                           downloadButton('download_csv', 'Download .csv'),
+                                           downloadButton('download_shp', 'Download .shp')
                               ),
                               mainPanel(id = "dt_mainpanel",
-                                        tableOutput("aaa")
+                                        tableOutput("table_dt")
                               )
                           )
                  ),
@@ -142,11 +145,14 @@ ui <- navbarPage(id = "navbar",
                         #mainpanel {
                         margin-left:-50px;
                         width: 1050px;
+                        color: #bbbbbb;
                         }
                         #dt_sidebar {
                         background-color: #353535;
                         color: #dddddd;
                         }
+                        
+                        
                 
                         body, label, input, button, select { 
                           font-family: "Trebuchet MS";
@@ -267,18 +273,49 @@ server <- function(input, output,session) {
                                      color = "#dddddd"))
         ggplotly(g)
     }) 
-    # output$table <- renderDataTable(
-    #     warstwa <- as.data.frame(warstwa()),
-    #     warstwa <- warstwa[, 3:5],
-    #     warstwa,
-    #     #warstwa1 <- warstwa %>% st_drop_geometry(),
-    #     options = list(pageLength = 15))
+    
     output$table <- DT::renderDataTable(DT::datatable(warstwa(), options = list(
         rownames = FALSE,
         pageLength = 12,
         autoWidth = TRUE,
-        columnDefs = list(list(visible=FALSE, targets= c(2:5, 8:10, 20))),
+        columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
         lengthMenu = c(6, 12, 18))))
+    
+    
+    datasetInput <- reactive({
+    dataset <- switch(input$dataset,
+           "Blocks - 1990" = shp_block_1990, "Blocks - 2000" = shp_block_2000, "Blocks - 2010" = shp_block_2010, "Blocks - 2020" = shp_block_2020,
+           "Groups of blocks - 1990" = shp_grp_blocks_1990, "Groups of blocks - 2000" = shp_grp_blocks_2000, "Groups of blocks - 2010" = shp_grp_blocks_2010, "Groups of blocks - 2020" = shp_grp_blocks_2020,
+           "Tracts - 1990" = shp_tract_1990, "Tracts - 2000" = shp_tract_2000, "Tracts - 2010" = shp_tract_2010, "Tracts - 2020" = shp_tract_2020)
+    #dataset <- dataset %>% st_drop_geometry()
+    })
+    
+    output$download_csv <- downloadHandler(
+        filename = function() {
+            paste(input$dataset, ".csv", sep = "")
+        },
+        content = function(file) {
+            datasetInput_1 <- datasetInput()
+            datasetInput_1 <- datasetInput_1 %>% st_drop_geometry()
+            write.csv(datasetInput_1, file, row.names = FALSE)
+        }
+    )
+    
+    output$download_shp <- downloadHandler(
+        filename = function() {
+            paste(input$dataset, ".shp", sep = "")
+        },
+        content = function(file) {
+            datasetInput <- datasetInput()
+            writeOGR(datasetInput, file, "warstwa", 
+                     driver = "ESRI Shapefile")
+        }
+    )
+    
+    output$table_dt <- renderTable({
+        datasetInput <- datasetInput()
+        datasetInput
+    })
 }
 
 
