@@ -110,7 +110,7 @@ ui <- navbarPage(id = "navbar",
                                            radioButtons("filetype", "File type:",
                                                         choices = c(".csv", ".shp", ".gpkg")),
                                            downloadButton('download_csv', 'Download .csv'),
-                                           downloadButton('download_shp', 'Download .shp')
+                                           downloadButton('download_gpkg', 'Download .gpkg')
                               ),
                               mainPanel(id = "dt_mainpanel",
                                         tableOutput("table_dt")
@@ -150,6 +150,9 @@ ui <- navbarPage(id = "navbar",
                         #dt_sidebar {
                         background-color: #353535;
                         color: #dddddd;
+                        }
+                        #download_gpkg {
+                        margin-left:160px;
                         }
                         
                         
@@ -283,7 +286,7 @@ server <- function(input, output,session) {
     
     
     datasetInput <- reactive({
-    dataset <- switch(input$dataset,
+            switch(input$dataset,
            "Blocks - 1990" = shp_block_1990, "Blocks - 2000" = shp_block_2000, "Blocks - 2010" = shp_block_2010, "Blocks - 2020" = shp_block_2020,
            "Groups of blocks - 1990" = shp_grp_blocks_1990, "Groups of blocks - 2000" = shp_grp_blocks_2000, "Groups of blocks - 2010" = shp_grp_blocks_2010, "Groups of blocks - 2020" = shp_grp_blocks_2020,
            "Tracts - 1990" = shp_tract_1990, "Tracts - 2000" = shp_tract_2000, "Tracts - 2010" = shp_tract_2010, "Tracts - 2020" = shp_tract_2020)
@@ -301,21 +304,17 @@ server <- function(input, output,session) {
         }
     )
     
-    output$download_shp <- downloadHandler(
+    output$download_gpkg <- downloadHandler(
         filename = function() {
-            paste(input$dataset, ".shp", sep = "")
+            paste(input$dataset, ".gpkg", sep = "")
         },
         content = function(file) {
             datasetInput <- datasetInput()
-            writeOGR(datasetInput, file, "warstwa", 
-                     driver = "ESRI Shapefile")
+            st_write(datasetInput, file)
         }
     )
     
-    output$table_dt <- renderTable({
-        datasetInput <- datasetInput()
-        datasetInput
-    })
+    
 }
 
 
