@@ -67,9 +67,14 @@ ui <- navbarPage(id = "navbar",
                      HTML('
                          #sidebar {
                             background-color: #222222;
+                            width:440px;
                          }
                         #navbar {
                             background-color: #222222;
+                        }
+                        #mainpanel {
+                        margin-left:-50px;
+                        width: 1050px;
                         
                         }
                 
@@ -116,11 +121,11 @@ ui <- navbarPage(id = "navbar",
                          actionButton("run", "Lets goooooooooo")
                      ),
                      
-                     mainPanel(
+                     mainPanel(id = "mainpanel",
                          tabsetPanel(
                              tabPanel("Map", tmapOutput("map", height = "600px")), 
                              tabPanel("Plot", plotlyOutput("plot",  height = "600px")), 
-                             tabPanel("Table", dataTableOutput("table"))
+                             tabPanel("Table", DT::dataTableOutput("table"))
                          )
                      )
                  )
@@ -202,7 +207,7 @@ server <- function(input, output,session) {
     
     output$map <- renderTmap({
        warstwa <- warstwa() 
-        tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3)) + tm_fill(col = "Entropia_std", 
+        tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + tm_fill(col = "Entropia_std", 
                                     id = "NAMELSAD",
                                     popup.vars = c("Nazwa: " = "NAMELSAD", "Entropia std: " = "Entropia_std", 
                                                    "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
@@ -218,12 +223,20 @@ server <- function(input, output,session) {
          g <- ggplot(warstwa, aes(warstwa$H)) + geom_histogram(bins = 80)
          ggplotly(g)
      }) 
-     output$table <- renderDataTable(
-         warstwa <- warstwa(),
-         warstwa,
-         #warstwa1 <- warstwa %>% st_drop_geometry(),
-         options = list(pageLength = 100))
+     # output$table <- renderDataTable(
+     #     warstwa <- as.data.frame(warstwa()),
+     #     warstwa <- warstwa[, 3:5],
+     #     warstwa,
+     #     #warstwa1 <- warstwa %>% st_drop_geometry(),
+     #     options = list(pageLength = 15))
+     output$table <- DT::renderDataTable(DT::datatable(warstwa(), options = list(
+                             rownames = FALSE,
+                             pageLength = 12,
+                             autoWidth = TRUE,
+                             columnDefs = list(list(visible=FALSE, targets= c(2:5, 8:10, 20))),
+                             lengthMenu = c(6, 12, 18))))
 }
+
 
 # Run the app ----
 shinyApp(ui = ui, server = server)
