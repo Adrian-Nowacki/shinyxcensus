@@ -3,6 +3,7 @@ library(shiny)
 library(dplyr)
 library(sf)
 library(tmap)
+library(DT)
 library(shinydashboard)
 library(shinyWidgets)
 library(shinyjs)
@@ -88,7 +89,7 @@ ui <- navbarPage(id = "navbar",
                                                                                "2010", 
                                                                                "2020"),
                                                                    selected = "1990")),
-                                           actionButton("run", "Lets goooooooooo")
+                                           actionButton("run", "Run")
                               ),
                               
                               mainPanel(id = "mainpanel",
@@ -153,6 +154,9 @@ ui <- navbarPage(id = "navbar",
                         }
                         #download_gpkg {
                         margin-left:160px;
+                        }
+                        #table {
+                        color:#dddddd;
                         }
                         
                         
@@ -258,7 +262,7 @@ server <- function(input, output,session) {
     
     output$plot <- renderPlotly({
         warstwa <- warstwa() 
-        g <- ggplot(warstwa, aes(warstwa$H)) + geom_histogram(bins = 80) + theme(
+        g <- ggplot(warstwa, aes(H)) + geom_histogram(bins = 80, fill = '#367d59') + theme(
             panel.grid.major.y = element_blank(),
             plot.background = element_rect(fill = "#252525"),
             panel.background = element_rect(fill = "#252525"), 
@@ -274,7 +278,7 @@ server <- function(input, output,session) {
             legend.text = element_text(size = 12),
             axis.text = element_text(size = 12, 
                                      color = "#dddddd"))
-        ggplotly(g)
+        ggplotly(g)%>% config(displayModeBar = F)
     }) 
     
     output$table <- DT::renderDataTable(DT::datatable(warstwa(), options = list(
