@@ -158,6 +158,18 @@ ui <- navbarPage(id = "navbar",
                         #table {
                         color:#dddddd;
                         }
+                        #table th{
+                        color:#dddddd;
+                        background-color:rgba(70, 70, 70, 0.9);
+                        border-right:1px solid #dddddd;
+                        }
+                        #table tr:nth-child(2n+1){
+                        background-color:#dddddd;
+                        color:#222222;
+                        }
+                        #table a{
+                        color:#dddddd!important;
+                        }
                         
                         
                 
