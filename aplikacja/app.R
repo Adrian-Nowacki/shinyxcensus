@@ -9,6 +9,7 @@ library(shinyWidgets)
 library(shinyjs)
 library(ggplot2)
 library(plotly)
+library(leaflet)
 # wczytanie danych
 shp_block_1990 <- st_read("dane/counties_shp/census_shp/shp_block_1990.gpkg")
 shp_block_2000 <- st_read("dane/counties_shp/census_shp/shp_block_2000.gpkg")
@@ -256,21 +257,104 @@ server <- function(input, output,session) {
         }
         #}
     })
-    tmap_mode("view")
     
-    output$map <- renderTmap({
-        warstwa <- warstwa() 
-        tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + tm_fill(col = "H", 
-                                                                           id = "NAMELSAD",
-                                                                           palette = "YlGn",
-                                                                           popup.vars = c("Nazwa: " = "NAMELSAD", "Entropia std: " = "Entropia_std", 
-                                                                                          "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
-                                                                                          "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
-                                                                                          "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")) + tm_borders()
+    
+    
+        output$map <- renderLeaflet({
+          
+          if (input$aggr_button == 1){
+          tmap_mode("view")
+          popup <- paste0("<strong>County: </strong>", 
+                                warstwa()$NAMELSAD, 
+                                "<br><strong> Entrophy std: </strong>",
+                          warstwa()$Entropia_std,
+                                "<br><strong> H index: </strong>",
+                          warstwa()$H,
+                                "<br><strong> D (white-black): </strong>",
+                          warstwa()$D_wb,
+                          "<br><strong> D (white-asian): </strong>",
+                          warstwa()$D_wa,
+                          "<br><strong> D (white-latin): </strong>",
+                          warstwa()$D_wl,
+                          "<br><strong> D (black-latin): </strong>",
+                          warstwa()$D_bl,
+                          "<br><strong> D (black-asian): </strong>",
+                          warstwa()$D_ba,
+                          "<br><strong> D (latin-asian): </strong>",
+                          warstwa()$D_la)
+          # text = paste0("Nazwa: " = "NAMELSAD", "Entropia std: " = "Entropia_std", 
+          #          "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
+          #          "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
+          #          "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")
+          warstwa <- warstwa()
+          pal <- colorNumeric(
+            palette = "YlGn",
+            domain = warstwa$H)
+          pal2 <- colorNumeric(
+            palette = "YlGn",
+            domain = warstwa$Entropia_std)
+          map <- leaflet(data = warstwa()) %>%
+            setView(lat = 50, lng = -120, zoom = 3.2) %>%
+            addTiles() %>%
+            
+            addPolygons(fillColor = ~pal(warstwa$H),
+                        popup = popup,
+                        group = "H",
+                        color = "#222222",
+                        fillOpacity = 0.8,
+                        weight = 0.5) %>%
+            addLegend(pal = pal, values = ~H, opacity = 1, group = "H") %>%
+            
+            addPolygons(fillColor = ~pal2(warstwa$Entropia_std),
+                        popup = popup,
+                        group = "Entropia_std",
+                        color = "#222222",
+                        fillOpacity = 0.8,
+                        weight = 0.5) %>%
+            addLegend(pal = pal2, values = ~Entropia_std, opacity = 1) %>%
+          addLayersControl(
+            baseGroups = "OSM (default)",
+            overlayGroups = c("Entropia_std", "H"),
+            options = layersControlOptions(collapsed = FALSE))
+          map %>% hideGroup("H")
+          
+          
+         # a <- tm_shape(warstwa()) + tm_polygons(col = c("Entropia_std", "H"),
+         #                                        palette = "YlGn",
+         #                                        popup.vars = text) + tm_facets(as.layers = TRUE) + tm_view(set.view = c(-120, 50, 3.2))
+         # 
+         # tmap_leaflet(a,
+          #             mode = "view",
+          #             in.shiny = TRUE)
+          
+          }
+          else if (input$indicator_button == 1){
+            if (input$index == "Entropy"){}
+            else if (input$index == "Index of dissimilarity"){}
+            else if (input$index == "The information theory index H"){}
+            
+            warstwa <- warstwa()
+            pal <- colorNumeric(
+              palette = "YlGn",
+              domain = warstwa$H_block)
+            map <- leaflet(data = warstwa()) %>%
+              setView(lat = 50, lng = -120, zoom = 3.2) %>%
+              addTiles() %>%
+              
+              addPolygons(fillColor = ~pal(warstwa$H_block),
+                          color = "#222222",
+                          fillOpacity = 0.8,
+                          weight = 0.5) %>%
+              addLegend(pal = pal, values = ~H_block, opacity = 1) %>%
+              addLayersControl(
+                baseGroups = "OSM (default)",
+                overlayGroups = "H_block",
+                options = layersControlOptions(collapsed = FALSE))
+            map 
+          }
+        })
         
-        
-        
-    })
+          
     
     output$plot <- renderPlotly({
         warstwa <- warstwa() 
