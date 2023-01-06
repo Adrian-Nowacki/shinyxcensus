@@ -74,7 +74,7 @@ ui <- navbarPage(id = "navbar",
                                                        selectInput("variable_unit", 
                                                                    label = "Choose a variable",
                                                                    choices = c("Entropia", 
-                                                                               "Entropia std",
+                                                                               "Entropia_std",
                                                                                "H", 
                                                                                "D_wb",
                                                                                "D_wa", 
@@ -257,39 +257,42 @@ server <- function(input, output,session) {
         })
     
     warstwa <- eventReactive(input$run, {
-        
-        aggr <- switch(input$unit, 
+      input$run
+        aggr <- isolate(switch(input$unit, 
                        "Blocks" = aggr_objects[[1]],
                        "Groups of blocks" = aggr_objects[[2]],
-                       "Tracts" = aggr_objects[[3]])
+                       "Tracts" = aggr_objects[[3]]))
         
-        indexes <- switch(input$index, 
+        indexes <- isolate(switch(input$index, 
                           "Entropy" = ind_objects[[1]],
                           "Index of dissimilarity" = ind_objects[[2]],
-                          "The information theory index H" = ind_objects[[3]])
+                          "The information theory index H" = ind_objects[[3]]))
         
         #function(){
         if (input$aggr_button == 1){
-            switch(input$year, 
+          input$run
+          isolate(switch(input$year, 
                    "1990" = aggr[[1]],
                    "2000" = aggr[[2]],
                    "2010" = aggr[[3]],
-                   "2020" = aggr[[4]])
+                   "2020" = aggr[[4]]))
         }
         else if (input$indicator_button == 1){
-            switch(input$year, 
+          input$run
+            isolate(switch(input$year, 
                    "1990" = indexes[[1]],
                    "2000" = indexes[[2]],
                    "2010" = indexes[[3]],
-                   "2020" = indexes[[4]])
+                   "2020" = indexes[[4]]))
         }
         #}
     })
     
     observeEvent(input$index, {
-      
     if (input$indicator_button == 1){
+      
         if (input$index == "Entropy"){
+          freezeReactiveValue(input, "variable_index")
           updateSelectInput(session, "variable_index",
                             label = "Choose an aggregation unit and variable",
                             choices = c("Entropy    |ALL AGGREGATION UNITS",
@@ -297,6 +300,7 @@ server <- function(input, output,session) {
                             selected = "Entropy    |ALL AGGREGATION UNITS"
           )}
         else if (input$index == "Index of dissimilarity"){
+          freezeReactiveValue(input, "variable_index")
           updateSelectInput(session, "variable_index",
                             label = "Choose an aggregation unit and variable",
                             choices = c("white-black    |BLOCKS",
@@ -321,6 +325,7 @@ server <- function(input, output,session) {
           )
         }
         else if (input$index == "The information theory index H"){
+          freezeReactiveValue(input, "variable_index")
           updateSelectInput(session, "variable_index",
                             label = "Choose an aggregation unit and variable",
                             choices = c("H    |BLOCKS",
@@ -330,14 +335,18 @@ server <- function(input, output,session) {
           )
         }
     }
+      
     })
     
+    
          output$map <- renderTmap({
-           if (input$aggr_button == 1){
-             
+           if (isolate(input$aggr_button) == 1){
+             input$run
              tmap_mode("view")
              warstwa <- warstwa()
-             variable_unit <- as.character(input$variable_unit)
+             
+             variable_unit <- isolate(input$variable_unit)
+             
              popup <- c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
                         "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
                         "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
@@ -422,16 +431,19 @@ server <- function(input, output,session) {
           #             in.shiny = TRUE)
           
           
-          else if (input$indicator_button == 1){
-            if (input$index == "Entropy"){
-              
+          else if (isolate(input$indicator_button) == 1){
+            
+            if (isolate(input$index) == "Entropy"){
+              input$run
               
               tmap_mode("view")
               warstwa <- warstwa()
-              var <- switch(input$variable_index, 
+              var <- isolate(switch(input$variable_index, 
                                        "Entropy    |ALL AGGREGATION UNITS" = "Entropy",
-                                       "Entropy std    |ALL AGGREGATION UNITS" = "Entropy_std")
+                                       "Entropy std    |ALL AGGREGATION UNITS" = "Entropy_std"))
               popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std")
+              
+             
               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
                 tm_fill(col = var, 
                         palette = "YlGn",
@@ -440,10 +452,11 @@ server <- function(input, output,session) {
             }
             
             
-            else if (input$index == "Index of dissimilarity"){
+            else if (isolate(input$index) == "Index of dissimilarity"){
+              input$run
               tmap_mode("view")
               warstwa <- warstwa()
-              var <- switch(input$variable_index, 
+              var <- isolate(switch(input$variable_index, 
                             "white-black    |BLOCKS" = "D_wb_block",
                             "white-asian    |BLOCKS" = "D_wa_block",
                             "white-latin    |BLOCKS" = "D_wl_block",
@@ -461,7 +474,7 @@ server <- function(input, output,session) {
                             "white-latin    |TRACT" = "D_wl_tract",
                             "black-latin    |TRACT" = "D_bl_tract",
                             "black-asian    |TRACT" = "D_ba_tract",
-                            "latin-asian    |TRACT" = "D_la_tract")
+                            "latin-asian    |TRACT" = "D_la_tract"))
               popup <- c("white-black    |BLOCKS: " = "D_wb_block",
                          "white-asian    |BLOCKS: " = "D_wa_block",
                          "white-latin    |BLOCKS: " = "D_wl_block",
@@ -481,6 +494,7 @@ server <- function(input, output,session) {
                          "black-asian    |TRACT: " = "D_ba_tract",
                          "latin-asian    |TRACT: " = "D_la_tract")
               
+              
               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
                 tm_fill(col = var, 
                         palette = "YlGn",
@@ -489,20 +503,23 @@ server <- function(input, output,session) {
             }
             
             
-            else if (input$index == "The information theory index H"){
+            else if (isolate(input$index) == "The information theory index H"){
+              input$run
               tmap_mode("view")
               warstwa <- warstwa()
-              var <- switch(input$variable_index, 
+              var <- isolate(switch(input$variable_index, 
                             "H    |BLOCKS" = "H_block",
                             "H    |GROUP OF BLOCKS" = "H_group_blocks",
-                            "H    |TRACTS" = "H_tracts")
+                            "H    |TRACTS" = "H_tracts"))
               popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std")
+              
               
               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
                 tm_fill(col = var, 
                         palette = "YlGn",
                         id = "NAMELSAD",
                         popup.vars = popup) + tm_borders()
+              
             
             }
             }
