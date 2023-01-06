@@ -71,6 +71,18 @@ ui <- navbarPage(id = "navbar",
                                                                                "Groups of blocks",
                                                                                "Tracts"),
                                                                    selected = "blocks"),
+                                                       selectInput("variable_unit", 
+                                                                   label = "Choose a variable",
+                                                                   choices = c("Entropia", 
+                                                                               "Entropia std",
+                                                                               "H", 
+                                                                               "D_wb",
+                                                                               "D_wa", 
+                                                                               "D_wl",
+                                                                               "D_bl", 
+                                                                               "D_ba",
+                                                                               "D_la"),
+                                                                   selected = "Entropia"),
                                                        
                                                        
                                                        checkboxInput("indicator_button", "Selected indicator for individual aggregation units", value = 0),
@@ -80,7 +92,12 @@ ui <- navbarPage(id = "navbar",
                                                                    choices = c("Entropy",
                                                                                "Index of dissimilarity", 
                                                                                "The information theory index H"),
-                                                                   selected = "Entrophy")),
+                                                                   selected = "Entrophy"),
+                                                       selectInput("variable_index", 
+                                                                   label = "Choose an aggregation unit and variable",
+                                                                   choices = c("Entropy    |ALL AGGREGATION UNITS", 
+                                                                               "Entropy std    |ALL AGGREGATION UNITS"),
+                                                                   selected = "Entropy")),
                                            
                                            tabsetPanel(id = "tabset2",
                                                        selectInput("year", 
@@ -175,8 +192,9 @@ ui <- navbarPage(id = "navbar",
                         
                 
                         body, label, input, button, select { 
-                          font-family: "Trebuchet MS";
+                          font-family: "Lucida Console";
                           color: #dddddd;
+                          letter-spacing: -0.3px;
                         }')
                  )),
                  
@@ -191,14 +209,18 @@ server <- function(input, output,session) {
     observeEvent(input$aggr_button, {
         if(input$aggr_button == 1){
             shinyjs::disable(id = "index")
+            shinyjs::disable(id = "variable_index")
             shinyjs::enable(id = "unit")
+            shinyjs::enable(id = "variable_unit")
             updateCheckboxInput(
                 inputId = "indicator_button", 
                 value = FALSE
             )} 
         else {
             shinyjs::enable(id = "index")
+            shinyjs::enable(id = "variable_index")
             shinyjs::disable(id = "unit")
+            shinyjs::disable(id = "variable_unit")
             updateCheckboxInput(
                 inputId = "aggr_button",
                 value = FALSE
@@ -208,14 +230,18 @@ server <- function(input, output,session) {
     observeEvent(input$indicator_button, {
         if(input$indicator_button == 0){
             shinyjs::disable(id = "index")
+            shinyjs::disable(id = "variable_index")
             shinyjs::enable(id = "unit")
+            shinyjs::enable(id = "variable_unit")
             updateCheckboxInput(
                 inputId = "indicator_button", 
                 value = FALSE
             )} 
         else {
             shinyjs::enable(id = "index")
+            shinyjs::enable(id = "variable_index")
             shinyjs::disable(id = "unit")
+            shinyjs::disable(id = "variable_unit")
             updateCheckboxInput(
                 inputId = "aggr_button",
                 value = FALSE
@@ -225,7 +251,9 @@ server <- function(input, output,session) {
         input$indicator_button}, {
             if(input$aggr_button == 0 & input$indicator_button ==0){
                 shinyjs::disable(id = "index")
-                shinyjs::disable(id = "unit")}
+                shinyjs::disable(id = "variable_index")
+                shinyjs::disable(id = "unit")
+                shinyjs::disable(id = "variable_unit")}
         })
     
     warstwa <- eventReactive(input$run, {
@@ -258,65 +286,131 @@ server <- function(input, output,session) {
         #}
     })
     
+    observeEvent(input$index, {
+      
+    if (input$indicator_button == 1){
+        if (input$index == "Entropy"){
+          updateSelectInput(session, "variable_index",
+                            label = "Choose an aggregation unit and variable",
+                            choices = c("Entropy    |ALL AGGREGATION UNITS",
+                                        "Entropy std    |ALL AGGREGATION UNITS"),
+                            selected = "Entropy    |ALL AGGREGATION UNITS"
+          )}
+        else if (input$index == "Index of dissimilarity"){
+          updateSelectInput(session, "variable_index",
+                            label = "Choose an aggregation unit and variable",
+                            choices = c("white-black    |BLOCKS",
+                                        "white-asian    |BLOCKS",
+                                        "white-latin    |BLOCKS",
+                                        "black-latin    |BLOCKS",
+                                        "black-asian    |BLOCKS",
+                                        "latin-asian    |BLOCKS",
+                                        "white-black    |GROUP OF BLOCKS",
+                                        "white-asian    |GROUP OF BLOCKS",
+                                        "white-latin    |GROUP OF BLOCKS",
+                                        "black-latin    |GROUP OF BLOCKS",
+                                        "black-asian    |GROUP OF BLOCKS",
+                                        "latin-asian    |GROUP OF BLOCKS",
+                                        "white-black    |TRACT",
+                                        "white-asian    |TRACT",
+                                        "white-latin    |TRACT",
+                                        "black-latin    |TRACT",
+                                        "black-asian    |TRACT",
+                                        "latin-asian    |TRACT"),
+                            selected = "white-black    |BLOCKS"
+          )
+        }
+        else if (input$index == "The information theory index H"){
+          updateSelectInput(session, "variable_index",
+                            label = "Choose an aggregation unit and variable",
+                            choices = c("H    |BLOCKS",
+                                        "H    |GROUP OF BLOCKS",
+                                        "H    |TRACTS"),
+                            selected = "H    |BLOCKS"
+          )
+        }
+    }
+    })
     
-    
-        output$map <- renderLeaflet({
-          
-          if (input$aggr_button == 1){
-          tmap_mode("view")
-          popup <- paste0("<strong>County: </strong>", 
-                                warstwa()$NAMELSAD, 
-                                "<br><strong> Entrophy std: </strong>",
-                          warstwa()$Entropia_std,
-                                "<br><strong> H index: </strong>",
-                          warstwa()$H,
-                                "<br><strong> D (white-black): </strong>",
-                          warstwa()$D_wb,
-                          "<br><strong> D (white-asian): </strong>",
-                          warstwa()$D_wa,
-                          "<br><strong> D (white-latin): </strong>",
-                          warstwa()$D_wl,
-                          "<br><strong> D (black-latin): </strong>",
-                          warstwa()$D_bl,
-                          "<br><strong> D (black-asian): </strong>",
-                          warstwa()$D_ba,
-                          "<br><strong> D (latin-asian): </strong>",
-                          warstwa()$D_la)
-          # text = paste0("Nazwa: " = "NAMELSAD", "Entropia std: " = "Entropia_std", 
-          #          "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
-          #          "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
-          #          "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")
-          warstwa <- warstwa()
-          pal <- colorNumeric(
-            palette = "YlGn",
-            domain = warstwa$H)
-          pal2 <- colorNumeric(
-            palette = "YlGn",
-            domain = warstwa$Entropia_std)
-          map <- leaflet(data = warstwa()) %>%
-            setView(lat = 50, lng = -120, zoom = 3.2) %>%
-            addTiles() %>%
+         output$map <- renderTmap({
+           if (input$aggr_button == 1){
+             
+             tmap_mode("view")
+             warstwa <- warstwa()
+             variable_unit <- as.character(input$variable_unit)
+             popup <- c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
+                        "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
+                        "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
+                        "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")
+             
+               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
+                 tm_fill(col = variable_unit, 
+                         palette = "YlGn",
+                         id = "NAMELSAD",
+                         popup.vars = popup) + tm_borders()
             
-            addPolygons(fillColor = ~pal(warstwa$H),
-                        popup = popup,
-                        group = "H",
-                        color = "#222222",
-                        fillOpacity = 0.8,
-                        weight = 0.5) %>%
-            addLegend(pal = pal, values = ~H, opacity = 1, group = "H") %>%
-            
-            addPolygons(fillColor = ~pal2(warstwa$Entropia_std),
-                        popup = popup,
-                        group = "Entropia_std",
-                        color = "#222222",
-                        fillOpacity = 0.8,
-                        weight = 0.5) %>%
-            addLegend(pal = pal2, values = ~Entropia_std, opacity = 1) %>%
-          addLayersControl(
-            baseGroups = "OSM (default)",
-            overlayGroups = c("Entropia_std", "H"),
-            options = layersControlOptions(collapsed = FALSE))
-          map %>% hideGroup("H")
+             
+             }
+        #   
+        #   if (input$aggr_button == 1){
+        #   tmap_mode("view")
+        #   popup <- paste0("<strong>County: </strong>", 
+        #                         warstwa()$NAMELSAD, 
+        #                         "<br><strong> Entrophy std: </strong>",
+        #                   warstwa()$Entropia_std,
+        #                         "<br><strong> H index: </strong>",
+        #                   warstwa()$H,
+        #                         "<br><strong> D (white-black): </strong>",
+        #                   warstwa()$D_wb,
+        #                   "<br><strong> D (white-asian): </strong>",
+        #                   warstwa()$D_wa,
+        #                   "<br><strong> D (white-latin): </strong>",
+        #                   warstwa()$D_wl,
+        #                   "<br><strong> D (black-latin): </strong>",
+        #                   warstwa()$D_bl,
+        #                   "<br><strong> D (black-asian): </strong>",
+        #                   warstwa()$D_ba,
+        #                   "<br><strong> D (latin-asian): </strong>",
+        #                   warstwa()$D_la)
+        #   # text = paste0("Nazwa: " = "NAMELSAD", "Entropia std: " = "Entropia_std", 
+        #   #          "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
+        #   #          "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
+        #   #          "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")
+        #   warstwa <- warstwa()
+        #   variable_unit <- as.character(input$variable_unit)
+        #   pal <- colorNumeric(
+        #     palette = "YlGn",
+        #     domain = warstwa[[variable_unit]])
+        #   pal2 <- colorNumeric(
+        #     palette = "YlGn",
+        #     domain = warstwa[[variable_unit]])
+        #   map <- leaflet(data = warstwa()) %>%
+        #     setView(lat = 50, lng = -120, zoom = 3.2) %>%
+        #     addTiles() %>%
+        #     
+        #     addPolygons(fillColor = ~pal(warstwa[[variable_unit]]),
+        #                 popup = popup,
+        #                 group = "H",
+        #                 color = "#222222",
+        #                 fillOpacity = 0.8,
+        #                 weight = 0.5) %>%
+        #     addLegend(pal = pal, 
+        #               values = ~warstwa[[variable_unit]], 
+        #               opacity = 1, 
+        #               title = variable_unit) %>%
+        #     
+        #     # addPolygons(fillColor = ~pal2(warstwa$Entropia_std),
+        #     #             popup = popup,
+        #     #             group = "Entropia_std",
+        #     #             color = "#222222",
+        #     #             fillOpacity = 0.8,
+        #     #             weight = 0.5) %>%
+        #     # addLegend(pal = pal2, values = ~Entropia_std, opacity = 1) %>%
+        #   addLayersControl(
+        #     baseGroups = "OSM (default)",
+        #     overlayGroups = c("Entropia_std", "H"),
+        #     options = layersControlOptions(collapsed = FALSE))
+        #   map 
           
           
          # a <- tm_shape(warstwa()) + tm_polygons(col = c("Entropia_std", "H"),
@@ -327,38 +421,100 @@ server <- function(input, output,session) {
           #             mode = "view",
           #             in.shiny = TRUE)
           
-          }
+          
           else if (input$indicator_button == 1){
-            if (input$index == "Entropy"){}
-            else if (input$index == "Index of dissimilarity"){}
-            else if (input$index == "The information theory index H"){}
-            
-            warstwa <- warstwa()
-            pal <- colorNumeric(
-              palette = "YlGn",
-              domain = warstwa$H_block)
-            map <- leaflet(data = warstwa()) %>%
-              setView(lat = 50, lng = -120, zoom = 3.2) %>%
-              addTiles() %>%
+            if (input$index == "Entropy"){
               
-              addPolygons(fillColor = ~pal(warstwa$H_block),
-                          color = "#222222",
-                          fillOpacity = 0.8,
-                          weight = 0.5) %>%
-              addLegend(pal = pal, values = ~H_block, opacity = 1) %>%
-              addLayersControl(
-                baseGroups = "OSM (default)",
-                overlayGroups = "H_block",
-                options = layersControlOptions(collapsed = FALSE))
-            map 
-          }
+              
+              tmap_mode("view")
+              warstwa <- warstwa()
+              var <- switch(input$variable_index, 
+                                       "Entropy    |ALL AGGREGATION UNITS" = "Entropy",
+                                       "Entropy std    |ALL AGGREGATION UNITS" = "Entropy_std")
+              popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std")
+              tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
+                tm_fill(col = var, 
+                        palette = "YlGn",
+                        id = "NAMELSAD",
+                        popup.vars = popup) + tm_borders()
+            }
+            
+            
+            else if (input$index == "Index of dissimilarity"){
+              tmap_mode("view")
+              warstwa <- warstwa()
+              var <- switch(input$variable_index, 
+                            "white-black    |BLOCKS" = "D_wb_block",
+                            "white-asian    |BLOCKS" = "D_wa_block",
+                            "white-latin    |BLOCKS" = "D_wl_block",
+                            "black-latin    |BLOCKS" = "D_bl_block",
+                            "black-asian    |BLOCKS" = "D_ba_block",
+                            "latin-asian    |BLOCKS" = "D_la_block",
+                            "white-black    |GROUP OF BLOCKS" = "D_wb_group_blocks",
+                            "white-asian    |GROUP OF BLOCKS" = "D_wa_group_blocks",
+                            "white-latin    |GROUP OF BLOCKS" = "D_wl_group_blocks",
+                            "black-latin    |GROUP OF BLOCKS" = "D_bl_group_blocks",
+                            "black-asian    |GROUP OF BLOCKS" = "D_ba_group_blocks",
+                            "latin-asian    |GROUP OF BLOCKS" = "D_la_group_blocks",
+                            "white-black    |TRACT" = "D_wb_tract",
+                            "white-asian    |TRACT" = "D_wa_tract",
+                            "white-latin    |TRACT" = "D_wl_tract",
+                            "black-latin    |TRACT" = "D_bl_tract",
+                            "black-asian    |TRACT" = "D_ba_tract",
+                            "latin-asian    |TRACT" = "D_la_tract")
+              popup <- c("white-black    |BLOCKS: " = "D_wb_block",
+                         "white-asian    |BLOCKS: " = "D_wa_block",
+                         "white-latin    |BLOCKS: " = "D_wl_block",
+                         "black-latin    |BLOCKS: " = "D_bl_block",
+                         "black-asian    |BLOCKS: " = "D_ba_block",
+                         "latin-asian    |BLOCKS: " = "D_la_block",
+                         "white-black    |GROUP OF BLOCKS: " = "D_wb_group_blocks",
+                         "white-asian    |GROUP OF BLOCKS: " = "D_wa_group_blocks",
+                         "white-latin    |GROUP OF BLOCKS: " = "D_wl_group_blocks",
+                         "black-latin    |GROUP OF BLOCKS: " = "D_bl_group_blocks",
+                         "black-asian    |GROUP OF BLOCKS: " = "D_ba_group_blocks",
+                         "latin-asian    |GROUP OF BLOCKS: " = "D_la_group_blocks",
+                         "white-black    |TRACT: " = "D_wb_tract",
+                         "white-asian    |TRACT: " = "D_wa_tract",
+                         "white-latin    |TRACT: " = "D_wl_tract",
+                         "black-latin    |TRACT: " = "D_bl_tract",
+                         "black-asian    |TRACT: " = "D_ba_tract",
+                         "latin-asian    |TRACT: " = "D_la_tract")
+              
+              tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
+                tm_fill(col = var, 
+                        palette = "YlGn",
+                        id = "NAMELSAD",
+                        popup.vars = popup) + tm_borders()
+            }
+            
+            
+            else if (input$index == "The information theory index H"){
+              tmap_mode("view")
+              warstwa <- warstwa()
+              var <- switch(input$variable_index, 
+                            "H    |BLOCKS" = "H_block",
+                            "H    |GROUP OF BLOCKS" = "H_group_blocks",
+                            "H    |TRACTS" = "H_tracts")
+              popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std")
+              
+              tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
+                tm_fill(col = var, 
+                        palette = "YlGn",
+                        id = "NAMELSAD",
+                        popup.vars = popup) + tm_borders()
+            
+            }
+            }
         })
         
           
     
     output$plot <- renderPlotly({
         warstwa <- warstwa() 
-        g <- ggplot(warstwa, aes(H)) + geom_histogram(bins = 80, fill = '#367d59') + theme(
+        variable_unit <- as.character(input$index)
+        
+        g <- ggplot(warstwa, aes(warstwa[[variable_unit]])) + geom_histogram(bins = 80, fill = '#367d59') + theme(
             panel.grid.major.y = element_blank(),
             plot.background = element_rect(fill = "#252525"),
             panel.background = element_rect(fill = "#252525"), 
