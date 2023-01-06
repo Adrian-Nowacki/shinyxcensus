@@ -112,14 +112,14 @@ ui <- navbarPage(id = "navbar",
                               
                               mainPanel(id = "mainpanel",
                                         tabsetPanel(
-                                            tabPanel("Map", tmapOutput("map", height = "600px")), 
-                                            tabPanel("Plot", plotlyOutput("plot",  height = "600px")), 
+                                            tabPanel("Interactive map", tmapOutput("map", height = "600px")), 
+                                            tabPanel("Statistics", plotlyOutput("plot",  height = "600px")), 
                                             tabPanel("Table", DT::dataTableOutput("table"))
                                         )
                               )
                           )
                  ),
-                 tabPanel("Data frames",
+                 tabPanel("Download data",
                           sidebarLayout(
                               sidebarPanel(id = "dt_sidebar",
                                            selectInput("dataset", "Choose a dataset:", 
@@ -136,7 +136,7 @@ ui <- navbarPage(id = "navbar",
                               )
                           )
                  ),
-                 tabPanel("Author",
+                 tabPanel("About",
                           fluidRow(
                               column(2,
                                      img(src='github_logo.png', width = "200px", height = "200px", align = "center")),
@@ -156,45 +156,72 @@ ui <- navbarPage(id = "navbar",
                      HTML('
                          #sidebar {
                             background-color: #353535;
-                            width:440px;
+                            width:400px;
+                            height:750px!important;
+                            border:none!important;
+                            border-right:1px solid #eeeeee!important;
                          }
-                        #navbar {
-                            background-color: #252525;
+                         .row {
+                            margin-left:-30px!important;
+                         }
+                        .navbar-default {
+                            background-color:#477676!important;
+                            color:#eeeeee!important;
+                        }
+                        .navbar-brand {
+                            color:#eeeeee!important;
+                            font-weight:bold!important;
+                        }
+                        .navbar .navbar-nav {
+                            float: right;
+                            background-color:#477676!important;
+                        }
+                        .navbar {
+                            margin-bottom:0px!important;
+                        }
+                        .navbar-nav>li>a {
+                            background-color:#477676!important;
+                            color:#eeeeee!important;
+                        }
+                        .navbar-nav li a:hover, .navbar-nav > .active > a {
+                            color: #eeeeee!important;
+                            background-color:#3a5959 !important;
+                            background-image: none !important;
                         }
                         #mainpanel {
-                        margin-left:-50px;
-                        width: 1050px;
-                        color: #bbbbbb;
+                            margin-left:-50px;
+                            width: 1050px;
+                            color: #bbbbbb;
                         }
                         #dt_sidebar {
-                        background-color: #353535;
-                        color: #dddddd;
+                            background-color: #353535;
+                            color: #dddddd;
                         }
                         #download_gpkg {
-                        margin-left:160px;
+                            margin-left:160px;
                         }
                         #table {
-                        color:#dddddd;
+                            color:#dddddd;
                         }
                         #table th{
-                        color:#dddddd;
-                        background-color:rgba(70, 70, 70, 0.9);
-                        border-right:1px solid #dddddd;
+                            color:#dddddd;
+                            background-color:rgba(70, 70, 70, 0.9);
+                            border-right:1px solid #dddddd;
                         }
                         #table tr:nth-child(2n+1){
-                        background-color:#dddddd;
-                        color:#222222;
+                            background-color:#dddddd;
+                            color:#222222;
                         }
                         #table a{
-                        color:#dddddd!important;
+                            color:#dddddd!important;
+                            font-size: 0.4;
                         }
                         
                         
                 
                         body, label, input, button, select { 
-                          font-family: "Lucida Console";
-                          color: #dddddd;
-                          letter-spacing: -0.3px;
+                            color: #dddddd;
+                            letter-spacing: -0.2px;
                         }')
                  )),
                  
@@ -579,6 +606,13 @@ server <- function(input, output,session) {
             st_write(datasetInput, file)
         }
     )
+    
+    output$table_dt <- DT::renderDataTable(DT::datatable(datasetInput(), options = list(
+      rownames = FALSE,
+      pageLength = 12,
+      autoWidth = TRUE,
+      columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
+      lengthMenu = c(6, 12, 18))))
     
     
 }
