@@ -360,76 +360,6 @@ server <- function(input, output,session) {
             
              
              }
-        #   
-        #   if (input$aggr_button == 1){
-        #   tmap_mode("view")
-        #   popup <- paste0("<strong>County: </strong>", 
-        #                         warstwa()$NAMELSAD, 
-        #                         "<br><strong> Entrophy std: </strong>",
-        #                   warstwa()$Entropia_std,
-        #                         "<br><strong> H index: </strong>",
-        #                   warstwa()$H,
-        #                         "<br><strong> D (white-black): </strong>",
-        #                   warstwa()$D_wb,
-        #                   "<br><strong> D (white-asian): </strong>",
-        #                   warstwa()$D_wa,
-        #                   "<br><strong> D (white-latin): </strong>",
-        #                   warstwa()$D_wl,
-        #                   "<br><strong> D (black-latin): </strong>",
-        #                   warstwa()$D_bl,
-        #                   "<br><strong> D (black-asian): </strong>",
-        #                   warstwa()$D_ba,
-        #                   "<br><strong> D (latin-asian): </strong>",
-        #                   warstwa()$D_la)
-        #   # text = paste0("Nazwa: " = "NAMELSAD", "Entropia std: " = "Entropia_std", 
-        #   #          "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
-        #   #          "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
-        #   #          "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")
-        #   warstwa <- warstwa()
-        #   variable_unit <- as.character(input$variable_unit)
-        #   pal <- colorNumeric(
-        #     palette = "YlGn",
-        #     domain = warstwa[[variable_unit]])
-        #   pal2 <- colorNumeric(
-        #     palette = "YlGn",
-        #     domain = warstwa[[variable_unit]])
-        #   map <- leaflet(data = warstwa()) %>%
-        #     setView(lat = 50, lng = -120, zoom = 3.2) %>%
-        #     addTiles() %>%
-        #     
-        #     addPolygons(fillColor = ~pal(warstwa[[variable_unit]]),
-        #                 popup = popup,
-        #                 group = "H",
-        #                 color = "#222222",
-        #                 fillOpacity = 0.8,
-        #                 weight = 0.5) %>%
-        #     addLegend(pal = pal, 
-        #               values = ~warstwa[[variable_unit]], 
-        #               opacity = 1, 
-        #               title = variable_unit) %>%
-        #     
-        #     # addPolygons(fillColor = ~pal2(warstwa$Entropia_std),
-        #     #             popup = popup,
-        #     #             group = "Entropia_std",
-        #     #             color = "#222222",
-        #     #             fillOpacity = 0.8,
-        #     #             weight = 0.5) %>%
-        #     # addLegend(pal = pal2, values = ~Entropia_std, opacity = 1) %>%
-        #   addLayersControl(
-        #     baseGroups = "OSM (default)",
-        #     overlayGroups = c("Entropia_std", "H"),
-        #     options = layersControlOptions(collapsed = FALSE))
-        #   map 
-          
-          
-         # a <- tm_shape(warstwa()) + tm_polygons(col = c("Entropia_std", "H"),
-         #                                        palette = "YlGn",
-         #                                        popup.vars = text) + tm_facets(as.layers = TRUE) + tm_view(set.view = c(-120, 50, 3.2))
-         # 
-         # tmap_leaflet(a,
-          #             mode = "view",
-          #             in.shiny = TRUE)
-          
           
           else if (isolate(input$indicator_button) == 1){
             
@@ -510,7 +440,7 @@ server <- function(input, output,session) {
               var <- isolate(switch(input$variable_index, 
                             "H    |BLOCKS" = "H_block",
                             "H    |GROUP OF BLOCKS" = "H_group_blocks",
-                            "H    |TRACTS" = "H_tracts"))
+                            "H    |TRACTS" = "H_tract"))
               popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std")
               
               
@@ -528,27 +458,90 @@ server <- function(input, output,session) {
           
     
     output$plot <- renderPlotly({
-        warstwa <- warstwa() 
-        variable_unit <- as.character(input$index)
+      
+      plot_theme <- theme(
+        panel.grid.major.y = element_blank(),
+        plot.background = element_rect(fill = "#252525"),
+        panel.background = element_rect(fill = "#252525"), 
+        axis.title = element_text(size = 15,
+                                  color = "#dddddd"), 
+        plot.title = element_text(size = 18,
+                                  color = "#dddddd",
+                                  vjust = 2,
+                                  hjust = 0.5), 
+        legend.background = element_rect(color = "#222222", 
+                                         fill = "#777777"),  
+        legend.title = element_text(size = 13),
+        legend.text = element_text(size = 12),
+        axis.text = element_text(size = 12, 
+                                 color = "#dddddd"))
+      
+      warstwa <- warstwa() 
+      
+      if (isolate(input$aggr_button) == 1){
         
-        g <- ggplot(warstwa, aes(warstwa[[variable_unit]])) + geom_histogram(bins = 80, fill = '#367d59') + theme(
-            panel.grid.major.y = element_blank(),
-            plot.background = element_rect(fill = "#252525"),
-            panel.background = element_rect(fill = "#252525"), 
-            axis.title = element_text(size = 15,
-                                      color = "#dddddd"), 
-            plot.title = element_text(size = 18,
-                                      color = "#dddddd",
-                                      vjust = 2,
-                                      hjust = 0.5), 
-            legend.background = element_rect(color = "#222222", 
-                                             fill = "#777777"),  
-            legend.title = element_text(size = 13),
-            legend.text = element_text(size = 12),
-            axis.text = element_text(size = 12, 
-                                     color = "#dddddd"))
+        var <- input$variable_unit
+        
+        g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
+          plot_theme + labs(x = var, y = "Count", title = var)
         ggplotly(g)%>% config(displayModeBar = F)
-    }) 
+        
+      }
+      else if (isolate(input$indicator_button) == 1){
+        if (isolate(input$index) == "Entropy"){
+          
+          var <- isolate(switch(input$variable_index, 
+                                "Entropy    |ALL AGGREGATION UNITS" = "Entropy",
+                                "Entropy std    |ALL AGGREGATION UNITS" = "Entropy_std"))
+          
+          g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
+            plot_theme + labs(x = var, y = "Count", title = var)
+          ggplotly(g)%>% config(displayModeBar = F)
+        }
+        
+        
+        else if (isolate(input$index) == "Index of dissimilarity"){
+          var <- isolate(switch(input$variable_index, 
+                                "white-black    |BLOCKS" = "D_wb_block",
+                                "white-asian    |BLOCKS" = "D_wa_block",
+                                "white-latin    |BLOCKS" = "D_wl_block",
+                                "black-latin    |BLOCKS" = "D_bl_block",
+                                "black-asian    |BLOCKS" = "D_ba_block",
+                                "latin-asian    |BLOCKS" = "D_la_block",
+                                "white-black    |GROUP OF BLOCKS" = "D_wb_group_blocks",
+                                "white-asian    |GROUP OF BLOCKS" = "D_wa_group_blocks",
+                                "white-latin    |GROUP OF BLOCKS" = "D_wl_group_blocks",
+                                "black-latin    |GROUP OF BLOCKS" = "D_bl_group_blocks",
+                                "black-asian    |GROUP OF BLOCKS" = "D_ba_group_blocks",
+                                "latin-asian    |GROUP OF BLOCKS" = "D_la_group_blocks",
+                                "white-black    |TRACT" = "D_wb_tract",
+                                "white-asian    |TRACT" = "D_wa_tract",
+                                "white-latin    |TRACT" = "D_wl_tract",
+                                "black-latin    |TRACT" = "D_bl_tract",
+                                "black-asian    |TRACT" = "D_ba_tract",
+                                "latin-asian    |TRACT" = "D_la_tract"))
+          
+          g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
+            plot_theme + labs(x = var, y = "Count", title = var)
+          ggplotly(g)%>% config(displayModeBar = F)
+        }
+        
+        
+        else if (isolate(input$index) == "The information theory index H"){
+          
+          var <- isolate(switch(input$variable_index, 
+                                "H    |BLOCKS" = "H_block",
+                                "H    |GROUP OF BLOCKS" = "H_group_blocks",
+                                "H    |TRACTS" = "H_tract"))
+          
+          g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
+            plot_theme + labs(x = var, y = "Count", title = var)
+          ggplotly(g)%>% config(displayModeBar = F)
+
+        }
+      }
+        }) 
+    
     
     output$table <- DT::renderDataTable(DT::datatable(warstwa(), options = list(
         rownames = FALSE,
