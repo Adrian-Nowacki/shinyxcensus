@@ -122,17 +122,32 @@ ui <- navbarPage(id = "navbar",
                  tabPanel("Download data",
                           sidebarLayout(
                               sidebarPanel(id = "dt_sidebar",
-                                           selectInput("dataset", "Choose a dataset:", 
+                                           checkboxInput("dataset_button_1", "Dataset divided into aggregation units:", value = 1),
+                                           
+                                           selectInput("dataset_1", "Choose a dataset:", 
                                                        choices = c("Blocks - 1990", "Blocks - 2000", "Blocks - 2010", "Blocks - 2020",
                                                                    "Groups of blocks - 1990", "Groups of blocks - 2000", "Groups of blocks - 2010", "Groups of blocks - 2020",
                                                                    "Tracts - 1990", "Tracts - 2000", "Tracts - 2010", "Tracts - 2020")),
+                                           
+                                           checkboxInput("dataset_button_2", "Dataset divided into individual indicators:", value = 0),
+                                           
+                                           selectInput("dataset_2", "Choose a dataset:", 
+                                                       choices = c("Entropy - 1990", "Entropy - 2000", "Entropy - 2010", "Entropy - 2020",
+                                                                   "Index of dissimilarity - 1990", "Index of dissimilarity - 2000",
+                                                                   "Index of dissimilarity - 2010", "Index of dissimilarity - 2020",
+                                                                   "The information theory index H - 1990", "The information theory index H - 2000", 
+                                                                   "The information theory index H - 2010", "The information theory index H - 2020")),
+                                           actionButton("choose", "Choose"),
+                                           
                                            radioButtons("filetype", "File type:",
                                                         choices = c(".csv", ".shp", ".gpkg")),
                                            downloadButton('download_csv', 'Download .csv'),
                                            downloadButton('download_gpkg', 'Download .gpkg')
                               ),
                               mainPanel(id = "dt_mainpanel",
-                                        tableOutput("table_dt")
+                                        tabsetPanel(
+                                          tabPanel("Table", DT::dataTableOutput("table_dt", height = "600px"))
+                                        )
                               )
                           )
                  ),
@@ -155,14 +170,20 @@ ui <- navbarPage(id = "navbar",
                  tags$head(tags$style(
                      HTML('
                          #sidebar {
-                            background-color: #353535;
-                            width:400px;
-                            height:750px!important;
+                            background-color: #454545;
+                            width:360px;
+                            height:740px!important;
                             border:none!important;
                             border-right:1px solid #eeeeee!important;
                          }
                          .row {
                             margin-left:-30px!important;
+                         }
+                         .well {
+                         margin-bottom:0px!important;
+                         }
+                         body {
+                            overflow:hidden;
                          }
                         .navbar-default {
                             background-color:#477676!important;
@@ -189,30 +210,52 @@ ui <- navbarPage(id = "navbar",
                             background-image: none !important;
                         }
                         #mainpanel {
-                            margin-left:-50px;
+                            margin-left:-100px;
+                            width: 1050px;
+                            color: #bbbbbb;
+                        }
+                        #dt_mainpanel{
+                            margin-left:-100px;
                             width: 1050px;
                             color: #bbbbbb;
                         }
                         #dt_sidebar {
-                            background-color: #353535;
-                            color: #dddddd;
+                            background-color: #454545;
+                            width:360px;
+                            height:740px!important;
+                            border:none!important;
+                            border-right:1px solid #eeeeee!important;
                         }
-                        #download_gpkg {
-                            margin-left:160px;
-                        }
+                        
                         #table {
                             color:#dddddd;
                         }
                         #table th{
                             color:#dddddd;
-                            background-color:rgba(70, 70, 70, 0.9);
+                            background-color:#477676;
                             border-right:1px solid #dddddd;
                         }
                         #table tr:nth-child(2n+1){
-                            background-color:#dddddd;
+                            background-color:#cfe2e2;
                             color:#222222;
                         }
                         #table a{
+                            color:#dddddd!important;
+                            font-size: 0.4;
+                        }
+                        #table_dt{
+                            color:#dddddd;
+                        }
+                        #table_dt th{
+                            color:#dddddd;
+                            background-color:#477676;
+                            border-right:1px solid #dddddd;
+                        }
+                        #table_dt tr:nth-child(2n+1){
+                            background-color:#cfe2e2;
+                            color:#222222;
+                        }
+                        #table_dt a{
                             color:#dddddd!important;
                             font-size: 0.4;
                         }
@@ -232,6 +275,7 @@ ui <- navbarPage(id = "navbar",
 
 # Define server logic ----
 server <- function(input, output,session) {
+  
     
     observeEvent(input$aggr_button, {
         if(input$aggr_button == 1){
@@ -282,6 +326,51 @@ server <- function(input, output,session) {
                 shinyjs::disable(id = "unit")
                 shinyjs::disable(id = "variable_unit")}
         })
+    
+    
+    
+    ## conditions for buttons downloading datasets:
+    observeEvent(input$dataset_button_1, {
+      if(input$dataset_button_1 == 1){
+        shinyjs::disable(id = "dataset_2")
+        shinyjs::enable(id = "dataset_1")
+        updateCheckboxInput(
+          inputId = "dataset_button_2", 
+          value = FALSE
+        )} 
+      else {
+        shinyjs::enable(id = "dataset_2")
+        shinyjs::disable(id = "dataset_1")
+        updateCheckboxInput(
+          inputId = "dataset_button_1",
+          value = FALSE
+        )}
+    })
+    
+    observeEvent(input$dataset_button_2, {
+      if(input$dataset_button_2 == 0){
+        shinyjs::disable(id = "dataset_2")
+        shinyjs::enable(id = "dataset_1")
+        updateCheckboxInput(
+          inputId = "dataset_button_2", 
+          value = FALSE
+        )} 
+      else {
+        shinyjs::enable(id = "dataset_2")
+        shinyjs::disable(id = "dataset_1")
+        updateCheckboxInput(
+          inputId = "dataset_button_1",
+          value = FALSE
+        )}
+    })
+    observeEvent({input$dataset_button_1
+      input$dataset_button_2}, {
+        if(input$dataset_button_1 == 0 & input$dataset_button_2 ==0){
+          shinyjs::disable(id = "dataset_2")
+          shinyjs::disable(id = "dataset_1")}
+      })
+    
+    
     
     warstwa <- eventReactive(input$run, {
       input$run
@@ -578,43 +667,72 @@ server <- function(input, output,session) {
         lengthMenu = c(6, 12, 18))))
     
     
-    datasetInput <- reactive({
-            switch(input$dataset,
+    datasetInput <- eventReactive(input$choose,{
+           if (input$dataset_button_1 == 1){
+            switch(input$dataset_1,
            "Blocks - 1990" = shp_block_1990, "Blocks - 2000" = shp_block_2000, "Blocks - 2010" = shp_block_2010, "Blocks - 2020" = shp_block_2020,
            "Groups of blocks - 1990" = shp_grp_blocks_1990, "Groups of blocks - 2000" = shp_grp_blocks_2000, "Groups of blocks - 2010" = shp_grp_blocks_2010, "Groups of blocks - 2020" = shp_grp_blocks_2020,
            "Tracts - 1990" = shp_tract_1990, "Tracts - 2000" = shp_tract_2000, "Tracts - 2010" = shp_tract_2010, "Tracts - 2020" = shp_tract_2020)
     #dataset <- dataset %>% st_drop_geometry()
+      }
+       else if (input$dataset_button_2 == 1){
+        switch(input$dataset_2,
+        "Entropy - 1990" = shp_ind_ent_1990, "Entropy - 2000" = shp_ind_ent_2000, "Entropy - 2010" = shp_ind_ent_2010, "Entropy - 2020" = shp_ind_ent_2020,
+        "Index of dissimilarity - 1990"  = shp_ind_D_1990, "Index of dissimilarity - 2000" = shp_ind_D_2000,
+        "Index of dissimilarity - 2010" = shp_ind_D_2010, "Index of dissimilarity - 2020" = shp_ind_D_2020,
+        "The information theory index H - 1990" = shp_ind_H_1990, "The information theory index H - 2000" = shp_ind_H_2000, 
+        "The information theory index H - 2010" = shp_ind_H_2010, "The information theory index H - 2020" = shp_ind_H_2020)
+      }
+      
     })
-    
     output$download_csv <- downloadHandler(
+      
         filename = function() {
-            paste(input$dataset, ".csv", sep = "")
+          if (input$dataset_button_1 == 1){
+            paste0(input$dataset_1, ".csv", sep = "")
+          }
+          else if (input$dataset_button_2 == 1){
+            paste0(input$dataset_2, ".csv", sep = "")
+          }
         },
         content = function(file) {
-            datasetInput_1 <- datasetInput()
-            datasetInput_1 <- datasetInput_1 %>% st_drop_geometry()
-            write.csv(datasetInput_1, file, row.names = FALSE)
+            datasetInput <- datasetInput() %>% st_drop_geometry()
+            write.csv(datasetInput, file, row.names = FALSE)
         }
     )
     
     output$download_gpkg <- downloadHandler(
         filename = function() {
-            paste(input$dataset, ".gpkg", sep = "")
+          if (input$dataset_button_1 == 1){
+            paste0(input$dataset_1, ".gpkg", sep = "")
+          }
+         else if (input$dataset_button_2 == 1){
+           paste0(input$dataset_2, ".gpkg", sep = "")
+         }
         },
         content = function(file) {
-            datasetInput <- datasetInput()
-            st_write(datasetInput, file)
+            st_write(datasetInput(), file)
         }
     )
+     dataset <- eventReactive(input$choose,{
+       datasetInput() %>% st_drop_geometry()
+     })
     
-    output$table_dt <- DT::renderDataTable(DT::datatable(datasetInput(), options = list(
+    output$table_dt <- DT::renderDataTable(DT::datatable(dataset(), options = list(
       rownames = FALSE,
       pageLength = 12,
-      autoWidth = TRUE,
-      columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
-      lengthMenu = c(6, 12, 18))))
+      scrollX = TRUE,
+      #autoWidth = TRUE,
+     # columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
+      lengthMenu = c(6, 12))))
     
-    
+    output$map <- renderLeaflet({
+      leaflet() %>%
+        addTiles() %>%  # Add default OpenStreetMap map tiles
+        setView(lng = -98.583, lat = 39.833, zoom = 4)
+      
+      
+    })
 }
 
 
