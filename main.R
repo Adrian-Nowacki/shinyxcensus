@@ -284,6 +284,22 @@ block_2020 = read.csv("counties_csv/block_2020.csv")
 grp_blocks_2020 = read.csv("counties_csv/grp_blocks_2020.csv")
 tract_2020 = read.csv("counties_csv/tract_2020.csv")
 
+# # # usuniecie zbędnej kolumny
+x_column <- function(){
+  block_1990 <<- block_1990[, -1]
+  block_2000 <<- block_2000[, -1]
+  block_2010 <<- block_2010[, -1]
+  block_2020 <<- block_2020[, -1]
+  grp_blocks_1990 <<- grp_blocks_1990[, -1]
+  grp_blocks_2000 <<- grp_blocks_2000[, -1]
+  grp_blocks_2010 <<- grp_blocks_2010[, -1]
+  grp_blocks_2020 <<- grp_blocks_2020[, -1]
+  tract_1990 <<- tract_1990[, -1]
+  tract_2000 <<- tract_2000[, -1]
+  tract_2010 <<- tract_2010[, -1]
+  tract_2020 <<- tract_2020[, -1]
+}
+x_column()
 # # # # # rozdzielenie plikow na wskazniki i lata
 rozdzielenie <- function(){
     # # # # wskaznik H
@@ -408,38 +424,43 @@ rozdzielenie()
 
 #  #  #  #  #  #  #  #  #  #  #  #  #  #   POLACZENIE DANYCH Z DANYMI PRZESTRZENNYMI
 
-# shp_1990 <- read_sf("../shp/1990/dane_1990.gpkg")
-# shp_2020 <- read_sf("../shp/2020/dane_2020.gpkg")
-# 
+ #shp_1990 <- read_sf("../shp_poprawne/poprawne/shp_1990.gpkg")
+ #shp_2020 <- read_sf("../shp_poprawne/poprawne/shp_2018.gpkg")
+ 
+
 # # usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
-# shp_1990$state_fips <- as.numeric(shp_1990$state_fips)  
+# shp_1990$ST <- as.numeric(shp_1990$ST)  
 # shp_2020$STATEFP <- as.numeric(shp_2020$STATEFP) 
-# 
+ 
 # # usuniecie zbednych kolumn
-# shp_1990 <- shp_1990[, -c(1:3, 8)]
-# shp_2020 <- shp_2020[, -c(3:4, 10:12)]
-# 
-# shp_2020 <- shp_2020 %>% arrange(GEOID)
-# shp_1990 <- shp_1990 %>% arrange(county, state_fips)
-# 
-# shp <- read_sf("../shp/1990/co99_d90_aggr.gpkg")
-# shp <- shp %>% st_set_geometry(NULL)
-# shp <- shp %>% arrange(NAME, ST)
-# shp_1990$COUNTYFP <- shp$CO
-# shp_1990$NAME <- shp$NAME
-# colnames(shp_1990) <- c("STUSPS", "NAMELSAD", "GEOID", "STATEFP", "geom", "COUNTYFP", "NAME")
-# shp_2020 <- shp_2020 %>% arrange(GEOID)
-# shp_1990 <- shp_1990 %>% arrange(GEOID)
-# 
-# st_write(shp_2020, "counties_shp/shp_2020.gpkg")
-# st_write(shp_1990, "counties_shp/shp_1990.gpkg")
+ #shp_1990 <- shp_1990[, -c(1:4)]
+ #shp_2020 <- shp_2020[, -c(3:4, 7:9)]
+
+ #shp_2020 <- shp_2020 %>% arrange(GEOID)
+ #shp_1990 <- shp_1990 %>% arrange(GEOID)
+ 
+ #shp <- read_sf("../shp/1990/co99_d90_aggr.gpkg")
+ #shp <- shp %>% st_set_geometry(NULL)
+ #shp <- shp %>% arrange(NAME, ST)
+ #shp_1990$COUNTYFP <- shp$CO
+ #shp_1990$NAME <- shp$NAME
+ 
+ # zmiana kolejnosci kolumn w pliku z 1990 r
+ #shp_1990 <- shp_1990[, c(1, 2, 4, 3, 5, 6, 7)]
+ 
+ # ujednolicenie nazw kolumn
+ #colnames(shp_1990) <- c("STATEFP", "COUNTYFP", "GEOID", "NAME", "STUSPS", "STATE_NAME", "geom")
+
+ #st_write(shp_2020, "counties_shp/low_res/shp_2020.gpkg")
+ #st_write(shp_1990, "counties_shp/low_res/shp_1990.gpkg")
 ## dodanie pelnych nazw stanow
-shp_1990 <- read_sf("counties_shp/shp_1990.gpkg")
-shp_2020 <- read_sf("counties_shp/shp_2020.gpkg")
+shp_1990 <- read_sf("counties_shp/low_res/shp_1990.gpkg")
+shp_2020 <- read_sf("counties_shp/low_res/shp_2020.gpkg")
 
 shp_2020 <- shp_2020 %>% arrange(COUNTYFP, STATEFP)
 shp_1990 <- shp_1990 %>% arrange(COUNTYFP, STATEFP)
-stany <- function(){
+
+# stany <- function(){
 shp_1990 <<- shp_1990 %>%
   mutate(STATE_NAME = case_when(
     shp_1990$STUSPS == "AL" ~ "Alabama",
@@ -495,7 +516,7 @@ shp_1990 <<- shp_1990 %>%
     shp_1990$STUSPS == "WY" ~ "Wyoming"
   ))
 } 
-stany()
+# stany()
 
 shp_join <- function(){
   ##dolaczenie geoid 1990-2000
@@ -558,43 +579,43 @@ shp_join <- function(){
 }
 shp_join()
 
-#zapis_wynikow <- function(){
-  st_write(shp_block_1990, "census_shp/shp_block_1990.gpkg")
-  st_write(shp_block_2000, "census_shp/shp_block_2000.gpkg")
-  st_write(shp_block_2010, "census_shp/shp_block_2010.gpkg")
-  st_write(shp_block_2020, "census_shp/shp_block_2020.gpkg")
+# zapis_wynikow <- function(){
+  st_write(shp_block_1990, "counties_shp/low_res/census_shp/shp_block_1990.gpkg")
+  st_write(shp_block_2000, "counties_shp/low_res/census_shp/shp_block_2000.gpkg")
+  st_write(shp_block_2010, "counties_shp/low_res/census_shp/shp_block_2010.gpkg")
+  st_write(shp_block_2020, "counties_shp/low_res/census_shp/shp_block_2020.gpkg")
   
-  st_write(shp_grp_blocks_1990, "census_shp/shp_grp_blocks_1990.gpkg")
-  st_write(shp_grp_blocks_2000, "census_shp/shp_grp_blocks_2000.gpkg")
-  st_write(shp_grp_blocks_2010, "census_shp/shp_grp_blocks_2010.gpkg")
-  st_write(shp_grp_blocks_2020, "census_shp/shp_grp_blocks_2020.gpkg")
+  st_write(shp_grp_blocks_1990, "counties_shp/low_res/census_shp/shp_grp_blocks_1990.gpkg")
+  st_write(shp_grp_blocks_2000, "counties_shp/low_res/census_shp/shp_grp_blocks_2000.gpkg")
+  st_write(shp_grp_blocks_2010, "counties_shp/low_res/census_shp/shp_grp_blocks_2010.gpkg")
+  st_write(shp_grp_blocks_2020, "counties_shp/low_res/census_shp/shp_grp_blocks_2020.gpkg")
   
-  st_write(shp_tract_1990, "census_shp/shp_tract_1990.gpkg")
-  st_write(shp_tract_2000, "census_shp/shp_tract_2000.gpkg")
-  st_write(shp_tract_2010, "census_shp/shp_tract_2010.gpkg")
-  st_write(shp_tract_2020, "census_shp/shp_tract_2020.gpkg")
+  st_write(shp_tract_1990, "counties_shp/low_res/census_shp/shp_tract_1990.gpkg")
+  st_write(shp_tract_2000, "counties_shp/low_res/census_shp/shp_tract_2000.gpkg")
+  st_write(shp_tract_2010, "counties_shp/low_res/census_shp/shp_tract_2010.gpkg")
+  st_write(shp_tract_2020, "counties_shp/low_res/census_shp/shp_tract_2020.gpkg")
   
-  st_write(shp_ind_D_1990, "indexes_shp/shp_ind_D_1990.gpkg")
-  st_write(shp_ind_D_2000, "indexes_shp/shp_ind_D_2000.gpkg")
-  st_write(shp_ind_D_2010, "indexes_shp/shp_ind_D_2010.gpkg")
-  st_write(shp_ind_D_2020, "indexes_shp/shp_ind_D_2020.gpkg")
+  st_write(shp_ind_D_1990, "counties_shp/low_res/indexes_shp/shp_ind_D_1990.gpkg")
+  st_write(shp_ind_D_2000, "counties_shp/low_res/indexes_shp/shp_ind_D_2000.gpkg")
+  st_write(shp_ind_D_2010, "counties_shp/low_res/indexes_shp/shp_ind_D_2010.gpkg")
+  st_write(shp_ind_D_2020, "counties_shp/low_res/indexes_shp/shp_ind_D_2020.gpkg")
   
-  st_write(shp_ind_ent_1990, "indexes_shp/shp_ind_ent_1990.gpkg")
-  st_write(shp_ind_ent_2000, "indexes_shp/shp_ind_ent_2000.gpkg")
-  st_write(shp_ind_ent_2010, "indexes_shp/shp_ind_ent_2010.gpkg")
-  st_write(shp_ind_ent_2020, "indexes_shp/shp_ind_ent_2020.gpkg")
+  st_write(shp_ind_ent_1990, "counties_shp/low_res/indexes_shp/shp_ind_ent_1990.gpkg")
+  st_write(shp_ind_ent_2000, "counties_shp/low_res/indexes_shp/shp_ind_ent_2000.gpkg")
+  st_write(shp_ind_ent_2010, "counties_shp/low_res/indexes_shp/shp_ind_ent_2010.gpkg")
+  st_write(shp_ind_ent_2020, "counties_shp/low_res/indexes_shp/shp_ind_ent_2020.gpkg")
   
-  st_write(shp_ind_H_1990, "indexes_shp/shp_ind_H_1990.gpkg")
-  st_write(shp_ind_H_2000, "indexes_shp/shp_ind_H_2000.gpkg")
-  st_write(shp_ind_H_2010, "indexes_shp/shp_ind_H_2010.gpkg")
-  st_write(shp_ind_H_2020, "indexes_shp/shp_ind_H_2020.gpkg")
+  st_write(shp_ind_H_1990, "counties_shp/low_res/indexes_shp/shp_ind_H_1990.gpkg")
+  st_write(shp_ind_H_2000, "counties_shp/low_res/indexes_shp/shp_ind_H_2000.gpkg")
+  st_write(shp_ind_H_2010, "counties_shp/low_res/indexes_shp/shp_ind_H_2010.gpkg")
+  st_write(shp_ind_H_2020, "counties_shp/low_res/indexes_shp/shp_ind_H_2020.gpkg")
   
 }
-#zapis_wynikow()
-shp_tract_1990 <- st_read("census_shp/shp_tract_1990.gpkg")
-shp_tract_2020 <- st_read("census_shp/shp_tract_2020.gpkg")
-shp_ind_H_1990 <- st_read("indexes_shp/shp_ind_H_1990.gpkg")
-shp_ind_H_2020 <- st_read("indexes_shp/shp_ind_H_2020.gpkg")
+# zapis_wynikow()
+shp_tract_1990 <- st_read("counties_shp/low_res/census_shp/shp_tract_1990.gpkg")
+shp_tract_2020 <- st_read("counties_shp/low_res/census_shp/shp_tract_2020.gpkg")
+shp_ind_H_1990 <- st_read("counties_shp/low_res/indexes_shp/shp_ind_H_1990.gpkg")
+shp_ind_H_2020 <- st_read("counties_shp/low_res/indexes_shp/shp_ind_H_2020.gpkg")
 
 
 #  #  #  #  #  #  #  #  #  #  #  #  #  #  WIZUALIZACJA
