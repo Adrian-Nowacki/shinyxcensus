@@ -11,20 +11,20 @@ library(ggplot2)
 library(plotly)
 library(leaflet)
 # wczytanie danych
-shp_block_1990 <- st_read("dane/counties_shp/census_shp/shp_block_1990.gpkg")
-shp_block_2000 <- st_read("dane/counties_shp/census_shp/shp_block_2000.gpkg")
-shp_block_2010 <- st_read("dane/counties_shp/census_shp/shp_block_2010.gpkg")
-shp_block_2020 <- st_read("dane/counties_shp/census_shp/shp_block_2020.gpkg")
+shp_block_1990 <- st_read("../counties_shp/low_res/census_shp/shp_block_1990.gpkg")
+shp_block_2000 <- st_read("../counties_shp/low_res/census_shp/shp_block_2000.gpkg")
+shp_block_2010 <- st_read("../counties_shp/low_res/census_shp/shp_block_2010.gpkg")
+shp_block_2020 <- st_read("../counties_shp/low_res/census_shp/shp_block_2020.gpkg")
 
-shp_grp_blocks_1990 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_1990.gpkg")
-shp_grp_blocks_2000 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_2000.gpkg")
-shp_grp_blocks_2010 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_2010.gpkg")
-shp_grp_blocks_2020 <- st_read("dane/counties_shp/census_shp/shp_grp_blocks_2020.gpkg")
+shp_grp_blocks_1990 <- st_read("../counties_shp/low_res/census_shp/shp_grp_blocks_1990.gpkg")
+shp_grp_blocks_2000 <- st_read("../counties_shp/low_res/census_shp/shp_grp_blocks_2000.gpkg")
+shp_grp_blocks_2010 <- st_read("../counties_shp/low_res/census_shp/shp_grp_blocks_2010.gpkg")
+shp_grp_blocks_2020 <- st_read("../counties_shp/low_res/census_shp/shp_grp_blocks_2020.gpkg")
 
-shp_tract_1990 <- st_read("dane/counties_shp/census_shp/shp_tract_1990.gpkg")
-shp_tract_2000 <- st_read("dane/counties_shp/census_shp/shp_tract_2000.gpkg")
-shp_tract_2010 <- st_read("dane/counties_shp/census_shp/shp_tract_2010.gpkg")
-shp_tract_2020 <- st_read("dane/counties_shp/census_shp/shp_tract_2020.gpkg")
+shp_tract_1990 <- st_read("../counties_shp/low_res/census_shp/shp_tract_1990.gpkg")
+shp_tract_2000 <- st_read("../counties_shp/low_res/census_shp/shp_tract_2000.gpkg")
+shp_tract_2010 <- st_read("../counties_shp/low_res/census_shp/shp_tract_2010.gpkg")
+shp_tract_2020 <- st_read("../counties_shp/low_res/census_shp/shp_tract_2020.gpkg")
 
 
 blocks <- list(shp_block_1990, shp_block_2000, shp_block_2010, shp_block_2020)
@@ -33,20 +33,20 @@ tracts <- list(shp_tract_1990, shp_tract_2000, shp_tract_2010, shp_tract_2020)
 
 aggr_objects <- list(blocks = blocks, grp_blocks =  grp_blocks, tracts = tracts)
 # wskazniki
-shp_ind_ent_1990 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_1990.gpkg")
-shp_ind_ent_2000 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_2000.gpkg")
-shp_ind_ent_2010 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_2010.gpkg")
-shp_ind_ent_2020 <- st_read("dane/counties_shp/indexes_shp/shp_ind_ent_2020.gpkg")
+shp_ind_ent_1990 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_ent_1990.gpkg")
+shp_ind_ent_2000 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_ent_2000.gpkg")
+shp_ind_ent_2010 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_ent_2010.gpkg")
+shp_ind_ent_2020 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_ent_2020.gpkg")
 
-shp_ind_D_1990 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_1990.gpkg")
-shp_ind_D_2000 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2000.gpkg")
-shp_ind_D_2010 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2010.gpkg")
-shp_ind_D_2020 <- st_read("dane/counties_shp/indexes_shp/shp_ind_D_2020.gpkg")
+shp_ind_D_1990 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_D_1990.gpkg")
+shp_ind_D_2000 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_D_2000.gpkg")
+shp_ind_D_2010 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_D_2010.gpkg")
+shp_ind_D_2020 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_D_2020.gpkg")
 
-shp_ind_H_1990 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_1990.gpkg")
-shp_ind_H_2000 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_2000.gpkg")
-shp_ind_H_2010 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_2010.gpkg")
-shp_ind_H_2020 <- st_read("dane/counties_shp/indexes_shp/shp_ind_H_2020.gpkg")
+shp_ind_H_1990 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_H_1990.gpkg")
+shp_ind_H_2000 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_H_2000.gpkg")
+shp_ind_H_2010 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_H_2010.gpkg")
+shp_ind_H_2020 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_H_2020.gpkg")
 
 entrophy <- list(shp_ind_ent_1990, shp_ind_ent_2000, shp_ind_ent_2010, shp_ind_ent_2020)
 d_index <- list(shp_ind_D_1990, shp_ind_D_2000, shp_ind_D_2010, shp_ind_D_2020)
@@ -55,8 +55,31 @@ h_index <- list(shp_ind_H_1990 , shp_ind_H_2000 , shp_ind_H_2010 , shp_ind_H_202
 ind_objects <- list(entrophy = entrophy, d_index = d_index, h_index = h_index)
 # Define UI ----
 
+
+
 ui <- navbarPage(id = "navbar",
-                 "Racial diversity",
+                   title=div(img(src='logo_5.png', width = "25px", height = "25px"), "Racial diversity App"),
+                 #"Racial diversity App",
+                 tabPanel("Home",
+                          fluidRow(style = "
+                          background: 
+                            radial-gradient(ellipse at top, #477676, transparent),
+                            radial-gradient(ellipse at bottom, #2a3c3c, transparent);",
+                                   
+                                   column(2),
+                                   column(8,
+                                          img(src='logo_5.png', width = "150px", height = "150px", align = "center", style = "margin-top:150px; margin-bottom:25px;"),
+                                          style = "height:800px!important; text-align:center; font-family: Trebuchet MS; color: #DDD;",
+                                          h1("Application visualizing the values of racial segregation indicators for individual aggregation units sizes", 
+                                             style = "font-weight:bold!important; text-shadow: #222 1px 1px 1px;"
+                                          ),
+                                          
+                                   ),
+                                   column(2)
+                          )
+                          
+                          
+                 ),
                  tabPanel("Interactive map",
                           sidebarLayout(
                               
@@ -73,16 +96,16 @@ ui <- navbarPage(id = "navbar",
                                                                    selected = "blocks"),
                                                        selectInput("variable_unit", 
                                                                    label = "Choose a variable",
-                                                                   choices = c("Entropia", 
-                                                                               "Entropia_std",
-                                                                               "H", 
-                                                                               "D_wb",
-                                                                               "D_wa", 
-                                                                               "D_wl",
-                                                                               "D_bl", 
-                                                                               "D_ba",
-                                                                               "D_la"),
-                                                                   selected = "Entropia"),
+                                                                   choices = c("Entropy", 
+                                                                               "Entropy std",
+                                                                               "The information theory index H", 
+                                                                               "Index of dissimilarity (white-black)",
+                                                                               "Index of dissimilarity (white-asian)", 
+                                                                               "Index of dissimilarity (white-latin)",
+                                                                               "Index of dissimilarity (black-latin)", 
+                                                                               "Index of dissimilarity (black-asian)",
+                                                                               "Index of dissimilarity (latin-asian)"),
+                                                                   selected = "Entropy"),
                                                        
                                                        
                                                        checkboxInput("indicator_button", "Selected indicator for individual aggregation units", value = 0),
@@ -111,7 +134,7 @@ ui <- navbarPage(id = "navbar",
                               ),
                               
                               mainPanel(id = "mainpanel",
-                                        tabsetPanel(
+                                        tabsetPanel(id = "tabsetpanel",
                                             tabPanel("Interactive map", tmapOutput("map", height = "600px")), 
                                             tabPanel("Statistics", plotlyOutput("plot",  height = "600px")), 
                                             tabPanel("Table", DT::dataTableOutput("table"))
@@ -138,9 +161,7 @@ ui <- navbarPage(id = "navbar",
                                                                    "The information theory index H - 1990", "The information theory index H - 2000", 
                                                                    "The information theory index H - 2010", "The information theory index H - 2020")),
                                            actionButton("choose", "Choose"),
-                                           
-                                           radioButtons("filetype", "File type:",
-                                                        choices = c(".csv", ".shp", ".gpkg")),
+                                           div(style = "clear:both;"),
                                            downloadButton('download_csv', 'Download .csv'),
                                            downloadButton('download_gpkg', 'Download .gpkg')
                               ),
@@ -152,11 +173,13 @@ ui <- navbarPage(id = "navbar",
                           )
                  ),
                  tabPanel("About",
-                          fluidRow(
-                              column(2,
-                                     img(src='github_logo.png', width = "200px", height = "200px", align = "center")),
-                              column(10, 
-                                     h2("Application visualizing the values of racial segregation indicators for individual aggregation units sizes"),
+                          fluidRow(style = "
+                          background: 
+                            radial-gradient(ellipse at top, #477676, transparent),
+                            radial-gradient(ellipse at bottom, #2a3c3c, transparent);",
+                              column(8,
+                                     style = "height:800px!important;",
+                                     
                               )
                           )
                           
@@ -170,11 +193,12 @@ ui <- navbarPage(id = "navbar",
                  tags$head(tags$style(
                      HTML('
                          #sidebar {
-                            background-color: #454545;
+                            background-color: #2f5151;
                             width:360px;
                             height:740px!important;
                             border:none!important;
                             border-right:1px solid #eeeeee!important;
+                            color:#ffffff!important;
                          }
                          .row {
                             margin-left:-30px!important;
@@ -184,14 +208,19 @@ ui <- navbarPage(id = "navbar",
                          }
                          body {
                             overflow:hidden;
+                            radial-gradient(ellipse at top, #477676, transparent),
+                            radial-gradient(ellipse at bottom, #2a3c3c, transparent);
                          }
+                         
                         .navbar-default {
                             background-color:#477676!important;
-                            color:#eeeeee!important;
+                            color:#ffffff!important;
                         }
                         .navbar-brand {
-                            color:#eeeeee!important;
+                            color:#ffffff!important;
                             font-weight:bold!important;
+                            font-size:22px!important;
+                            line-height: 30px!important;
                         }
                         .navbar .navbar-nav {
                             float: right;
@@ -199,10 +228,13 @@ ui <- navbarPage(id = "navbar",
                         }
                         .navbar {
                             margin-bottom:0px!important;
+                            height: 60px!important;
                         }
                         .navbar-nav>li>a {
                             background-color:#477676!important;
                             color:#eeeeee!important;
+                            height: 59px!important;
+                            line-height: 30px!important;
                         }
                         .navbar-nav li a:hover, .navbar-nav > .active > a {
                             color: #eeeeee!important;
@@ -211,9 +243,19 @@ ui <- navbarPage(id = "navbar",
                         }
                         #mainpanel {
                             margin-left:-100px;
-                            width: 1050px;
+                            margin-top:20px;
+                            width: 1100px;
                             color: #bbbbbb;
                         }
+                        #tabsetpanel a {
+                            color:#ffffff;
+                            background-color:#444444;
+                        }
+                        #tabsetpanel a:hover,  #tabsetpanel a:active, #tabsetpanel a:focus{
+                            color:#ffffff;
+                            background-color:#777777;
+                        }
+                       
                         #dt_mainpanel{
                             margin-left:-100px;
                             width: 1050px;
@@ -259,11 +301,19 @@ ui <- navbarPage(id = "navbar",
                             color:#dddddd!important;
                             font-size: 0.4;
                         }
-                        
-                        
-                
+                        #choose {
+                        float:left;
+                        margin-bottom:40px;
+                        }
+                        #download_csv {
+                        float:left;
+                        }
+                        #download_gpkg {
+                        float:right;
+                        }
+
                         body, label, input, button, select { 
-                            color: #dddddd;
+                            color: #ffffff;
                             letter-spacing: -0.2px;
                         }')
                  )),
@@ -455,13 +505,23 @@ server <- function(input, output,session) {
     })
     
     
+    
          output$map <- renderTmap({
            if (isolate(input$aggr_button) == 1){
              input$run
              tmap_mode("view")
              warstwa <- warstwa()
              
-             variable_unit <- isolate(input$variable_unit)
+             var <- isolate(switch(input$variable_unit, 
+                                   "Entropy" = "Entropia", 
+                                   "Entropy std" = "Entropia_std",
+                                   "The information theory index H" = "H", 
+                                   "Index of dissimilarity (white-black)" = "D_wb",
+                                   "Index of dissimilarity (white-asian)" = "D_wa", 
+                                   "Index of dissimilarity (white-latin)" = "D_wl",
+                                   "Index of dissimilarity (black-latin)" = "D_bl", 
+                                   "Index of dissimilarity (black-asian)" = "D_ba",
+                                   "Index of dissimilarity (latin-asian)" = "D_la"))
              
              popup <- c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
                         "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
@@ -469,9 +529,9 @@ server <- function(input, output,session) {
                         "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")
              
                tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
-                 tm_fill(col = variable_unit, 
+                 tm_fill(col = var, 
                          palette = "YlGn",
-                         id = "NAMELSAD",
+                         id = "NAME",
                          popup.vars = popup) + tm_borders()
             
              
@@ -493,7 +553,7 @@ server <- function(input, output,session) {
               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
                 tm_fill(col = var, 
                         palette = "YlGn",
-                        id = "NAMELSAD",
+                        id = "NAME",
                         popup.vars = popup) + tm_borders()
             }
             
@@ -544,7 +604,7 @@ server <- function(input, output,session) {
               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
                 tm_fill(col = var, 
                         palette = "YlGn",
-                        id = "NAMELSAD",
+                        id = "NAME",
                         popup.vars = popup) + tm_borders()
             }
             
@@ -563,7 +623,7 @@ server <- function(input, output,session) {
               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
                 tm_fill(col = var, 
                         palette = "YlGn",
-                        id = "NAMELSAD",
+                        id = "NAME",
                         popup.vars = popup) + tm_borders()
               
             
@@ -596,7 +656,17 @@ server <- function(input, output,session) {
       
       if (isolate(input$aggr_button) == 1){
         
-        var <- input$variable_unit
+        
+        var <- isolate(switch(input$variable_unit, 
+                              "Entropy" = "Entropia", 
+                              "Entropy std" = "Entropia_std",
+                              "The information theory index H" = "H", 
+                              "Index of dissimilarity (white-black)" = "D_wb",
+                              "Index of dissimilarity (white-asian)" = "D_wa", 
+                              "Index of dissimilarity (white-latin)" = "D_wl",
+                              "Index of dissimilarity (black-latin)" = "D_bl", 
+                              "Index of dissimilarity (black-asian)" = "D_ba",
+                              "Index of dissimilarity (latin-asian)" = "D_la"))
         
         g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
           plot_theme + labs(x = var, y = "Count", title = var)
@@ -658,13 +728,17 @@ server <- function(input, output,session) {
       }
         }) 
     
+    table_dataset_1<- eventReactive(input$run,{
+      warstwa() %>% st_drop_geometry()
+    })
     
-    output$table <- DT::renderDataTable(DT::datatable(warstwa(), options = list(
+    output$table <- DT::renderDataTable(DT::datatable(table_dataset_1(), options = list(
         rownames = FALSE,
         pageLength = 12,
-        autoWidth = TRUE,
-        columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
-        lengthMenu = c(6, 12, 18))))
+       # autoWidth = TRUE,
+        scrollX = TRUE,
+        #columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
+        lengthMenu = c(6, 12))))
     
     
     datasetInput <- eventReactive(input$choose,{
@@ -714,11 +788,11 @@ server <- function(input, output,session) {
             st_write(datasetInput(), file)
         }
     )
-     dataset <- eventReactive(input$choose,{
+     table_dataset_2 <- eventReactive(input$choose,{
        datasetInput() %>% st_drop_geometry()
      })
     
-    output$table_dt <- DT::renderDataTable(DT::datatable(dataset(), options = list(
+    output$table_dt <- DT::renderDataTable(DT::datatable(table_dataset_2(), options = list(
       rownames = FALSE,
       pageLength = 12,
       scrollX = TRUE,
@@ -726,15 +800,10 @@ server <- function(input, output,session) {
      # columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
       lengthMenu = c(6, 12))))
     
-    output$map <- renderLeaflet({
-      leaflet() %>%
-        addTiles() %>%  # Add default OpenStreetMap map tiles
-        setView(lng = -98.583, lat = 39.833, zoom = 4)
-      
-      
-    })
+    
 }
 
 
 # Run the app ----
-shinyApp(ui = ui, server = server)
+shinyApp(ui, server)
+#runApp()
