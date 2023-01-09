@@ -70,7 +70,7 @@ ui <- navbarPage(id = "navbar",
                                    column(8,
                                           img(src='logo_5.png', width = "150px", height = "150px", align = "center", style = "margin-top:150px; margin-bottom:25px;"),
                                           style = "height:800px!important; text-align:center; font-family: Trebuchet MS; color: #DDD;",
-                                          h1("Application visualizing the values of racial segregation indicators for individual aggregation units sizes", 
+                                          h1("Application visualizing the values ​​of racial segregation indicators for individual sizes of aggregation units", 
                                              style = "font-weight:bold!important; text-shadow: #222 1px 1px 1px;"
                                           ),
                                           
@@ -177,11 +177,24 @@ ui <- navbarPage(id = "navbar",
                           background: 
                             radial-gradient(ellipse at top, #477676, transparent),
                             radial-gradient(ellipse at bottom, #2a3c3c, transparent);",
-                              column(8,
-                                     style = "height:800px!important;",
+                                   column(1),
+                                   column(10,
+                                     style = "margin-top:30px;height:800px!important; font-size:18px; text-align:adjusted; font-family: Trebuchet MS; color: #DDD;",
+                                     p("The aim of the work was to create and make available a database containing segregation 
+                                       indicators calculated for each county in the USA for the years: 1990, 2000, 2010 and 2020."),
+                                     p("These indicators were calculated for 3 levels of aggregation: census blocks, groups of blocks
+                                       and census areas. The application allows you to view county spatial data combined with the resulting 
+                                       tabular data. It enables visualization of data in the form of an interactive map, interactive charts 
+                                       and a table  containing all calculated indicator values ​​for each county. The application also allows you 
+                                       to download shared data in tabular and spatial form."),
+                                     img(src='github-sign.png', width = "60px", height = "60px", align = "center", style = "margin-left: 47.5%; 
+                                         margin-top:100px; margin-bottom:25px;"),
+                                     p("Adrian Nowacki © 2022",
+                                       style = "font-size:16px; text-align:center;"),
                                      
-                              )
-                          )
+                              ),
+                                   column(1),
+                          ),
                           
                           
                  ),
@@ -200,6 +213,10 @@ ui <- navbarPage(id = "navbar",
                             border-right:1px solid #eeeeee!important;
                             color:#ffffff!important;
                          }
+                         .leaflet-popup-content-wrapper{
+                            font-family: Lucida Console;
+                         }
+                         
                          .row {
                             margin-left:-30px!important;
                          }
@@ -207,7 +224,7 @@ ui <- navbarPage(id = "navbar",
                          margin-bottom:0px!important;
                          }
                          body {
-                            overflow:hidden;
+                            
                             radial-gradient(ellipse at top, #477676, transparent),
                             radial-gradient(ellipse at bottom, #2a3c3c, transparent);
                          }
@@ -262,8 +279,9 @@ ui <- navbarPage(id = "navbar",
                             color: #bbbbbb;
                         }
                         #dt_sidebar {
-                            background-color: #454545;
+                            background-color: #2f5151;
                             width:360px;
+                            color:#ffffff!important;
                             height:740px!important;
                             border:none!important;
                             border-right:1px solid #eeeeee!important;
@@ -313,7 +331,7 @@ ui <- navbarPage(id = "navbar",
                         }
 
                         body, label, input, button, select { 
-                            color: #ffffff;
+                            
                             letter-spacing: -0.2px;
                         }')
                  )),
@@ -604,7 +622,7 @@ server <- function(input, output,session) {
               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
                 tm_fill(col = var, 
                         palette = "YlGn",
-                        id = "NAME",
+                        id = "<span style = NAME",
                         popup.vars = popup) + tm_borders()
             }
             
@@ -617,7 +635,9 @@ server <- function(input, output,session) {
                             "H    |BLOCKS" = "H_block",
                             "H    |GROUP OF BLOCKS" = "H_group_blocks",
                             "H    |TRACTS" = "H_tract"))
-              popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std")
+              popup <- c("H    |BLOCKS" = "H_block",
+                         "H    |GROUP OF BLOCKS" = "H_group_blocks",
+                         "H    |TRACTS" = "H_tract")
               
               
               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
