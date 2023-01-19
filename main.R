@@ -178,7 +178,7 @@ index_entropia <- function(x){
   # tabela
   ent_table <- do.call(rbind.data.frame, ent)                           
   Ent_indexes <- cbind(ent_table, ent_std_table)                         
-  colnames(Ent_indexes) <- c("Entropia", "Entropia_std")                  
+  colnames(Ent_indexes) <- c("Entropy", "Entropy_std")                  
   Ent_indexes <- round(Ent_indexes, 4)
   county_num <- group_keys(grpd)                                        # wyszczegolnienie kodu zlaczenia danych
   Ent_indexes <- cbind(county_num, Ent_indexes)                         # ramka danych z kodem stanu, hrabstwa oraz dwoma wskaznikami
@@ -406,17 +406,17 @@ rozdzielenie <- function(){
     
     # # # # entropia i entropia std
     
-    ind_ent_2020 <<- data.frame("Entropy" = block_2020$Entropia,
-                                "Entropy_std" = block_2020$Entropia_std)
+    ind_ent_2020 <<- data.frame("Entropy" = block_2020$Entropy,
+                                "Entropy_std" = block_2020$Entropy_std)
     
-    ind_ent_2010 <<- data.frame("Entropy" = block_2010$Entropia,
-                                "Entropy_std" = block_2010$Entropia_std)
+    ind_ent_2010 <<- data.frame("Entropy" = block_2010$Entropy,
+                                "Entropy_std" = block_2010$Entropy_std)
     
-    ind_ent_2000 <<- data.frame("Entropy" = block_2000$Entropia,
-                                "Entropy_std" = block_2000$Entropia_std)
+    ind_ent_2000 <<- data.frame("Entropy" = block_2000$Entropy,
+                                "Entropy_std" = block_2000$Entropy_std)
     
-    ind_ent_1990 <<- data.frame("Entropy" = block_1990$Entropia,
-                                "Entropy_std" = block_1990$Entropia_std)
+    ind_ent_1990 <<- data.frame("Entropy" = block_1990$Entropy,
+                                "Entropy_std" = block_1990$Entropy_std)
 }
 rozdzielenie()
 
@@ -551,9 +551,9 @@ tm_shape(shp_ind_H_1990) + tm_fill(col = "H_block") + tm_borders() +
   tm_shape(shp_ind_H_2020) + tm_fill(col = "H_block") + tm_borders()
 
 
-tm_shape(shp_tract_2020) + tm_fill(col = "Entropia_std", 
+tm_shape(shp_tract_2020) + tm_fill(col = "Entropy_std", 
                          id = "NAMELSAD",
-                         popup.vars = c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
+                         popup.vars = c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std", 
                                         "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
                                         "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
                                         "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")) + tm_borders()

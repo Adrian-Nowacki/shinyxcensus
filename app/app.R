@@ -1,4 +1,4 @@
-
+library(ceramic)
 library(webshot)
 library(shiny)
 library(dplyr)
@@ -226,14 +226,12 @@ ui <- navbarPage(id = "navbar",
                                    column(1),
                                    column(10,
                                      style = "margin-top:30px;height:1200px!important; font-size:16px; text-align:justify; font-family: Trebuchet MS; color: #DDD;",
-                                     p("The aim of the work was to create and make available a database containing segregation 
-                                       indicators calculated for each county in the USA for the years: 1990, 2000, 2010 and 2020."),
+                                     p("The aim of the app was to visualize and share a database containing racial-ethnic segregation and differentiation indicators calculated for each county in the USA for the years: 1990, 2000, 2010 and 2020."),
                                      br(),
                                      p("These indicators were calculated for 3 levels of aggregation: census blocks, groups of blocks
-                                       and census areas. The application allows you to view county spatial data combined with the resulting 
+                                       and census areas. The application allows to view county spatial data combined with the resulting 
                                        tabular data. It enables visualization of data in the form of an interactive map, interactive charts 
-                                       and a table  containing all calculated indicator values for each county. The application also allows you 
-                                       to download shared data in tabular and spatial form."),
+                                       and a table. This app also allows to download shared data in tabular and spatial form."),
                                      br(), br(),
                                      p("1. Measures of racial differentiation", style = "color:#ffffff; font-weight:bold;"),
                                      p("These measures are used to determine the level of racial and ethnic heterogeneity of the population structure in the analyzed area. 
@@ -281,8 +279,29 @@ ui <- navbarPage(id = "navbar",
                          }
                          .leaflet-popup-content-wrapper{
                             font-family: Lucida Console;
+                            background-color:#477676;
+                            color:#ffffff;
+                            border:0.5px solid #222222;
+                            max-height:250px;
+                         }
+                         .leaflet-popup-content{
+                         max-height:200px;
+                         }
+                         #map{
+                         border:1px solid #ffffff;
                          }
                          
+                         .leaflet-popup-tip{
+                         background-color:#477676;
+                         border:0.5px solid #222222;
+                         }
+                         .leaflet-popup-content-wrapper tr td:nth-child(2n+1){
+                         color:#cccccc!important;
+                         padding-right:10px!important;
+                         }
+                         .leaflet-popup-content-wrapper thead{
+                         font-size:18px!important;
+                         }
                          .row {
                             margin-left:-30px!important;
                          }
@@ -329,6 +348,7 @@ ui <- navbarPage(id = "navbar",
                             background-color:#3a5959 !important;
                             background-image: none !important;
                         }
+                        
                         #mainpanel {
                             margin-left:-100px;
                             margin-top:20px;
@@ -511,7 +531,7 @@ server <- function(input, output,session) {
     
     
     
-    warstwa <- eventReactive(input$run, {
+    layer <- eventReactive(input$run, {
       input$run
         aggr <- isolate(switch(input$unit, 
                        "Blocks" = aggr_objects[[1]],
@@ -596,14 +616,15 @@ server <- function(input, output,session) {
     
     
          output$map <- renderTmap({
+           
            if (isolate(input$aggr_button) == 1){
              input$run
              tmap_mode("view")
-             warstwa <- warstwa()
-             
+             layer <- layer()
+            
              var <- isolate(switch(input$variable_unit, 
-                                   "Entropy" = "Entropia", 
-                                   "Entropy std" = "Entropia_std",
+                                   "Entropy" = "Entropy", 
+                                   "Entropy std" = "Entropy_std",
                                    "The information theory index H" = "H", 
                                    "Index of dissimilarity (white-black)" = "D_wb",
                                    "Index of dissimilarity (white-asian)" = "D_wa", 
@@ -612,18 +633,21 @@ server <- function(input, output,session) {
                                    "Index of dissimilarity (black-asian)" = "D_ba",
                                    "Index of dissimilarity (latin-asian)" = "D_la"))
              
-             popup <- c("Entropia: " = "Entropia", "Entropia std: " = "Entropia_std", 
-                        "H: " = "H", "D (white-black)" = "D_wb", "D (white-asian)" = "D_wa", 
-                        "D (white-latin)" = "D_wl", "D (black-latin)" = "D_bl", 
-                        "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")
+             popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std", 
+                        "H: " = "H", "D (white-black): " = "D_wb", "D (white-asian): " = "D_wa", 
+                        "D (white-latin): " = "D_wl", "D (black-latin): " = "D_bl", 
+                        "D (black-asian): " = "D_ba", "D (latin-asian): " = "D_la")
              
-               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
+                tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                                                                                                                   "OpenStreetMap" = "OpenStreetMap",
+                                                                                                                   "Esri" = "Esri.WorldGrayCanvas")) +
                  tm_fill(title = isolate(paste0(input$variable_unit, br(), " in ", input$year, " | ", input$unit)),
                         col = var, 
                          palette = "YlGn",
                          id = "NAME",
-                         popup.vars = popup) + tm_borders()
-            
+                         popup.vars = popup,
+                         popup.format=list(digits=2)) + tm_borders() 
+                #leaflet::providers
              
              }
           
@@ -633,26 +657,29 @@ server <- function(input, output,session) {
               input$run
               
               tmap_mode("view")
-              warstwa <- warstwa()
+              layer <- layer()
               var <- isolate(switch(input$variable_index, 
                                        "Entropy |ALL AGGREGATION UNITS" = "Entropy",
                                        "Entropy std |ALL AGGREGATION UNITS" = "Entropy_std"))
               popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std")
               
              
-              tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
-                tm_fill(title = paste0(input$variable_index, br(), " in ", input$year),
+              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                                                                                      "OpenStreetMap" = "OpenStreetMap",
+                                                                                      "Esri" = "Esri.WorldGrayCanvas")) +
+                tm_fill(title = isolate(paste0(input$variable_index, br(), " in ", input$year)),
                         col = var, 
                         palette = "YlGn",
                         id = "NAME",
-                        popup.vars = popup) + tm_borders()
+                        popup.vars = popup,
+                        popup.format=list(digits=2)) + tm_borders()
             }
             
             
             else if (isolate(input$index) == "Index of dissimilarity"){
               input$run
               tmap_mode("view")
-              warstwa <- warstwa()
+              layer <- layer()
               var <- isolate(switch(input$variable_index, 
                             "white-black |BLOCKS" = "D_wb_block",
                             "white-asian |BLOCKS" = "D_wa_block",
@@ -692,34 +719,40 @@ server <- function(input, output,session) {
                          "latin-asian |TRACT: " = "D_la_tract")
               
               
-              tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
-                tm_fill(title = paste0(input$variable_index, br(), " in ", input$year),
+              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                                                                                      "OpenStreetMap" = "OpenStreetMap",
+                                                                                      "Esri" = "Esri.WorldGrayCanvas")) +
+                tm_fill(title = isolate(paste0(input$index, br(), input$variable_index, br(), " in ", input$year)),
                         col = var, 
                         palette = "YlGn",
-                        id = "<span style = NAME",
-                        popup.vars = popup) + tm_borders()
+                        id = "NAME",
+                        popup.vars = popup,
+                        popup.format=list(digits=2)) + tm_borders()
             }
             
             
             else if (isolate(input$index) == "The information theory index H"){
               input$run
               tmap_mode("view")
-              warstwa <- warstwa()
+              layer <- layer()
               var <- isolate(switch(input$variable_index, 
                             "H |BLOCKS" = "H_block",
                             "H |GROUP OF BLOCKS" = "H_group_blocks",
                             "H |TRACTS" = "H_tract"))
-              popup <- c("H |BLOCKS" = "H_block",
-                         "H |GROUP OF BLOCKS" = "H_group_blocks",
-                         "H |TRACTS" = "H_tract")
+              popup <- c("H |BLOCKS: " = "H_block",
+                         "H |GROUP OF BLOCKS: " = "H_group_blocks",
+                         "H |TRACTS: " = "H_tract")
               
               
-              tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
-                tm_fill(title = paste0(input$variable_index, br(), " in ", input$year),
+              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                                                                                      "OpenStreetMap" = "OpenStreetMap",
+                                                                                      "Esri" = "Esri.WorldGrayCanvas")) +
+                tm_fill(title = isolate(paste0(input$variable_index, br(), " in ", input$year)),
                         col = var, 
                         palette = "YlGn",
                         id = "NAME",
-                        popup.vars = popup) + tm_borders()
+                        popup.vars = popup,
+                        popup.format=list(digits=2)) + tm_borders()
               
             
             }
@@ -747,14 +780,14 @@ server <- function(input, output,session) {
         axis.text = element_text(size = 12, 
                                  color = "#dddddd"))
       
-      warstwa <- warstwa() 
+      layer <- layer() 
       
       if (isolate(input$aggr_button) == 1){
         
         
         var <- isolate(switch(input$variable_unit, 
-                              "Entropy" = "Entropia", 
-                              "Entropy std" = "Entropia_std",
+                              "Entropy" = "Entropy", 
+                              "Entropy std" = "Entropy_std",
                               "The information theory index H" = "H", 
                               "Index of dissimilarity (white-black)" = "D_wb",
                               "Index of dissimilarity (white-asian)" = "D_wa", 
@@ -763,16 +796,21 @@ server <- function(input, output,session) {
                               "Index of dissimilarity (black-asian)" = "D_ba",
                               "Index of dissimilarity (latin-asian)" = "D_la"))
         
-        output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]], na.rm = TRUE), 2)) })
-        output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]], na.rm = TRUE), 2)) })
-        output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]], na.rm = TRUE), 2)) })
-        output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]], na.rm = TRUE), 2)) })
-        output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]], na.rm = TRUE), 2)) })
-        output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75, na.rm = TRUE), 2)) })
+        output$text_mean <- renderText({paste0("mean: ", round(mean(layer[[var]], na.rm = TRUE), 2)) })
+        output$text_sd <- renderText({paste0("sd: ", round(sd(layer[[var]], na.rm = TRUE), 2)) })
+        output$text_min <- renderText({paste0("min.: ", round(min(layer[[var]], na.rm = TRUE), 2)) })
+        output$text_max <- renderText({paste0("max.: ", round(max(layer[[var]], na.rm = TRUE), 2)) })
+        output$text_median <- renderText({paste0("median: ", round(median(layer[[var]], na.rm = TRUE), 2)) })
+        output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(layer[[var]], probs = 0.75, na.rm = TRUE), 2)) })
         
-        g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
+        index <- layer[[var]]
+        g <- ggplot(layer(), aes(index)) +#paste(#'<span style = " font-weight:bold"> Count: </span>',
+                                                               #'<span>', count ,'</span>',
+                                                               #'</br></br><span style = " font-weight:bold"> index value: </span>',
+                                                               #'<span>', round(var, 2) ,'</span>')) + 
+        geom_histogram(bins = 80, fill = '#367d59') + 
           plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_unit, " in ", input$year))
-        ggplotly(g)%>% config(displayModeBar = F)
+        ggplotly(g) %>% config(displayModeBar = F)
         
         
         
@@ -784,14 +822,15 @@ server <- function(input, output,session) {
                                 "Entropy |ALL AGGREGATION UNITS" = "Entropy",
                                 "Entropy std |ALL AGGREGATION UNITS" = "Entropy_std"))
           
-          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75, na.rm = TRUE), 2)) })
+          output$text_mean <- renderText({paste0("mean: ", round(mean(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_sd <- renderText({paste0("sd: ", round(sd(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_min <- renderText({paste0("min.: ", round(min(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_max <- renderText({paste0("max.: ", round(max(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_median <- renderText({paste0("median: ", round(median(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(layer[[var]], probs = 0.75, na.rm = TRUE), 2)) })
           
-          g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
+          index <- layer[[var]]
+          g <- ggplot(layer, aes(index)) + geom_histogram(bins = 80, fill = '#367d59') + 
             plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_index, " in ", input$year))
           ggplotly(g)%>% config(displayModeBar = F)
         }
@@ -818,14 +857,15 @@ server <- function(input, output,session) {
                                 "black-asian |TRACT" = "D_ba_tract",
                                 "latin-asian |TRACT" = "D_la_tract"))
           
-          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75, na.rm = TRUE), 2)) })
+          output$text_mean <- renderText({paste0("mean: ", round(mean(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_sd <- renderText({paste0("sd: ", round(sd(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_min <- renderText({paste0("min.: ", round(min(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_max <- renderText({paste0("max.: ", round(max(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_median <- renderText({paste0("median: ", round(median(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(layer[[var]], probs = 0.75, na.rm = TRUE), 2)) })
           
-          g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
+          index <- layer[[var]]
+          g <- ggplot(layer, aes(index)) + geom_histogram(bins = 80, fill = '#367d59') + 
             plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_index, " in ", input$year))
           ggplotly(g)%>% config(displayModeBar = F)
         }
@@ -838,14 +878,15 @@ server <- function(input, output,session) {
                                 "H |GROUP OF BLOCKS" = "H_group_blocks",
                                 "H |TRACTS" = "H_tract"))
           
-          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]], na.rm = TRUE), 2)) })
-          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75, na.rm = TRUE), 2)) })
+          output$text_mean <- renderText({paste0("mean: ", round(mean(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_sd <- renderText({paste0("sd: ", round(sd(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_min <- renderText({paste0("min.: ", round(min(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_max <- renderText({paste0("max.: ", round(max(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_median <- renderText({paste0("median: ", round(median(layer[[var]], na.rm = TRUE), 2)) })
+          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(layer[[var]], probs = 0.75, na.rm = TRUE), 2)) })
           
-          g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
+          index <- layer[[var]]
+          g <- ggplot(layer, aes(index)) + geom_histogram(bins = 80, fill = '#367d59') + 
             plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_index, " in ", input$year))
           ggplotly(g)%>% config(displayModeBar = F)
 
@@ -858,7 +899,7 @@ server <- function(input, output,session) {
       })
       
     table_dataset_1<- eventReactive(input$run,{
-      warstwa() %>% st_drop_geometry()
+      layer() %>% st_drop_geometry()
     })
     
     # output$table <- DT::renderDataTable(DT::datatable(table_dataset_1(), options = list(
