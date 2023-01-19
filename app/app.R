@@ -121,8 +121,8 @@ ui <- navbarPage(id = "navbar",
                                                                    selected = "Entrophy"),
                                                        selectInput("variable_index", 
                                                                    label = "Choose an aggregation unit and variable",
-                                                                   choices = c("Entropy    |ALL AGGREGATION UNITS", 
-                                                                               "Entropy std    |ALL AGGREGATION UNITS"),
+                                                                   choices = c("Entropy |ALL AGGREGATION UNITS", 
+                                                                               "Entropy std |ALL AGGREGATION UNITS"),
                                                                    selected = "Entropy")),
                                            
                                            tabsetPanel(id = "tabset2",
@@ -196,7 +196,7 @@ ui <- navbarPage(id = "navbar",
                                                                    "Index of dissimilarity - 2010", "Index of dissimilarity - 2020",
                                                                    "The information theory index H - 1990", "The information theory index H - 2000", 
                                                                    "The information theory index H - 2010", "The information theory index H - 2020")),
-                                           actionButton("choose", "Choose"),
+                                           actionButton("show", "Show"),
                                            div(style = "clear:both;"),
                                            downloadButton('download_csv', 'Download .csv'),
                                            downloadButton('download_gpkg', 'Download .gpkg')
@@ -390,7 +390,7 @@ ui <- navbarPage(id = "navbar",
                             color:#dddddd!important;
                             font-size: 0.4;
                         }
-                        #choose {
+                        #show {
                         float:left;
                         margin-bottom:40px;
                         }
@@ -550,43 +550,43 @@ server <- function(input, output,session) {
           freezeReactiveValue(input, "variable_index")
           updateSelectInput(session, "variable_index",
                             label = "Choose an aggregation unit and variable",
-                            choices = c("Entropy    |ALL AGGREGATION UNITS",
-                                        "Entropy std    |ALL AGGREGATION UNITS"),
-                            selected = "Entropy    |ALL AGGREGATION UNITS"
+                            choices = c("Entropy |ALL AGGREGATION UNITS",
+                                        "Entropy std |ALL AGGREGATION UNITS"),
+                            selected = "Entropy |ALL AGGREGATION UNITS"
           )}
         else if (input$index == "Index of dissimilarity"){
           freezeReactiveValue(input, "variable_index")
           updateSelectInput(session, "variable_index",
                             label = "Choose an aggregation unit and variable",
-                            choices = c("white-black    |BLOCKS",
-                                        "white-asian    |BLOCKS",
-                                        "white-latin    |BLOCKS",
-                                        "black-latin    |BLOCKS",
-                                        "black-asian    |BLOCKS",
-                                        "latin-asian    |BLOCKS",
-                                        "white-black    |GROUP OF BLOCKS",
-                                        "white-asian    |GROUP OF BLOCKS",
-                                        "white-latin    |GROUP OF BLOCKS",
-                                        "black-latin    |GROUP OF BLOCKS",
-                                        "black-asian    |GROUP OF BLOCKS",
-                                        "latin-asian    |GROUP OF BLOCKS",
-                                        "white-black    |TRACT",
-                                        "white-asian    |TRACT",
-                                        "white-latin    |TRACT",
-                                        "black-latin    |TRACT",
-                                        "black-asian    |TRACT",
-                                        "latin-asian    |TRACT"),
-                            selected = "white-black    |BLOCKS"
+                            choices = c("white-black |BLOCKS",
+                                        "white-asian |BLOCKS",
+                                        "white-latin |BLOCKS",
+                                        "black-latin |BLOCKS",
+                                        "black-asian |BLOCKS",
+                                        "latin-asian |BLOCKS",
+                                        "white-black |GROUP OF BLOCKS",
+                                        "white-asian |GROUP OF BLOCKS",
+                                        "white-latin |GROUP OF BLOCKS",
+                                        "black-latin |GROUP OF BLOCKS",
+                                        "black-asian |GROUP OF BLOCKS",
+                                        "latin-asian |GROUP OF BLOCKS",
+                                        "white-black |TRACT",
+                                        "white-asian |TRACT",
+                                        "white-latin |TRACT",
+                                        "black-latin |TRACT",
+                                        "black-asian |TRACT",
+                                        "latin-asian |TRACT"),
+                            selected = "white-black |BLOCKS"
           )
         }
         else if (input$index == "The information theory index H"){
           freezeReactiveValue(input, "variable_index")
           updateSelectInput(session, "variable_index",
                             label = "Choose an aggregation unit and variable",
-                            choices = c("H    |BLOCKS",
-                                        "H    |GROUP OF BLOCKS",
-                                        "H    |TRACTS"),
-                            selected = "H    |BLOCKS"
+                            choices = c("H |BLOCKS",
+                                        "H |GROUP OF BLOCKS",
+                                        "H |TRACTS"),
+                            selected = "H |BLOCKS"
           )
         }
     }
@@ -618,7 +618,8 @@ server <- function(input, output,session) {
                         "D (black-asian)" = "D_ba", "D (latin-asian)" = "D_la")
              
                tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
-                 tm_fill(col = var, 
+                 tm_fill(title = isolate(paste0(input$variable_unit, br(), " in ", input$year, " | ", input$unit)),
+                        col = var, 
                          palette = "YlGn",
                          id = "NAME",
                          popup.vars = popup) + tm_borders()
@@ -634,13 +635,14 @@ server <- function(input, output,session) {
               tmap_mode("view")
               warstwa <- warstwa()
               var <- isolate(switch(input$variable_index, 
-                                       "Entropy    |ALL AGGREGATION UNITS" = "Entropy",
-                                       "Entropy std    |ALL AGGREGATION UNITS" = "Entropy_std"))
+                                       "Entropy |ALL AGGREGATION UNITS" = "Entropy",
+                                       "Entropy std |ALL AGGREGATION UNITS" = "Entropy_std"))
               popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std")
               
              
               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
-                tm_fill(col = var, 
+                tm_fill(title = paste0(input$variable_index, br(), " in ", input$year),
+                        col = var, 
                         palette = "YlGn",
                         id = "NAME",
                         popup.vars = popup) + tm_borders()
@@ -652,46 +654,47 @@ server <- function(input, output,session) {
               tmap_mode("view")
               warstwa <- warstwa()
               var <- isolate(switch(input$variable_index, 
-                            "white-black    |BLOCKS" = "D_wb_block",
-                            "white-asian    |BLOCKS" = "D_wa_block",
-                            "white-latin    |BLOCKS" = "D_wl_block",
-                            "black-latin    |BLOCKS" = "D_bl_block",
-                            "black-asian    |BLOCKS" = "D_ba_block",
-                            "latin-asian    |BLOCKS" = "D_la_block",
-                            "white-black    |GROUP OF BLOCKS" = "D_wb_group_blocks",
-                            "white-asian    |GROUP OF BLOCKS" = "D_wa_group_blocks",
-                            "white-latin    |GROUP OF BLOCKS" = "D_wl_group_blocks",
-                            "black-latin    |GROUP OF BLOCKS" = "D_bl_group_blocks",
-                            "black-asian    |GROUP OF BLOCKS" = "D_ba_group_blocks",
-                            "latin-asian    |GROUP OF BLOCKS" = "D_la_group_blocks",
-                            "white-black    |TRACT" = "D_wb_tract",
-                            "white-asian    |TRACT" = "D_wa_tract",
-                            "white-latin    |TRACT" = "D_wl_tract",
-                            "black-latin    |TRACT" = "D_bl_tract",
-                            "black-asian    |TRACT" = "D_ba_tract",
-                            "latin-asian    |TRACT" = "D_la_tract"))
-              popup <- c("white-black    |BLOCKS: " = "D_wb_block",
-                         "white-asian    |BLOCKS: " = "D_wa_block",
-                         "white-latin    |BLOCKS: " = "D_wl_block",
-                         "black-latin    |BLOCKS: " = "D_bl_block",
-                         "black-asian    |BLOCKS: " = "D_ba_block",
-                         "latin-asian    |BLOCKS: " = "D_la_block",
-                         "white-black    |GROUP OF BLOCKS: " = "D_wb_group_blocks",
-                         "white-asian    |GROUP OF BLOCKS: " = "D_wa_group_blocks",
-                         "white-latin    |GROUP OF BLOCKS: " = "D_wl_group_blocks",
-                         "black-latin    |GROUP OF BLOCKS: " = "D_bl_group_blocks",
-                         "black-asian    |GROUP OF BLOCKS: " = "D_ba_group_blocks",
-                         "latin-asian    |GROUP OF BLOCKS: " = "D_la_group_blocks",
-                         "white-black    |TRACT: " = "D_wb_tract",
-                         "white-asian    |TRACT: " = "D_wa_tract",
-                         "white-latin    |TRACT: " = "D_wl_tract",
-                         "black-latin    |TRACT: " = "D_bl_tract",
-                         "black-asian    |TRACT: " = "D_ba_tract",
-                         "latin-asian    |TRACT: " = "D_la_tract")
+                            "white-black |BLOCKS" = "D_wb_block",
+                            "white-asian |BLOCKS" = "D_wa_block",
+                            "white-latin |BLOCKS" = "D_wl_block",
+                            "black-latin |BLOCKS" = "D_bl_block",
+                            "black-asian |BLOCKS" = "D_ba_block",
+                            "latin-asian |BLOCKS" = "D_la_block",
+                            "white-black |GROUP OF BLOCKS" = "D_wb_group_blocks",
+                            "white-asian |GROUP OF BLOCKS" = "D_wa_group_blocks",
+                            "white-latin |GROUP OF BLOCKS" = "D_wl_group_blocks",
+                            "black-latin |GROUP OF BLOCKS" = "D_bl_group_blocks",
+                            "black-asian |GROUP OF BLOCKS" = "D_ba_group_blocks",
+                            "latin-asian |GROUP OF BLOCKS" = "D_la_group_blocks",
+                            "white-black |TRACT" = "D_wb_tract",
+                            "white-asian |TRACT" = "D_wa_tract",
+                            "white-latin |TRACT" = "D_wl_tract",
+                            "black-latin |TRACT" = "D_bl_tract",
+                            "black-asian |TRACT" = "D_ba_tract",
+                            "latin-asian |TRACT" = "D_la_tract"))
+              popup <- c("white-black |BLOCKS: " = "D_wb_block",
+                         "white-asian |BLOCKS: " = "D_wa_block",
+                         "white-latin |BLOCKS: " = "D_wl_block",
+                         "black-latin |BLOCKS: " = "D_bl_block",
+                         "black-asian |BLOCKS: " = "D_ba_block",
+                         "latin-asian |BLOCKS: " = "D_la_block",
+                         "white-black |GROUP OF BLOCKS: " = "D_wb_group_blocks",
+                         "white-asian |GROUP OF BLOCKS: " = "D_wa_group_blocks",
+                         "white-latin |GROUP OF BLOCKS: " = "D_wl_group_blocks",
+                         "black-latin |GROUP OF BLOCKS: " = "D_bl_group_blocks",
+                         "black-asian |GROUP OF BLOCKS: " = "D_ba_group_blocks",
+                         "latin-asian |GROUP OF BLOCKS: " = "D_la_group_blocks",
+                         "white-black |TRACT: " = "D_wb_tract",
+                         "white-asian |TRACT: " = "D_wa_tract",
+                         "white-latin |TRACT: " = "D_wl_tract",
+                         "black-latin |TRACT: " = "D_bl_tract",
+                         "black-asian |TRACT: " = "D_ba_tract",
+                         "latin-asian |TRACT: " = "D_la_tract")
               
               
               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
-                tm_fill(col = var, 
+                tm_fill(title = paste0(input$variable_index, br(), " in ", input$year),
+                        col = var, 
                         palette = "YlGn",
                         id = "<span style = NAME",
                         popup.vars = popup) + tm_borders()
@@ -703,16 +706,17 @@ server <- function(input, output,session) {
               tmap_mode("view")
               warstwa <- warstwa()
               var <- isolate(switch(input$variable_index, 
-                            "H    |BLOCKS" = "H_block",
-                            "H    |GROUP OF BLOCKS" = "H_group_blocks",
-                            "H    |TRACTS" = "H_tract"))
-              popup <- c("H    |BLOCKS" = "H_block",
-                         "H    |GROUP OF BLOCKS" = "H_group_blocks",
-                         "H    |TRACTS" = "H_tract")
+                            "H |BLOCKS" = "H_block",
+                            "H |GROUP OF BLOCKS" = "H_group_blocks",
+                            "H |TRACTS" = "H_tract"))
+              popup <- c("H |BLOCKS" = "H_block",
+                         "H |GROUP OF BLOCKS" = "H_group_blocks",
+                         "H |TRACTS" = "H_tract")
               
               
               tm_shape(warstwa) + tm_view(set.view = c(-120, 50, 3.2)) + 
-                tm_fill(col = var, 
+                tm_fill(title = paste0(input$variable_index, br(), " in ", input$year),
+                        col = var, 
                         palette = "YlGn",
                         id = "NAME",
                         popup.vars = popup) + tm_borders()
@@ -759,15 +763,15 @@ server <- function(input, output,session) {
                               "Index of dissimilarity (black-asian)" = "D_ba",
                               "Index of dissimilarity (latin-asian)" = "D_la"))
         
-        output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]]), 2)) })
-        output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]]), 2)) })
-        output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]]), 2)) })
-        output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]]), 2)) })
-        output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]]), 2)) })
-        output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75), 2)) })
+        output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]], na.rm = TRUE), 2)) })
+        output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]], na.rm = TRUE), 2)) })
+        output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]], na.rm = TRUE), 2)) })
+        output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]], na.rm = TRUE), 2)) })
+        output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]], na.rm = TRUE), 2)) })
+        output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75, na.rm = TRUE), 2)) })
         
         g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
-          plot_theme + labs(x = var, y = "Count", title = var)
+          plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_unit, " in ", input$year))
         ggplotly(g)%>% config(displayModeBar = F)
         
         
@@ -777,52 +781,52 @@ server <- function(input, output,session) {
         if (isolate(input$index) == "Entropy"){
           
           var <- isolate(switch(input$variable_index, 
-                                "Entropy    |ALL AGGREGATION UNITS" = "Entropy",
-                                "Entropy std    |ALL AGGREGATION UNITS" = "Entropy_std"))
+                                "Entropy |ALL AGGREGATION UNITS" = "Entropy",
+                                "Entropy std |ALL AGGREGATION UNITS" = "Entropy_std"))
           
-          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]]), 2)) })
-          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]]), 2)) })
-          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]]), 2)) })
-          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]]), 2)) })
-          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]]), 2)) })
-          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75), 2)) })
+          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75, na.rm = TRUE), 2)) })
           
           g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
-            plot_theme + labs(x = var, y = "Count", title = var)
+            plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_index, " in ", input$year))
           ggplotly(g)%>% config(displayModeBar = F)
         }
         
         
         else if (isolate(input$index) == "Index of dissimilarity"){
           var <- isolate(switch(input$variable_index, 
-                                "white-black    |BLOCKS" = "D_wb_block",
-                                "white-asian    |BLOCKS" = "D_wa_block",
-                                "white-latin    |BLOCKS" = "D_wl_block",
-                                "black-latin    |BLOCKS" = "D_bl_block",
-                                "black-asian    |BLOCKS" = "D_ba_block",
-                                "latin-asian    |BLOCKS" = "D_la_block",
-                                "white-black    |GROUP OF BLOCKS" = "D_wb_group_blocks",
-                                "white-asian    |GROUP OF BLOCKS" = "D_wa_group_blocks",
-                                "white-latin    |GROUP OF BLOCKS" = "D_wl_group_blocks",
-                                "black-latin    |GROUP OF BLOCKS" = "D_bl_group_blocks",
-                                "black-asian    |GROUP OF BLOCKS" = "D_ba_group_blocks",
-                                "latin-asian    |GROUP OF BLOCKS" = "D_la_group_blocks",
-                                "white-black    |TRACT" = "D_wb_tract",
-                                "white-asian    |TRACT" = "D_wa_tract",
-                                "white-latin    |TRACT" = "D_wl_tract",
-                                "black-latin    |TRACT" = "D_bl_tract",
-                                "black-asian    |TRACT" = "D_ba_tract",
-                                "latin-asian    |TRACT" = "D_la_tract"))
+                                "white-black |BLOCKS" = "D_wb_block",
+                                "white-asian |BLOCKS" = "D_wa_block",
+                                "white-latin |BLOCKS" = "D_wl_block",
+                                "black-latin |BLOCKS" = "D_bl_block",
+                                "black-asian |BLOCKS" = "D_ba_block",
+                                "latin-asian |BLOCKS" = "D_la_block",
+                                "white-black |GROUP OF BLOCKS" = "D_wb_group_blocks",
+                                "white-asian |GROUP OF BLOCKS" = "D_wa_group_blocks",
+                                "white-latin |GROUP OF BLOCKS" = "D_wl_group_blocks",
+                                "black-latin |GROUP OF BLOCKS" = "D_bl_group_blocks",
+                                "black-asian |GROUP OF BLOCKS" = "D_ba_group_blocks",
+                                "latin-asian |GROUP OF BLOCKS" = "D_la_group_blocks",
+                                "white-black |TRACT" = "D_wb_tract",
+                                "white-asian |TRACT" = "D_wa_tract",
+                                "white-latin |TRACT" = "D_wl_tract",
+                                "black-latin |TRACT" = "D_bl_tract",
+                                "black-asian |TRACT" = "D_ba_tract",
+                                "latin-asian |TRACT" = "D_la_tract"))
           
-          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]]), 2)) })
-          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]]), 2)) })
-          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]]), 2)) })
-          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]]), 2)) })
-          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]]), 2)) })
-          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75), 2)) })
+          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75, na.rm = TRUE), 2)) })
           
           g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
-            plot_theme + labs(x = var, y = "Count", title = var)
+            plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_index, " in ", input$year))
           ggplotly(g)%>% config(displayModeBar = F)
         }
         
@@ -830,19 +834,19 @@ server <- function(input, output,session) {
         else if (isolate(input$index) == "The information theory index H"){
           
           var <- isolate(switch(input$variable_index, 
-                                "H    |BLOCKS" = "H_block",
-                                "H    |GROUP OF BLOCKS" = "H_group_blocks",
-                                "H    |TRACTS" = "H_tract"))
+                                "H |BLOCKS" = "H_block",
+                                "H |GROUP OF BLOCKS" = "H_group_blocks",
+                                "H |TRACTS" = "H_tract"))
           
-          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]]), 2)) })
-          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]]), 2)) })
-          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]]), 2)) })
-          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]]), 2)) })
-          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]]), 2)) })
-          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75), 2)) })
+          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]], na.rm = TRUE), 2)) })
+          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75, na.rm = TRUE), 2)) })
           
           g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
-            plot_theme + labs(x = var, y = "Count", title = var)
+            plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_index, " in ", input$year))
           ggplotly(g)%>% config(displayModeBar = F)
 
         }
@@ -866,7 +870,7 @@ server <- function(input, output,session) {
     #     lengthMenu = c(6, 12))))
     
     
-    datasetInput <- eventReactive(input$choose,{
+    datasetInput <- eventReactive(input$show,{
            if (input$dataset_button_1 == 1){
             switch(input$dataset_1,
            "Blocks - 1990" = shp_block_1990, "Blocks - 2000" = shp_block_2000, "Blocks - 2010" = shp_block_2010, "Blocks - 2020" = shp_block_2020,
@@ -928,7 +932,7 @@ server <- function(input, output,session) {
         export(plot(), file=file)
       }
     )
-     table_dataset_2 <- eventReactive(input$choose,{
+     table_dataset_2 <- eventReactive(input$show,{
        datasetInput() %>% st_drop_geometry()
      })
     
@@ -941,7 +945,7 @@ server <- function(input, output,session) {
       lengthMenu = c(6, 12))))
     observeEvent(input$run,{hide("instruction_1")})
     observeEvent(input$run,{hide("instruction_2")})
-    observeEvent(input$run,{hide("instruction_3")})
+    observeEvent(input$show,{hide("instruction_3")})
     observeEvent(input$run,
                   runjs('document.getElementById("save_png").style.visibility = "visible";')
                  )
