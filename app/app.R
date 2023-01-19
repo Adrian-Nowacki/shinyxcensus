@@ -1,4 +1,4 @@
-library(ceramic)
+library(rsconnect)
 library(webshot)
 library(shiny)
 library(dplyr)
@@ -12,20 +12,20 @@ library(ggplot2)
 library(plotly)
 library(leaflet)
 # wczytanie danych
-shp_block_1990 <- st_read("../counties_shp/low_res/census_shp/shp_block_1990.gpkg")
-shp_block_2000 <- st_read("../counties_shp/low_res/census_shp/shp_block_2000.gpkg")
-shp_block_2010 <- st_read("../counties_shp/low_res/census_shp/shp_block_2010.gpkg")
-shp_block_2020 <- st_read("../counties_shp/low_res/census_shp/shp_block_2020.gpkg")
+shp_block_1990 <- st_read("data/census_shp/shp_block_1990.gpkg")
+shp_block_2000 <- st_read("data/census_shp/shp_block_2000.gpkg")
+shp_block_2010 <- st_read("data/census_shp/shp_block_2010.gpkg")
+shp_block_2020 <- st_read("data/census_shp/shp_block_2020.gpkg")
 
-shp_grp_blocks_1990 <- st_read("../counties_shp/low_res/census_shp/shp_grp_blocks_1990.gpkg")
-shp_grp_blocks_2000 <- st_read("../counties_shp/low_res/census_shp/shp_grp_blocks_2000.gpkg")
-shp_grp_blocks_2010 <- st_read("../counties_shp/low_res/census_shp/shp_grp_blocks_2010.gpkg")
-shp_grp_blocks_2020 <- st_read("../counties_shp/low_res/census_shp/shp_grp_blocks_2020.gpkg")
+shp_grp_blocks_1990 <- st_read("data/census_shp/shp_grp_blocks_1990.gpkg")
+shp_grp_blocks_2000 <- st_read("data/census_shp/shp_grp_blocks_2000.gpkg")
+shp_grp_blocks_2010 <- st_read("data/census_shp/shp_grp_blocks_2010.gpkg")
+shp_grp_blocks_2020 <- st_read("data/census_shp/shp_grp_blocks_2020.gpkg")
 
-shp_tract_1990 <- st_read("../counties_shp/low_res/census_shp/shp_tract_1990.gpkg")
-shp_tract_2000 <- st_read("../counties_shp/low_res/census_shp/shp_tract_2000.gpkg")
-shp_tract_2010 <- st_read("../counties_shp/low_res/census_shp/shp_tract_2010.gpkg")
-shp_tract_2020 <- st_read("../counties_shp/low_res/census_shp/shp_tract_2020.gpkg")
+shp_tract_1990 <- st_read("data/census_shp/shp_tract_1990.gpkg")
+shp_tract_2000 <- st_read("data/census_shp/shp_tract_2000.gpkg")
+shp_tract_2010 <- st_read("data/census_shp/shp_tract_2010.gpkg")
+shp_tract_2020 <- st_read("data/census_shp/shp_tract_2020.gpkg")
 
 
 blocks <- list(shp_block_1990, shp_block_2000, shp_block_2010, shp_block_2020)
@@ -34,20 +34,20 @@ tracts <- list(shp_tract_1990, shp_tract_2000, shp_tract_2010, shp_tract_2020)
 
 aggr_objects <- list(blocks = blocks, grp_blocks =  grp_blocks, tracts = tracts)
 # wskazniki
-shp_ind_ent_1990 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_ent_1990.gpkg")
-shp_ind_ent_2000 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_ent_2000.gpkg")
-shp_ind_ent_2010 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_ent_2010.gpkg")
-shp_ind_ent_2020 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_ent_2020.gpkg")
+shp_ind_ent_1990 <- st_read("data/indexes_shp/shp_ind_ent_1990.gpkg")
+shp_ind_ent_2000 <- st_read("data/indexes_shp/shp_ind_ent_2000.gpkg")
+shp_ind_ent_2010 <- st_read("data/indexes_shp/shp_ind_ent_2010.gpkg")
+shp_ind_ent_2020 <- st_read("data/indexes_shp/shp_ind_ent_2020.gpkg")
 
-shp_ind_D_1990 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_D_1990.gpkg")
-shp_ind_D_2000 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_D_2000.gpkg")
-shp_ind_D_2010 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_D_2010.gpkg")
-shp_ind_D_2020 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_D_2020.gpkg")
+shp_ind_D_1990 <- st_read("data/indexes_shp/shp_ind_D_1990.gpkg")
+shp_ind_D_2000 <- st_read("data/indexes_shp/shp_ind_D_2000.gpkg")
+shp_ind_D_2010 <- st_read("data/indexes_shp/shp_ind_D_2010.gpkg")
+shp_ind_D_2020 <- st_read("data/indexes_shp/shp_ind_D_2020.gpkg")
 
-shp_ind_H_1990 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_H_1990.gpkg")
-shp_ind_H_2000 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_H_2000.gpkg")
-shp_ind_H_2010 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_H_2010.gpkg")
-shp_ind_H_2020 <- st_read("../counties_shp/low_res/indexes_shp/shp_ind_H_2020.gpkg")
+shp_ind_H_1990 <- st_read("data/indexes_shp/shp_ind_H_1990.gpkg")
+shp_ind_H_2000 <- st_read("data/indexes_shp/shp_ind_H_2000.gpkg")
+shp_ind_H_2010 <- st_read("data/indexes_shp/shp_ind_H_2010.gpkg")
+shp_ind_H_2020 <- st_read("data/indexes_shp/shp_ind_H_2020.gpkg")
 
 entrophy <- list(shp_ind_ent_1990, shp_ind_ent_2000, shp_ind_ent_2010, shp_ind_ent_2020)
 d_index <- list(shp_ind_D_1990, shp_ind_D_2000, shp_ind_D_2010, shp_ind_D_2020)
@@ -59,8 +59,12 @@ ind_objects <- list(entrophy = entrophy, d_index = d_index, h_index = h_index)
 
 
 ui <- navbarPage(id = "navbar",
-                   title=div(img(src='logo_5.png', width = "32px", height = "32px"), "🇸‌🇭‌🇮‌🇳‌🇾‌🇽‌🇨‌🇪‌🇳‌🇸‌🇺‌🇸‌", style = "margin-top:-2px;font-weight:bold!important; text-shadow: #222 1px 1px 1px;"),
-                 #"Racial diversity App",
+                 title = div(img(src='logo_5.png', width = "32px", height = "32px"), "🇸‌🇭‌🇮‌🇳‌🇾‌🇽‌🇨‌🇪‌🇳‌🇸‌🇺‌🇸‌", style = "margin-top:-2px;font-weight:bold!important; text-shadow: #222 1px 1px 1px;"),
+                # tags$head(HTML("<link rel='icon' type='image/gif/png' href='logo_5.png'>")), 
+                 
+                 windowTitle = HTML("shinyxcensus</title><link rel='icon' type='png' href='logo_5.png'>"),
+                  
+                 
                  tabPanel("Home",
                           fluidRow(style = "
                           background: 
@@ -178,6 +182,7 @@ ui <- navbarPage(id = "navbar",
                               )
                           )
                  ),
+                 
                  tabPanel("Download data",
                           sidebarLayout(
                               sidebarPanel(id = "dt_sidebar",
@@ -263,10 +268,11 @@ ui <- navbarPage(id = "navbar",
                           
                  ),
                  
+                 
+                 
                  setBackgroundColor(
                      color =  "#252525"
                  ),
-                 
                  tags$head(tags$style(
                      HTML('
                          #sidebar {
@@ -426,8 +432,8 @@ ui <- navbarPage(id = "navbar",
                             letter-spacing: -0.2px;
                         }')
                  )),
-                 
                  shinyjs::useShinyjs()
+                 
                  
 )
 
