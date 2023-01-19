@@ -1,4 +1,5 @@
 
+library(webshot)
 library(shiny)
 library(dplyr)
 library(sf)
@@ -58,7 +59,7 @@ ind_objects <- list(entrophy = entrophy, d_index = d_index, h_index = h_index)
 
 
 ui <- navbarPage(id = "navbar",
-                   title=div(img(src='logo_5.png', width = "25px", height = "25px"), "Racial diversity App"),
+                   title=div(img(src='logo_5.png', width = "32px", height = "32px"), "🇸‌🇭‌🇮‌🇳‌🇾‌🇽‌🇨‌🇪‌🇳‌🇸‌🇺‌🇸‌", style = "margin-top:-2px;font-weight:bold!important; text-shadow: #222 1px 1px 1px;"),
                  #"Racial diversity App",
                  tabPanel("Home",
                           fluidRow(style = "
@@ -68,10 +69,12 @@ ui <- navbarPage(id = "navbar",
                                    
                                    column(2),
                                    column(8,
-                                          img(src='logo_5.png', width = "150px", height = "150px", align = "center", style = "margin-top:150px; margin-bottom:25px;"),
+                                          img(src='logo_5.png', width = "150px", height = "150px", align = "center", style = "margin-top:150px;"),
                                           style = "height:800px!important; text-align:center; font-family: Trebuchet MS; color: #DDD;",
-                                          h1("Application visualizing the values ​​of racial segregation indicators for individual sizes of aggregation units", 
-                                             style = "font-weight:bold!important; text-shadow: #222 1px 1px 1px;"
+                                          h2("🆂🅷🅸🅽🆈🆇🅲🅴🅽🆂🆄🆂",
+                                             style = "font-weight:bold!important; text-shadow: #222 1px 1px 1px;"),
+                                          h4("Application visualizing the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units", 
+                                             style = "text-shadow: #222 1px 1px 1px; margin-top:50px;"
                                           ),
                                           
                                    ),
@@ -135,9 +138,42 @@ ui <- navbarPage(id = "navbar",
                               
                               mainPanel(id = "mainpanel",
                                         tabsetPanel(id = "tabsetpanel",
-                                            tabPanel("Interactive map", tmapOutput("map", height = "600px")), 
-                                            tabPanel("Statistics", plotlyOutput("plot",  height = "600px")), 
-                                            tabPanel("Table", DT::dataTableOutput("table"))
+                                            tabPanel("Interactive map", tmapOutput("map", height = "600px"),
+                                                     fluidRow(id = "instruction_1",
+                                                              style = "margin-top: -570px; font-size:16px; color:#ffffff",
+                                                              h3("On the left, there is a side panel divided into two sections:"),
+                                                              p("- the first one allows you to select a layer covering", span("all indicators for the selected aggregation unit", style = "font-weight:bold; color:#5f8484")),
+                                                              p("- the second one allows you to select", span("one indicator for all aggregation units", style = "font-weight:bold; color:#5f8484")),
+                                                              br(),
+                                                              p("1. Select the indicator and year you are interested in"),
+                                                              p("2. Click 'Run'"), 
+                                                              br(),
+                                                              p("For more information on aggregation units and indices of racial differentiation and racial segregation, see the 'About' tab", style = "color:#cccccc; font-size:12px"))),
+                                            tabPanel("Statistics", 
+                                                     fluidRow(style = "margin-top: 30px; text-size: 18px;text-align: center; color: #eeeeee; background-color:#444444;",
+                                                              column(4,
+                                                                     textOutput("text_mean"),
+                                                                     textOutput("text_sd")),
+                                                              column(4,
+                                                                     textOutput("text_min"),
+                                                                     textOutput("text_max")),
+                                                              column(4,
+                                                                     textOutput("text_median"),
+                                                                     textOutput("text_quantile"))),
+                                                     plotlyOutput("plot", height = "480px", width = "770px"),
+                                                     # fluidRow(id = "instruction_2",
+                                                     #          style = "margin-top: -445px; font-size:16px; color:#ffffff",
+                                                     #          h3("On the left, there is a side panel divided into two sections:"),
+                                                     #          p("- the first one allows you to select a layer covering", span("all indicators for the selected aggregation unit", style = "font-weight:bold; color:#5f8484")),
+                                                     #          p("- the second one allows you to select", span("one indicator for all aggregation units", style = "font-weight:bold; color:#5f8484")),
+                                                     #          br(),
+                                                     #          p("1. Select the indicator and year you are interested in"),
+                                                     #          p("2. Click 'Run'"), 
+                                                     #          br(),
+                                                     #          p("For more information on aggregation units and indices of racial differentiation and racial segregation, see the 'About' tab", style = "color:#cccccc; font-size:12px")),
+                                                     downloadButton('save_png', 'Save as .png',
+                                                                    style = "visibility:hidden"))
+                                            
                                         )
                               )
                           )
@@ -167,7 +203,17 @@ ui <- navbarPage(id = "navbar",
                               ),
                               mainPanel(id = "dt_mainpanel",
                                         tabsetPanel(
-                                          tabPanel("Table", DT::dataTableOutput("table_dt", height = "600px"))
+                                          tabPanel("Table", DT::dataTableOutput("table_dt", height = "600px"),
+                                                   fluidRow(id = "instruction_3",
+                                                            style = "margin-top: -570px; font-size:16px; color:#ffffff",
+                                                            h3("On the left, there is a side panel divided into two datasets:"),
+                                                            p("- the first one allows you to show and download a table covering", span("all indicators for the selected aggregation unit", style = "font-weight:bold; color:#5f8484")),
+                                                            p("- the second one allows you to show and download a table covering", span("one indicator for all aggregation units", style = "font-weight:bold; color:#5f8484")),
+                                                            br(),
+                                                            p("1. Select the layer you are interested in"),
+                                                            p("2. Click 'Show'"), 
+                                                            br(),
+                                                            ))
                                         )
                               )
                           )
@@ -179,16 +225,36 @@ ui <- navbarPage(id = "navbar",
                             radial-gradient(ellipse at bottom, #2a3c3c, transparent);",
                                    column(1),
                                    column(10,
-                                     style = "margin-top:30px;height:800px!important; font-size:18px; text-align:adjusted; font-family: Trebuchet MS; color: #DDD;",
+                                     style = "margin-top:30px;height:1200px!important; font-size:16px; text-align:justify; font-family: Trebuchet MS; color: #DDD;",
                                      p("The aim of the work was to create and make available a database containing segregation 
                                        indicators calculated for each county in the USA for the years: 1990, 2000, 2010 and 2020."),
+                                     br(),
                                      p("These indicators were calculated for 3 levels of aggregation: census blocks, groups of blocks
                                        and census areas. The application allows you to view county spatial data combined with the resulting 
                                        tabular data. It enables visualization of data in the form of an interactive map, interactive charts 
-                                       and a table  containing all calculated indicator values ​​for each county. The application also allows you 
+                                       and a table  containing all calculated indicator values for each county. The application also allows you 
                                        to download shared data in tabular and spatial form."),
-                                     img(src='github-sign.png', width = "60px", height = "60px", align = "center", style = "margin-left: 47.5%; 
-                                         margin-top:100px; margin-bottom:25px;"),
+                                     br(), br(),
+                                     p("1. Measures of racial differentiation", style = "color:#ffffff; font-weight:bold;"),
+                                     p("These measures are used to determine the level of racial and ethnic heterogeneity of the population structure in the analyzed area. 
+                                       The values of racial differentiation measures are independent of the adopted division into spatial units and have the same value for all 
+                                       aggregation units in a given year. The most commonly used measures are:"),
+                                         column(1),
+                                         column(11,
+                                         p("• ", span("Entropy", style = "font-weight:bold; color:#111111;"), " - informs about the level of racial-ethnic mixing of the population structure in the study area. Its maximum value depends on the number of racial and ethnic groups inhabiting a given area - the more groups considered, the higher the maximum value of entropy. Due to the reclassification of data to 6 categories, the calculated measure assumes the highest possible value of 1.79. The lower the entropy index, the greater the dominance of a single racial-ethnic group - the higher it is, the more equal the share of all groups."),
+                                         p("• ", span("Standardized entropy", style = "font-weight:bold; color:#111111;"), "– a measure used for comparative purposes, with an adopted unified range of values ​​from 0 to 1, which is obtained as a result of dividing by the maximum entropy value."),
+                                         br(),br()
+                                         ),
+                                     p("2. Indicators of racial segregation", style = "color:#ffffff; font-weight:bold;"),
+                                     p("These measures measure the extent to which two or more groups live separately from each other in different parts of the city (Massey & Denton, 1988). They describe the level of spatial distribution of particular races and ethnic groups in a given geographical area. The values ​​of segregation indicators - in contrast to racial differentiation indicators - depend on the adopted division into aggregation units and require dividing the area into smaller component areas. Commonly used indicators of racial segregation are:"),
+                                         column(1),
+                                         column(11,
+                                                p("• ", span("Index of dissimilarity", style = "font-weight:bold; color:#111111;"), "– used to measure the integration or relative separation of two groups within neighborhoods of a single city or metropolitan area, as well as within individual constituent census areas. In the work, the index was presented in relation to counties and calculated on the basis of the blocks, groups of blocks and census areas included in it. The index takes values ​​from 0 to 1, where 0 means complete integration (even distribution) of both groups, and 1 – complete segregation, i.e. a given spatial unit is inhabited by only one group. It tells you the percentage of the group that would need to move between units to equalize the size of the other group (i.e. both subgroups would be fully integrated)."),
+                                                p("• ", span("Information theory index H", style = "font-weight:bold; color:#111111;"), "measures the difference between the entropy (racial diversity) of the entire area and the entropy of individual census areas in relation to the diversity of the entire area (Fig. 2). Its range is from 0 to 1, where 0 means the same racial and ethnic structure of the census area as compared to the entire area, i.e. full integration of all groups - while the value of 1 indicates that the census area is inhabited by one racial and ethnic group (full segregation)."),
+                                         br(),br()
+                                                ),
+                                     tags$a(img(src='github-sign.png', width = "60px", height = "60px", align = "center", style = "margin-left: 47.5%; 
+                                         margin-top:100px; margin-bottom:25px;"), href="https://github.com/Adrian-Nowacki/praca-inzynierska"),
                                      p("Adrian Nowacki © 2022",
                                        style = "font-size:16px; text-align:center;"),
                                      
@@ -228,6 +294,11 @@ ui <- navbarPage(id = "navbar",
                             radial-gradient(ellipse at top, #477676, transparent),
                             radial-gradient(ellipse at bottom, #2a3c3c, transparent);
                          }
+                         #plot{
+                         margin-left:auto;
+                         margin-right:auto;
+                         margin-top:50px;
+                         }
                          
                         .navbar-default {
                             background-color:#477676!important;
@@ -236,7 +307,7 @@ ui <- navbarPage(id = "navbar",
                         .navbar-brand {
                             color:#ffffff!important;
                             font-weight:bold!important;
-                            font-size:22px!important;
+                            font-size:20px!important;
                             line-height: 30px!important;
                         }
                         .navbar .navbar-nav {
@@ -653,8 +724,8 @@ server <- function(input, output,session) {
         
           
     
-    output$plot <- renderPlotly({
-      
+   # output$plot <- renderPlotly({
+      plot <- reactive({
       plot_theme <- theme(
         panel.grid.major.y = element_blank(),
         plot.background = element_rect(fill = "#252525"),
@@ -688,9 +759,18 @@ server <- function(input, output,session) {
                               "Index of dissimilarity (black-asian)" = "D_ba",
                               "Index of dissimilarity (latin-asian)" = "D_la"))
         
+        output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]]), 2)) })
+        output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]]), 2)) })
+        output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]]), 2)) })
+        output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]]), 2)) })
+        output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]]), 2)) })
+        output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75), 2)) })
+        
         g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
           plot_theme + labs(x = var, y = "Count", title = var)
         ggplotly(g)%>% config(displayModeBar = F)
+        
+        
         
       }
       else if (isolate(input$indicator_button) == 1){
@@ -699,6 +779,13 @@ server <- function(input, output,session) {
           var <- isolate(switch(input$variable_index, 
                                 "Entropy    |ALL AGGREGATION UNITS" = "Entropy",
                                 "Entropy std    |ALL AGGREGATION UNITS" = "Entropy_std"))
+          
+          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]]), 2)) })
+          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]]), 2)) })
+          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]]), 2)) })
+          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]]), 2)) })
+          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]]), 2)) })
+          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75), 2)) })
           
           g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
             plot_theme + labs(x = var, y = "Count", title = var)
@@ -727,6 +814,13 @@ server <- function(input, output,session) {
                                 "black-asian    |TRACT" = "D_ba_tract",
                                 "latin-asian    |TRACT" = "D_la_tract"))
           
+          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]]), 2)) })
+          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]]), 2)) })
+          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]]), 2)) })
+          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]]), 2)) })
+          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]]), 2)) })
+          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75), 2)) })
+          
           g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
             plot_theme + labs(x = var, y = "Count", title = var)
           ggplotly(g)%>% config(displayModeBar = F)
@@ -740,6 +834,13 @@ server <- function(input, output,session) {
                                 "H    |GROUP OF BLOCKS" = "H_group_blocks",
                                 "H    |TRACTS" = "H_tract"))
           
+          output$text_mean <- renderText({paste0("mean: ", round(mean(warstwa[[var]]), 2)) })
+          output$text_sd <- renderText({paste0("sd: ", round(sd(warstwa[[var]]), 2)) })
+          output$text_min <- renderText({paste0("min.: ", round(min(warstwa[[var]]), 2)) })
+          output$text_max <- renderText({paste0("max.: ", round(max(warstwa[[var]]), 2)) })
+          output$text_median <- renderText({paste0("median: ", round(median(warstwa[[var]]), 2)) })
+          output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(warstwa[[var]], probs = 0.75), 2)) })
+          
           g <- ggplot(warstwa, aes(warstwa[[var]])) + geom_histogram(bins = 80, fill = '#367d59') + 
             plot_theme + labs(x = var, y = "Count", title = var)
           ggplotly(g)%>% config(displayModeBar = F)
@@ -747,18 +848,22 @@ server <- function(input, output,session) {
         }
       }
         }) 
-    
+      
+      output$plot <- renderPlotly({
+        print(plot())
+      })
+      
     table_dataset_1<- eventReactive(input$run,{
       warstwa() %>% st_drop_geometry()
     })
     
-    output$table <- DT::renderDataTable(DT::datatable(table_dataset_1(), options = list(
-        rownames = FALSE,
-        pageLength = 12,
-       # autoWidth = TRUE,
-        scrollX = TRUE,
-        #columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
-        lengthMenu = c(6, 12))))
+    # output$table <- DT::renderDataTable(DT::datatable(table_dataset_1(), options = list(
+    #     rownames = FALSE,
+    #     pageLength = 12,
+    #    # autoWidth = TRUE,
+    #     scrollX = TRUE,
+    #     #columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
+    #     lengthMenu = c(6, 12))))
     
     
     datasetInput <- eventReactive(input$choose,{
@@ -808,6 +913,21 @@ server <- function(input, output,session) {
             st_write(datasetInput(), file)
         }
     )
+    
+    output$save_png<- downloadHandler(
+      filename = function() {
+        if (isolate(input$aggr_button) == 1){
+          paste0(input$variable_unit, "_", input$year, ".png", sep = "")
+        }
+        else if (isolate(input$indicator_button) == 1){
+          paste0(input$variable_index, "_", input$year, ".png", sep = "")
+        }
+      },
+      content = function(file) {
+        #ggsave(file, plot = plot(), device = "png")
+        export(plot(), file=file)
+      }
+    )
      table_dataset_2 <- eventReactive(input$choose,{
        datasetInput() %>% st_drop_geometry()
      })
@@ -819,8 +939,13 @@ server <- function(input, output,session) {
       #autoWidth = TRUE,
      # columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
       lengthMenu = c(6, 12))))
-    
-    
+    observeEvent(input$run,{hide("instruction_1")})
+    observeEvent(input$run,{hide("instruction_2")})
+    observeEvent(input$run,{hide("instruction_3")})
+    observeEvent(input$run,
+                  runjs('document.getElementById("save_png").style.visibility = "visible";')
+                 )
+                 
 }
 
 

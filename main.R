@@ -36,13 +36,11 @@ library(tmap)
 # names(tract_2000)[40:44]<- paste0("FYF0", 10:14)
 
 
-    # all_files = list(block_1990, grp_blocks_1990, tract_1990, block_2000, grp_blocks_2000, 
-    #                  tract_2000, block_2010, grp_blocks_2010, tract_2010, block_2020, 
-    #                  grp_blocks_2020, tract_2020)
-    # 
-    # all_files <- list(tract_1990, tract_2000, tract_2010, tract_2020)
+     all_files = list(block_1990, grp_blocks_1990, tract_1990, block_2000, grp_blocks_2000, 
+                      tract_2000, block_2010, grp_blocks_2010, tract_2010, block_2020, 
+                      grp_blocks_2020, tract_2020)
+     
     
-    all_files <- list(tract_1990, tract_2000, tract_2010, tract_2020)
     
 
 #  #  #  #  #  #  #  #  #  #  #  #  #  #  REKLASYFIKACJA
@@ -101,18 +99,18 @@ reclass <- function(x) {
 reclassify <- function(){
   for (i in length(all_files)){
     empty <- lapply(all_files[1:i], reclass)
-    #block_1990 <<- as.data.frame(empty[1])
-    #grp_blocks_1990 <<- as.data.frame(empty[1])
-    tract_1990 <<- as.data.frame(empty[1])
-    #block_2000 <<- as.data.frame(empty[1])
-    #grp_blocks_2000 <<- as.data.frame(empty[2])
-    tract_2000 <<- as.data.frame(empty[2])
-    #block_2010 <<- as.data.frame(empty[1])
-    #grp_blocks_2010 <<- as.data.frame(empty[3])
-    tract_2010 <<- as.data.frame(empty[3])
-    #block_2020 <<- as.data.frame(empty[1])
-    #grp_blocks_2020 <<- as.data.frame(empty[4])
-    tract_2020 <<- as.data.frame(empty[4])
+    block_1990 <<- as.data.frame(empty[1])
+    grp_blocks_1990 <<- as.data.frame(empty[2])
+    tract_1990 <<- as.data.frame(empty[3])
+    block_2000 <<- as.data.frame(empty[4])
+    grp_blocks_2000 <<- as.data.frame(empty[5])
+    tract_2000 <<- as.data.frame(empty[6])
+    block_2010 <<- as.data.frame(empty[7])
+    grp_blocks_2010 <<- as.data.frame(empty[8])
+    tract_2010 <<- as.data.frame(empty[9])
+    block_2020 <<- as.data.frame(empty[10])
+    grp_blocks_2020 <<- as.data.frame(empty[11])
+    tract_2020 <<- as.data.frame(empty[12])
   }
 }
 
@@ -222,12 +220,12 @@ index_D <- function(x){
 }
 
 
-all_files <- list(tract_1990, tract_2000, tract_2010, tract_2020)
+
 #  #  #  #  #  #  #  #  #  #  #  #  #  # OBLICZENIE WSKAŹNIKÓW DLA KAŻDEGO PLIKU
 
 
-#all_files <- list(block_1990, block_2000, block_2010, block_2020, grp_blocks_1990, grp_blocks_2000, 
-#                  grp_blocks_2010, grp_blocks_2000, tract_1990, tract_2000, tract_2010, tract_2000)
+all_files <- list(block_1990, block_2000, block_2010, block_2020, grp_blocks_1990, grp_blocks_2000, 
+                  grp_blocks_2010, grp_blocks_2000, tract_1990, tract_2000, tract_2010, tract_2000)
 
 
 indexes <- function(){
@@ -239,18 +237,18 @@ indexes <- function(){
       binded <- cbind(a, b, c)
     }, ent_list, H_list, D_list, SIMPLIFY = FALSE)
     
-    #block_1990 <<- as.data.frame(list[1])                                # przypisanie ramek danych ze wskaznikami do pierwotnych plikow
-    #block_2000 <<- as.data.frame(list[1])
-    #block_2010 <<- as.data.frame(list[1])
-    #block_2020<<- as.data.frame(list[1])
-    #grp_blocks_1990 <<- as.data.frame(list[1])
-    #grp_blocks_2000 <<- as.data.frame(list[2])
-    #grp_blocks_2010 <<- as.data.frame(list[3])
-    #grp_blocks_2020 <<- as.data.frame(list[4])
-    tract_1990 <<- as.data.frame(list[1])
-    tract_2000 <<- as.data.frame(list[2])
-    tract_2010 <<- as.data.frame(list[3])
-    tract_2020 <<- as.data.frame(list[4])
+    block_1990 <<- as.data.frame(list[1])                                # przypisanie ramek danych ze wskaznikami do pierwotnych plikow
+    block_2000 <<- as.data.frame(list[2])
+    block_2010 <<- as.data.frame(list[3])
+    block_2020<<- as.data.frame(list[4])
+    grp_blocks_1990 <<- as.data.frame(list[5])
+    grp_blocks_2000 <<- as.data.frame(list[6])
+    grp_blocks_2010 <<- as.data.frame(list[7])
+    grp_blocks_2020 <<- as.data.frame(list[8])
+    tract_1990 <<- as.data.frame(list[9])
+    tract_2000 <<- as.data.frame(list[10])
+    tract_2010 <<- as.data.frame(list[11])
+    tract_2020 <<- as.data.frame(list[12])
   }
 }
 indexes()       
@@ -424,99 +422,28 @@ rozdzielenie()
 
 #  #  #  #  #  #  #  #  #  #  #  #  #  #   POLACZENIE DANYCH Z DANYMI PRZESTRZENNYMI
 
- #shp_1990 <- read_sf("../shp_poprawne/poprawne/shp_1990.gpkg")
- #shp_2020 <- read_sf("../shp_poprawne/poprawne/shp_2018.gpkg")
- 
+shp_1990 <- read_sf("counties_shp/low_res/shp_1990.gpkg")
+shp_2020 <- read_sf("counties_shp/low_res/shp_2020.gpkg")
 
-# # usuniecie 0 z poczatku kodu hrabstwa w celu polaczenia danych
-# shp_1990$ST <- as.numeric(shp_1990$ST)  
-# shp_2020$STATEFP <- as.numeric(shp_2020$STATEFP) 
- 
 # # usuniecie zbednych kolumn
- #shp_1990 <- shp_1990[, -c(1:4)]
- #shp_2020 <- shp_2020[, -c(3:4, 7:9)]
+ shp_1990 <- shp_1990[, -c(1:4)]
+ shp_2020 <- shp_2020[, -c(3:4, 7:9)]
 
- #shp_2020 <- shp_2020 %>% arrange(GEOID)
- #shp_1990 <- shp_1990 %>% arrange(GEOID)
- 
- #shp <- read_sf("../shp/1990/co99_d90_aggr.gpkg")
- #shp <- shp %>% st_set_geometry(NULL)
- #shp <- shp %>% arrange(NAME, ST)
- #shp_1990$COUNTYFP <- shp$CO
- #shp_1990$NAME <- shp$NAME
  
  # zmiana kolejnosci kolumn w pliku z 1990 r
- #shp_1990 <- shp_1990[, c(1, 2, 4, 3, 5, 6, 7)]
+ shp_1990 <- shp_1990[, c(1, 2, 4, 3, 5, 6, 7)]
  
  # ujednolicenie nazw kolumn
- #colnames(shp_1990) <- c("STATEFP", "COUNTYFP", "GEOID", "NAME", "STUSPS", "STATE_NAME", "geom")
+ colnames(shp_1990) <- c("STATEFP", "COUNTYFP", "GEOID", "NAME", "STUSPS", "STATE_NAME", "geom")
 
  #st_write(shp_2020, "counties_shp/low_res/shp_2020.gpkg")
  #st_write(shp_1990, "counties_shp/low_res/shp_1990.gpkg")
-## dodanie pelnych nazw stanow
-shp_1990 <- read_sf("counties_shp/low_res/shp_1990.gpkg")
-shp_2020 <- read_sf("counties_shp/low_res/shp_2020.gpkg")
+#shp_1990 <- read_sf("counties_shp/low_res/shp_1990.gpkg")
+#shp_2020 <- read_sf("counties_shp/low_res/shp_2020.gpkg")
 
 shp_2020 <- shp_2020 %>% arrange(COUNTYFP, STATEFP)
 shp_1990 <- shp_1990 %>% arrange(COUNTYFP, STATEFP)
 
-# stany <- function(){
-shp_1990 <<- shp_1990 %>%
-  mutate(STATE_NAME = case_when(
-    shp_1990$STUSPS == "AL" ~ "Alabama",
-    shp_1990$STUSPS == "AK" ~ "Alaska",
-    shp_1990$STUSPS == "AZ" ~ "Arizona",
-    shp_1990$STUSPS == "AR" ~ "Arkansas",
-    shp_1990$STUSPS == "CA" ~ "California",
-    shp_1990$STUSPS == "CO" ~ "Colorado",
-    shp_1990$STUSPS == "CT" ~ "Connecticut",
-    shp_1990$STUSPS == "DE" ~ "Delaware",
-    shp_1990$STUSPS == "DC" ~ "District of Columbia",
-    shp_1990$STUSPS == "FL" ~ "Florida",
-    shp_1990$STUSPS == "GA" ~ "Georgia",
-    shp_1990$STUSPS == "HI" ~ "Hawaii",
-    shp_1990$STUSPS == "ID" ~ "Idaho",
-    shp_1990$STUSPS == "IL" ~ "Illinois",
-    shp_1990$STUSPS == "IN" ~ "Indiana",
-    shp_1990$STUSPS == "IA" ~ "Iowa",
-    shp_1990$STUSPS == "KS" ~ "Kansas",
-    shp_1990$STUSPS == "KY" ~ "Kentucky",
-    shp_1990$STUSPS == "LA" ~ "Louisiana",
-    shp_1990$STUSPS == "ME" ~ "Maine",
-    shp_1990$STUSPS == "MD" ~ "Maryland",
-    shp_1990$STUSPS == "MA" ~ "Massachusetts",
-    shp_1990$STUSPS == "MI" ~ "Michigan",
-    shp_1990$STUSPS == "MN" ~ "Minnesota",
-    shp_1990$STUSPS == "MS" ~ "Mississippi",
-    shp_1990$STUSPS == "MO" ~ "Missouri",
-    shp_1990$STUSPS == "MT" ~ "Montana",
-    shp_1990$STUSPS == "NE" ~ "Nebraska",
-    shp_1990$STUSPS == "NV" ~ "Nevada",
-    shp_1990$STUSPS == "NH" ~ "New Hampshire",
-    shp_1990$STUSPS == "NJ" ~ "New Jersey",
-    shp_1990$STUSPS == "NM" ~ "New Mexico",
-    shp_1990$STUSPS == "NY" ~ "New York",
-    shp_1990$STUSPS == "NC" ~ "North Carolina",
-    shp_1990$STUSPS == "ND" ~ "North Dakota",
-    shp_1990$STUSPS == "OH" ~ "Ohio",
-    shp_1990$STUSPS == "OK" ~ "Oklahoma",
-    shp_1990$STUSPS == "OR" ~ "Oregon",
-    shp_1990$STUSPS == "PA" ~ "Pennsylvania",
-    shp_1990$STUSPS == "RI" ~ "Rhode Island",
-    shp_1990$STUSPS == "SC" ~ "South Carolina",
-    shp_1990$STUSPS == "SD" ~ "South Dakota",
-    shp_1990$STUSPS == "TN" ~ "Tennessee",
-    shp_1990$STUSPS == "TX" ~ "Texas",
-    shp_1990$STUSPS == "UT" ~ "Utah",
-    shp_1990$STUSPS == "VT" ~ "Vermont",
-    shp_1990$STUSPS == "VA" ~ "Virginia",
-    shp_1990$STUSPS == "WA" ~ "Washington",
-    shp_1990$STUSPS == "WV" ~ "West Virginia",
-    shp_1990$STUSPS == "WI" ~ "Wisconsin",
-    shp_1990$STUSPS == "WY" ~ "Wyoming"
-  ))
-} 
-# stany()
 
 shp_join <- function(){
   ##dolaczenie geoid 1990-2000
@@ -579,7 +506,7 @@ shp_join <- function(){
 }
 shp_join()
 
-# zapis_wynikow <- function(){
+ zapis_wynikow <- function(){
   st_write(shp_block_1990, "counties_shp/low_res/census_shp/shp_block_1990.gpkg")
   st_write(shp_block_2000, "counties_shp/low_res/census_shp/shp_block_2000.gpkg")
   st_write(shp_block_2010, "counties_shp/low_res/census_shp/shp_block_2010.gpkg")
