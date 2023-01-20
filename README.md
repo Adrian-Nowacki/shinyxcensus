@@ -1,7 +1,7 @@
 # shinyxcensus
 <img src="./images/logo_5.png" width="200">
 
-### *Application visualizing the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units*
+### *$${\color{red}Application}$$ visualizing the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units*
 
 ## Table of contents
 * [About](#about)
