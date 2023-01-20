@@ -1,0 +1,68 @@
+# shinyxcensus
+![Logo](./images/logo_5.png)
+
+### Application visualizing the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units
+
+## Table of contents
+* [About](#about)
+* [Features](#features)
+* [Tech](#tech)
+* [Setup](#setup)
+
+## About
+The aim of the app was to visualize and share a database containing racial-ethnic segregation and differentiation indicators calculated for each county in the USA 
+for the years: 1990, 2000, 2010 and 2020.
+
+These indicators were calculated for 3 levels of aggregation: census blocks, groups of blocks and census areas. The application allows to view county spatial data 
+combined with the resulting tabular data. It enables visualization of data in the form of an interactive map, interactive charts and a table. This app also allows 
+to download shared data in tabular and spatial form.
+
+The racial-ethnic structure can be described by two concepts – racial differentiation and racial segregation. Racial diversity, a concept that describes a measure 
+of the relative heterogeneity of the racial-ethnic structure of a population in a given area (White, 1986), is measured by entropy. It allows to determine the level
+of population mixing in a given area. The index of dissimilarity D (index of dissimilarity) and the information theory index H (information theory index H) make it 
+possible to determine racial segregation, i.e. a measure of the spatial distribution of two or more groups living separately from each other in different parts of the 
+entire area (Massey and Denton, 1988). The concepts of racial differentiation and racial segregation are summarized in a variety of indicators (Reardon and Firebough, 
+2002), but these are the most widely used. Their use gives the opportunity to learn about the trend of changes in the racial and ethnic diversity of the society for 
+the study areas and allows to assess how this situation may change in the coming years.
+
+The values of segregation indicators depend on the adopted division into aggregation units. These measures compare the racial structure of an individual with the 
+racial structure of the entire area. Smaller units are more racially and ethnically homogeneous, and therefore their structure differs from that of the entire area. 
+As a result, the value of the segregation index decreases with the size of aggregation units. For census areas that are divided into census block groups and census 
+blocks, these values are the smallest. This means that, given a larger aggregation unit, there is a less even distribution of racial and ethnic groups within its 
+area.
+
+## Features
+* visualization of calculated indicators in the form of an interactive map
+![Interactive Map](./images/shiny_panel_mapy.png)
+
+* indicator statistics and a histogram of values
+![Histogram](./images/panel_statystyk.png)
+
+* scatter plot of the indicator values for two sizes of aggregation units in the selected year
+![Scatter plot](./images/panel_rozrzutu.png)
+
+* displaying the table with the possibility of downloading in the form of .csv and .gpkg
+![Data download](./images/panel_pobierania.png)
+
+## Setup
+
+```
+install.packages(c("shiny", "dplyr", "sf", "tmap", 
+                   "DT", "shinyjs", "ggplot2", "plotly"))
+                   
+library(shiny)
+runGitHub("shinyxcensus, "anowacki")
+```
+
+## Tech
+
+* shiny – creates interactive applications
+* dplyr – manipulates data frames using e.g. filtering, grouping, ordering or combining functions
+* sf – handles spatial data through (setting a coordinate system, reading and writing files, or working on geometry)
+* tmap – visualizes spatial data in the form of all kinds of maps
+* DT – displays data frames and matrixes in the form of interactive tables, with the possibility of sorting, filtering or searching
+* shinyjs – enables the implementation of operations from the JavaScript language in order to improve the application with particular functions
+* ggplot2 – allows you to visualize data using charts
+* plotly – creates interactive plots
+
+
