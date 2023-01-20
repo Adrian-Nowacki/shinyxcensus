@@ -1,7 +1,7 @@
 # shinyxcensus
 <img src="./images/logo_5.png" width="200">
 
-### $\textcolor{green}{Application visualizing}$  the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units
+### *Application visualizing  the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units*
 
 ## Table of contents
 * [About](#about)
@@ -11,13 +11,13 @@
 
 ## About
 *The aim of the app was to visualize and share a database containing racial-ethnic segregation and differentiation indicators calculated for each county in the USA 
-for the years: 1990, 2000, 2010 and 2020.*
+for the years: **$\textcolor{lightblue}{1990,\ 2000,\ 2010\ and\ 2020}$**.*
 
-These indicators were calculated for 3 levels of aggregation: **census blocks**, **groups of blocks** and **census areas**. The application allows to view county spatial data 
+These indicators were calculated for 3 levels of aggregation: **$\textcolor{lightblue}{census\ blocks,\ groups\ of\ blocks\ and\ census\ areas}$**. The application allows to view county spatial data 
 combined with the resulting tabular data. It enables visualization of data in the form of an interactive map, interactive charts and a table. This app also allows 
 to download shared data in tabular and spatial form.
 
-The racial-ethnic structure can be described by two concepts – **racial differentiation** and **racial segregation**. Racial diversity, a concept that describes a measure 
+The racial-ethnic structure can be described by two concepts – **$\textcolor{lightblue}{racial\ differentiation\ and\ racial\ segregation}$**. Racial diversity, a concept that describes a measure 
 of the relative heterogeneity of the racial-ethnic structure of a population in a given area (White, 1986), is measured by ***entropy***. It allows to determine the level
 of population mixing in a given area. ***The index of dissimilarity D*** (index of dissimilarity) and ***the information theory index H*** (information theory index H) make it 
 possible to determine racial segregation, i.e. a measure of the spatial distribution of two or more groups living separately from each other in different parts of the 
