@@ -32,21 +32,25 @@ blocks, these values are the smallest. This means that, given a larger aggregati
 area.
 
 ## Features
-* visualization of calculated indicators in the form of an interactive map
+* **visualization of calculated indicators in the form of an interactive map**
 
 <img src="./images/shiny_panel_mapy.png" width="600">
 
-* indicator statistics and a histogram of values
+
+* **indicator statistics and a histogram of values**
 
 <img src="./images/panel_statystyk.png" width="600">
 
-* scatter plot of the indicator values for two sizes of aggregation units in the selected year
+
+* **scatter plot of the indicator values for two sizes of aggregation units in the selected year**
 
 <img src="./images/panel_rozrzutu.png" width="600">
 
-* displaying the table with the possibility of downloading in the form of .csv and .gpkg
+
+* **displaying the table with the possibility of downloading in the form of .csv and .gpkg**
 
 <img src="./images/panel_pobierania.png" width="600">
+
 
 ## Setup
 
