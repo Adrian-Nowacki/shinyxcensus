@@ -11,7 +11,7 @@
 
 ## About
 *The aim of the app was to visualize and share a database containing racial-ethnic segregation and differentiation indicators calculated for each county in the USA 
-for the years: **$\textcolor{lightgreen}{1990,\ 2000,\ 2010\ and\ 2020}$**.*
+for the years: **$\color{lightgreen}{1990,\ 2000,\ 2010\ and\ 2020}$**.*
 
 These indicators were calculated for 3 levels of aggregation: **$\textcolor{lightgreen}{census\ blocks,\ groups\ of\ blocks\ and\ census\ areas}$**. The application allows to view county spatial data 
 combined with the resulting tabular data. It enables visualization of data in the form of an interactive map, interactive charts and a table. This app also allows 
@@ -19,7 +19,7 @@ to download shared data in tabular and spatial form.
 
 The racial-ethnic structure can be described by two concepts – **$\textcolor{lightgreen}{racial\ differentiation\ and\ racial\ segregation}$**. Racial diversity, a concept that describes a measure 
 of the relative heterogeneity of the racial-ethnic structure of a population in a given area (White, 1986), is measured by ***entropy***. It allows to determine the level
-of population mixing in a given area. ***$\textcolor{lightgreen}{The\ index\ of\ dissimilarity\ D}$*** (index of dissimilarity) and ***$\textcolor{lightgreen}{the\ information\ theory\ index\ H}$*** (information theory index H) make it 
+of population mixing in a given area. ***$\color{lightgreen}{The\ index\ of\ dissimilarity\ D}$*** (index of dissimilarity) and ***$\textcolor{lightgreen}{the\ information\ theory\ index\ H}$*** (information theory index H) make it 
 possible to determine racial segregation, i.e. a measure of the spatial distribution of two or more groups living separately from each other in different parts of the 
 entire area (Massey and Denton, 1988). The concepts of racial differentiation and racial segregation are summarized in a variety of indicators (Reardon and Firebough, 
 2002), but these are the most widely used. Their use gives the opportunity to learn about the trend of changes in the racial and ethnic diversity of the society for 
@@ -36,25 +36,25 @@ area.
 
 <img src="./images/shiny_panel_mapy.png" width="650">
 
-
+<br />
 
 * **indicator statistics and a histogram of values**
 
 <img src="./images/panel_statystyk.png" width="650">
 
-
+<br />
 
 * **scatter plot of the indicator values for two sizes of aggregation units in the selected year**
 
 <img src="./images/panel_rozrzutu.png" width="650">
 
-
+<br />
 
 * **displaying the table with the possibility of downloading in the form of .csv and .gpkg**
 
 <img src="./images/panel_pobierania.png" width="650">
 
-
+<br />
 
 ## Setup
 
