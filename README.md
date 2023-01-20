@@ -1,5 +1,5 @@
 # shinyxcensus
-![Logo](./images/logo_5.png)
+<img src="./images/logo_5.png" width="200">
 
 ### Application visualizing the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units
 
@@ -33,16 +33,20 @@ area.
 
 ## Features
 * visualization of calculated indicators in the form of an interactive map
-![Interactive Map](./images/shiny_panel_mapy.png)
+
+<img src="./images/shiny_panel_mapy.png" width="200">
 
 * indicator statistics and a histogram of values
-![Histogram](./images/panel_statystyk.png)
+
+<img src="./images/panel_statystyk.png" width="200">
 
 * scatter plot of the indicator values for two sizes of aggregation units in the selected year
-![Scatter plot](./images/panel_rozrzutu.png)
+
+<img src="./images/panel_rozrzutu.png" width="200">
 
 * displaying the table with the possibility of downloading in the form of .csv and .gpkg
-![Data download](./images/panel_pobierania.png)
+
+<img src="./images/panel_pobierania.png" width="200">
 
 ## Setup
 
