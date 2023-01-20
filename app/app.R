@@ -1,3 +1,5 @@
+
+#wczytanie pakietów
 library(rsconnect)
 library(webshot)
 library(shiny)
@@ -11,7 +13,7 @@ library(shinyjs)
 library(ggplot2)
 library(plotly)
 library(leaflet)
-# wczytanie danych
+# wczytanie danych obejmujących wszystkie wskaźniki dla wybranej jednostki agregacji
 shp_block_1990 <- st_read("data/census_shp/shp_block_1990.gpkg")
 shp_block_2000 <- st_read("data/census_shp/shp_block_2000.gpkg")
 shp_block_2010 <- st_read("data/census_shp/shp_block_2010.gpkg")
@@ -27,13 +29,14 @@ shp_tract_2000 <- st_read("data/census_shp/shp_tract_2000.gpkg")
 shp_tract_2010 <- st_read("data/census_shp/shp_tract_2010.gpkg")
 shp_tract_2020 <- st_read("data/census_shp/shp_tract_2020.gpkg")
 
-
+# utworzenie list z obiektami
 blocks <- list(shp_block_1990, shp_block_2000, shp_block_2010, shp_block_2020)
 grp_blocks <- list(shp_grp_blocks_1990, shp_grp_blocks_2000, shp_grp_blocks_2010, shp_grp_blocks_2020)
 tracts <- list(shp_tract_1990, shp_tract_2000, shp_tract_2010, shp_tract_2020)
 
 aggr_objects <- list(blocks = blocks, grp_blocks =  grp_blocks, tracts = tracts)
-# wskazniki
+
+# wczytanie danych obejmujących pojedyncze wskaźniki dla wszystkich jednostek agregacji
 shp_ind_ent_1990 <- st_read("data/indexes_shp/shp_ind_ent_1990.gpkg")
 shp_ind_ent_2000 <- st_read("data/indexes_shp/shp_ind_ent_2000.gpkg")
 shp_ind_ent_2010 <- st_read("data/indexes_shp/shp_ind_ent_2010.gpkg")
@@ -49,22 +52,23 @@ shp_ind_H_2000 <- st_read("data/indexes_shp/shp_ind_H_2000.gpkg")
 shp_ind_H_2010 <- st_read("data/indexes_shp/shp_ind_H_2010.gpkg")
 shp_ind_H_2020 <- st_read("data/indexes_shp/shp_ind_H_2020.gpkg")
 
+#utworzenie list z obiektami
 entrophy <- list(shp_ind_ent_1990, shp_ind_ent_2000, shp_ind_ent_2010, shp_ind_ent_2020)
 d_index <- list(shp_ind_D_1990, shp_ind_D_2000, shp_ind_D_2010, shp_ind_D_2020)
 h_index <- list(shp_ind_H_1990 , shp_ind_H_2000 , shp_ind_H_2010 , shp_ind_H_2020 )
 
 ind_objects <- list(entrophy = entrophy, d_index = d_index, h_index = h_index)
-# Define UI ----
 
 
-
+# zdefinowanie wyglądu oraz struktury aplikacji
 ui <- navbarPage(id = "navbar",
-                 title = div(img(src='logo_5.png', width = "32px", height = "32px"), "🇸‌🇭‌🇮‌🇳‌🇾‌🇽‌🇨‌🇪‌🇳‌🇸‌🇺‌🇸‌", style = "margin-top:-2px;font-weight:bold!important; text-shadow: #222 1px 1px 1px;"),
-                # tags$head(HTML("<link rel='icon' type='image/gif/png' href='logo_5.png'>")), 
+                 title = div(img(src='logo_5.png', width = "32px", height = "32px"), "🇸‌🇭‌🇮‌🇳‌🇾‌🇽‌🇨‌🇪‌🇳‌🇸‌🇺‌🇸‌", #tutył aplikacji w navibarze
+                             style = "margin-top:-2px;font-weight:bold!important; text-shadow: #222 1px 1px 1px;"),
+                
                  
-                 windowTitle = HTML("shinyxcensus</title><link rel='icon' type='png' href='logo_5.png'>"),
+                 windowTitle = HTML("shinyxcensus</title><link rel='icon' type='png' href='logo_5.png'>"), #tytuł aplikacji na zakładce
                   
-                 
+                 # zdefiniowanie głównych zakładek 
                  tabPanel("Home",
                           fluidRow(style = "
                           background: 
@@ -80,21 +84,19 @@ ui <- navbarPage(id = "navbar",
                                           h4("Application visualizing the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units", 
                                              style = "text-shadow: #222 1px 1px 1px; margin-top:50px;"
                                           ),
-                                          
                                    ),
                                    column(2)
                           )
-                          
-                          
                  ),
+                 
+                 # zdefiniowanie głównych zakładek - 2. Mapa interaktywna
                  tabPanel("Interactive map",
                           sidebarLayout(
-                              
+                            # panel wyboru warstwy do wizualizacji
                               sidebarPanel(id = "sidebar",
                                            tabsetPanel(id = "tabset",
+                                                       # wybór pliku zawierającego wszystkie wskaźniki dla jednej jednostki agregacji
                                                        checkboxInput("aggr_button", "All indicators for individual years", value = 1),
-                                                       
-                                                       
                                                        selectInput("unit", 
                                                                    label = "Choose an aggregation unit",
                                                                    choices = c("Blocks", 
@@ -113,10 +115,9 @@ ui <- navbarPage(id = "navbar",
                                                                                "Index of dissimilarity (black-asian)",
                                                                                "Index of dissimilarity (latin-asian)"),
                                                                    selected = "Entropy"),
-                                                       
-                                                       
                                                        checkboxInput("indicator_button", "Selected indicator for individual aggregation units", value = 0),
                                                        
+                                                       # wybór pliku zawierającego jeden wskaźnik dla wszystkich jednostek agregacji
                                                        selectInput("index", 
                                                                    label = "Choose an index",
                                                                    choices = c("Entropy",
@@ -129,6 +130,7 @@ ui <- navbarPage(id = "navbar",
                                                                                "Entropy std |ALL AGGREGATION UNITS"),
                                                                    selected = "Entropy")),
                                            
+                                           # wybór roku
                                            tabsetPanel(id = "tabset2",
                                                        selectInput("year", 
                                                                    label = "Choose a year",
@@ -140,10 +142,12 @@ ui <- navbarPage(id = "navbar",
                                            actionButton("run", "Run")
                               ),
                               
+                              # panel wizualizacji mapy interaktywnej
                               mainPanel(id = "mainpanel",
                                         tabsetPanel(id = "tabsetpanel",
-                                            tabPanel("Interactive map", tmapOutput("map", height = "600px"),
-                                                     fluidRow(id = "instruction_1",
+                                            
+                                              tabPanel("Interactive map", tmapOutput("map", height = "600px"), # panel z mapą interaktywną
+                                                     fluidRow(id = "instruction_1", # instrukcja użycia, gdy mapa jest nieaktywna
                                                               style = "margin-top: -570px; font-size:16px; color:#ffffff",
                                                               h3("On the left, there is a side panel divided into two sections:"),
                                                               p("- the first one allows you to select a layer covering", span("all indicators for the selected aggregation unit", style = "font-weight:bold; color:#5f8484")),
@@ -153,7 +157,8 @@ ui <- navbarPage(id = "navbar",
                                                               p("2. Click 'Run'"), 
                                                               br(),
                                                               p("For more information on aggregation units and indices of racial differentiation and racial segregation, see the 'About' tab", style = "color:#cccccc; font-size:12px"))),
-                                            tabPanel("Statistics", 
+                                           
+                                             tabPanel("Statistics", # panel ze statystykami oraz histogramem
                                                      fluidRow(style = "margin-top: 30px; text-size: 18px;text-align: center; color: #eeeeee; background-color:#444444;",
                                                               column(4,
                                                                      textOutput("text_mean"),
@@ -176,16 +181,32 @@ ui <- navbarPage(id = "navbar",
                                                      #          br(),
                                                      #          p("For more information on aggregation units and indices of racial differentiation and racial segregation, see the 'About' tab", style = "color:#cccccc; font-size:12px")),
                                                      downloadButton('save_png', 'Save as .png',
-                                                                    style = "visibility:hidden"))
-                                            
-                                        )
-                              )
-                          )
-                 ),
+                                                                    style = "visibility:hidden")),
+                                            tabPanel("Scatter plot", # panel z wykresem rozrzutu
+                                                     fluidRow(
+                                                       column(8,style = "margin-top: 25px; font-size: 18px;text-align: center; color: #eeeeee;",
+                                                              p("compare the value of the selected indicator with another aggregation unit for the same year:")
+                                                              ),
+                                                       column(2,
+                                                              selectInput("scatter_input", 
+                                                                                 label = "",
+                                                                                 choices = c("block",
+                                                                                             "group_blocks",
+                                                                                             "tract"),
+                                                                                 selected = "block")
+                                                            ),
+                                                       column(2)),
+                                                     
+                                                     plotlyOutput("scatter_plot", height = "480px", width = "770px"))
+                                                )
+                                          )
+                                    )
+                              ),
                  
+                 # zdefiniowanie głównych zakładek - 3. Pobieranie danych
                  tabPanel("Download data",
                           sidebarLayout(
-                              sidebarPanel(id = "dt_sidebar",
+                              sidebarPanel(id = "dt_sidebar", # panel z wyborem warstwy do wyświetlenia oraz pobrania
                                            checkboxInput("dataset_button_1", "Dataset divided into aggregation units:", value = 1),
                                            
                                            selectInput("dataset_1", "Choose a dataset:", 
@@ -206,7 +227,7 @@ ui <- navbarPage(id = "navbar",
                                            downloadButton('download_csv', 'Download .csv'),
                                            downloadButton('download_gpkg', 'Download .gpkg')
                               ),
-                              mainPanel(id = "dt_mainpanel",
+                              mainPanel(id = "dt_mainpanel", # panel główny ukazujący podgląd tabeli
                                         tabsetPanel(
                                           tabPanel("Table", DT::dataTableOutput("table_dt", height = "600px"),
                                                    fluidRow(id = "instruction_3",
@@ -219,10 +240,12 @@ ui <- navbarPage(id = "navbar",
                                                             p("2. Click 'Show'"), 
                                                             br(),
                                                             ))
-                                        )
-                              )
-                          )
-                 ),
+                                                   )
+                                         )
+                                      )
+                          ),
+                 
+                 # zdefiniowanie głównych zakładek - 4. O projekcie
                  tabPanel("About",
                           fluidRow(style = "
                           background: 
@@ -261,187 +284,185 @@ ui <- navbarPage(id = "navbar",
                                      p("Adrian Nowacki © 2022",
                                        style = "font-size:16px; text-align:center;"),
                                      
-                              ),
-                                   column(1),
-                          ),
-                          
-                          
-                 ),
-                 
-                 
-                 
+                                        ),
+                                     column(1),
+                                    ),
+                            ),
                  setBackgroundColor(
                      color =  "#252525"
                  ),
+                 
+                 # ustawienie stylu dla poszczególnych elementów aplikacji
                  tags$head(tags$style(
                      HTML('
                          #sidebar {
-                            background-color: #2f5151;
-                            width:360px;
-                            height:740px!important;
-                            border:none!important;
-                            border-right:1px solid #eeeeee!important;
-                            color:#ffffff!important;
+                              background-color: #2f5151;
+                              width:360px;
+                              height:740px!important;
+                              border:none!important;
+                              border-right:1px solid #eeeeee!important;
+                              color:#ffffff!important;
                          }
                          .leaflet-popup-content-wrapper{
-                            font-family: Lucida Console;
-                            background-color:#477676;
-                            color:#ffffff;
-                            border:0.5px solid #222222;
-                            max-height:250px;
+                              font-family: Lucida Console;
+                              background-color:#477676;
+                              color:#ffffff;
+                              border:0.5px solid #222222;
+                              max-height:250px;
                          }
                          .leaflet-popup-content{
-                         max-height:200px;
+                              max-height:200px;
                          }
                          #map{
-                         border:1px solid #ffffff;
+                              border:1px solid #ffffff;
                          }
-                         
                          .leaflet-popup-tip{
-                         background-color:#477676;
-                         border:0.5px solid #222222;
+                              background-color:#477676;
+                              border:0.5px solid #222222;
                          }
                          .leaflet-popup-content-wrapper tr td:nth-child(2n+1){
-                         color:#cccccc!important;
-                         padding-right:10px!important;
+                              color:#cccccc!important;
+                              padding-right:10px!important;
                          }
                          .leaflet-popup-content-wrapper thead{
-                         font-size:18px!important;
+                              font-size:18px!important;
                          }
                          .row {
-                            margin-left:-30px!important;
+                              margin-left:-30px!important;
                          }
                          .well {
-                         margin-bottom:0px!important;
+                              margin-bottom:0px!important;
                          }
                          body {
-                            
-                            radial-gradient(ellipse at top, #477676, transparent),
-                            radial-gradient(ellipse at bottom, #2a3c3c, transparent);
+                              radial-gradient(ellipse at top, #477676, transparent),
+                              radial-gradient(ellipse at bottom, #2a3c3c, transparent);
                          }
                          #plot{
-                         margin-left:auto;
-                         margin-right:auto;
-                         margin-top:50px;
+                              margin-left:auto;
+                              margin-right:auto;
+                              margin-top:50px;
                          }
-                         
-                        .navbar-default {
-                            background-color:#477676!important;
-                            color:#ffffff!important;
-                        }
-                        .navbar-brand {
-                            color:#ffffff!important;
-                            font-weight:bold!important;
-                            font-size:20px!important;
-                            line-height: 30px!important;
-                        }
-                        .navbar .navbar-nav {
-                            float: right;
-                            background-color:#477676!important;
-                        }
-                        .navbar {
-                            margin-bottom:0px!important;
-                            height: 60px!important;
-                        }
-                        .navbar-nav>li>a {
-                            background-color:#477676!important;
-                            color:#eeeeee!important;
-                            height: 59px!important;
-                            line-height: 30px!important;
-                        }
-                        .navbar-nav li a:hover, .navbar-nav > .active > a {
-                            color: #eeeeee!important;
-                            background-color:#3a5959 !important;
-                            background-image: none !important;
-                        }
-                        
-                        #mainpanel {
-                            margin-left:-100px;
-                            margin-top:20px;
-                            width: 1100px;
-                            color: #bbbbbb;
-                        }
-                        #tabsetpanel a {
-                            color:#ffffff;
-                            background-color:#444444;
-                        }
-                        #tabsetpanel a:hover,  #tabsetpanel a:active, #tabsetpanel a:focus{
-                            color:#ffffff;
-                            background-color:#777777;
-                        }
-                       
-                        #dt_mainpanel{
-                            margin-left:-100px;
-                            width: 1050px;
-                            color: #bbbbbb;
-                        }
-                        #dt_sidebar {
-                            background-color: #2f5151;
-                            width:360px;
-                            color:#ffffff!important;
-                            height:740px!important;
-                            border:none!important;
-                            border-right:1px solid #eeeeee!important;
-                        }
-                        
-                        #table {
-                            color:#dddddd;
-                        }
-                        #table th{
-                            color:#dddddd;
-                            background-color:#477676;
-                            border-right:1px solid #dddddd;
-                        }
-                        #table tr:nth-child(2n+1){
-                            background-color:#cfe2e2;
-                            color:#222222;
-                        }
-                        #table a{
-                            color:#dddddd!important;
-                            font-size: 0.4;
-                        }
-                        #table_dt{
-                            color:#dddddd;
-                        }
-                        #table_dt th{
-                            color:#dddddd;
-                            background-color:#477676;
-                            border-right:1px solid #dddddd;
-                        }
-                        #table_dt tr:nth-child(2n+1){
-                            background-color:#cfe2e2;
-                            color:#222222;
-                        }
-                        #table_dt a{
-                            color:#dddddd!important;
-                            font-size: 0.4;
-                        }
-                        #show {
-                        float:left;
-                        margin-bottom:40px;
-                        }
-                        #download_csv {
-                        float:left;
-                        }
-                        #download_gpkg {
-                        float:right;
-                        }
-
-                        body, label, input, button, select { 
-                            
+                         #scatter_plot{
+                              margin-top: 30px; 
+                              margin-left:auto;
+                              margin-right:auto;
+                              text-align: center; 
+                         }
+                         #scatter_input{
+                              text-align:center;
+                         }
+                         .navbar-default {
+                              background-color:#477676!important;
+                              color:#ffffff!important;
+                         }
+                         .navbar-brand {
+                              color:#ffffff!important;
+                              font-weight:bold!important;
+                              font-size:20px!important;
+                              line-height: 30px!important;
+                         }
+                         .navbar .navbar-nav {
+                              float: right;
+                              background-color:#477676!important;
+                         }
+                         .navbar {
+                              margin-bottom:0px!important;
+                              height: 60px!important;
+                         }
+                         .navbar-nav>li>a {
+                              background-color:#477676!important;
+                              color:#eeeeee!important;
+                              height: 59px!important;
+                              line-height: 30px!important;
+                         }
+                         .navbar-nav li a:hover, .navbar-nav > .active > a {
+                              color: #eeeeee!important;
+                              background-color:#3a5959 !important;
+                              background-image: none !important;
+                         }
+                         #mainpanel {
+                              margin-left:-100px;
+                              margin-top:20px;
+                              width: 1100px;
+                              color: #bbbbbb;
+                         }
+                         #tabsetpanel a {
+                              color:#ffffff;
+                              background-color:#444444;
+                         }
+                         #tabsetpanel a:hover,  #tabsetpanel a:active, #tabsetpanel a:focus{
+                              color:#ffffff;
+                              background-color:#777777;
+                         }
+                         #dt_mainpanel{
+                              margin-left:-100px;
+                              width: 1050px;
+                              color: #bbbbbb;
+                         }
+                         #dt_sidebar {
+                              background-color: #2f5151;
+                              width:360px;
+                              color:#ffffff!important;
+                              height:740px!important;
+                              border:none!important;
+                              border-right:1px solid #eeeeee!important;
+                         }
+                         #table {
+                              color:#dddddd;
+                         }
+                         #table th{
+                              color:#dddddd;
+                              background-color:#477676;
+                              border-right:1px solid #dddddd;
+                         }
+                         #table tr:nth-child(2n+1){
+                              background-color:#cfe2e2;
+                              color:#222222;
+                         }
+                         #table a{
+                              color:#dddddd!important;
+                              font-size: 0.4;
+                         }
+                         #table_dt{
+                              color:#dddddd;
+                         }
+                         #table_dt th{
+                              color:#dddddd;
+                              background-color:#477676;
+                              border-right:1px solid #dddddd;
+                         }
+                         #table_dt tr:nth-child(2n+1){
+                              background-color:#cfe2e2;
+                              color:#222222;
+                         }
+                         #table_dt a{
+                              color:#dddddd!important;
+                              font-size: 0.4;
+                         }
+                         #show {
+                              float:left;
+                              margin-bottom:40px;
+                         }
+                         #download_csv {
+                              float:left;
+                         }
+                         #download_gpkg {
+                              float:right;
+                         }
+                         body, label, input, button, select { 
                             letter-spacing: -0.2px;
-                        }')
+                         }'
+                          )
                  )),
                  shinyjs::useShinyjs()
-                 
-                 
 )
 
 
-# Define server logic ----
+# zdefiniowanie działania aplikacji
 server <- function(input, output,session) {
   
-    
+    ### utworzenie wydarzenia obserwacyjnego, aktywującego lub dezaktywującego 
+    ### sekcję według warunków wyboru kategorii wskaźników
     observeEvent(input$aggr_button, {
         if(input$aggr_button == 1){
             shinyjs::disable(id = "index")
@@ -462,7 +483,6 @@ server <- function(input, output,session) {
                 value = FALSE
             )}
     })
-    
     observeEvent(input$indicator_button, {
         if(input$indicator_button == 0){
             shinyjs::disable(id = "index")
@@ -494,7 +514,9 @@ server <- function(input, output,session) {
     
     
     
-    ## conditions for buttons downloading datasets:
+    
+    ### utworzenie wydarzenia obserwacyjnego, aktywującego lub dezaktywującego 
+    ### sekcję według warunków wyboru zbiorów danych do pobrania
     observeEvent(input$dataset_button_1, {
       if(input$dataset_button_1 == 1){
         shinyjs::disable(id = "dataset_2")
@@ -511,7 +533,6 @@ server <- function(input, output,session) {
           value = FALSE
         )}
     })
-    
     observeEvent(input$dataset_button_2, {
       if(input$dataset_button_2 == 0){
         shinyjs::disable(id = "dataset_2")
@@ -537,19 +558,23 @@ server <- function(input, output,session) {
     
     
     
+    
+    
+    
+    ##### WARSTWA WYJŚCIOWA
+    ####### utworzenie obiektu reaktywnego - warstwy wyjściowej wyborów poszczególnych opcji
     layer <- eventReactive(input$run, {
       input$run
-        aggr <- isolate(switch(input$unit, 
+        aggr <- isolate(switch(input$unit, # utworzenie obiektu zawierającego wybraną listę wybranych obiektów według jednostki agregacji
                        "Blocks" = aggr_objects[[1]],
                        "Groups of blocks" = aggr_objects[[2]],
                        "Tracts" = aggr_objects[[3]]))
         
-        indexes <- isolate(switch(input$index, 
+        indexes <- isolate(switch(input$index, # utworzenie obiektu zawierającego wybraną listę wybranych obiektów według wskaźnika
                           "Entropy" = ind_objects[[1]],
                           "Index of dissimilarity" = ind_objects[[2]],
                           "The information theory index H" = ind_objects[[3]]))
-        
-        #function(){
+        # warunki wyboru roku pliku wyjściowego według zaznaczonej opcji (według jednostki agregacji lub wskaźnika)
         if (input$aggr_button == 1){
           input$run
           isolate(switch(input$year, 
@@ -566,12 +591,10 @@ server <- function(input, output,session) {
                    "2010" = indexes[[3]],
                    "2020" = indexes[[4]]))
         }
-        #}
     })
-    
+    # utworzenie wydarzenia obserwującego wybór poszczególnych wskaźników z listy i zamieniającego elementy listy według wyboru danej miary
     observeEvent(input$index, {
     if (input$indicator_button == 1){
-      
         if (input$index == "Entropy"){
           freezeReactiveValue(input, "variable_index")
           updateSelectInput(session, "variable_index",
@@ -613,22 +636,26 @@ server <- function(input, output,session) {
                                         "H |GROUP OF BLOCKS",
                                         "H |TRACTS"),
                             selected = "H |BLOCKS"
-          )
-        }
-    }
+                            )
+                          }}
       
     })
     
     
     
+    
+    
+   
+    
+    ######### RENDEROWANIE MAPY INTERAKTYWNEJ
          output$map <- renderTmap({
            
-           if (isolate(input$aggr_button) == 1){
+           ### opcje mapy przy wyborze pliku ze wszystkimi wskaźnikami dla jednej jednostki agregacji
+           if (isolate(input$aggr_button) == 1){ 
              input$run
              tmap_mode("view")
              layer <- layer()
-            
-             var <- isolate(switch(input$variable_unit, 
+             var <- isolate(switch(input$variable_unit, # obiekt podmieniający wybór z listy wskaźników na nazwę kolumny
                                    "Entropy" = "Entropy", 
                                    "Entropy std" = "Entropy_std",
                                    "The information theory index H" = "H", 
@@ -639,29 +666,27 @@ server <- function(input, output,session) {
                                    "Index of dissimilarity (black-asian)" = "D_ba",
                                    "Index of dissimilarity (latin-asian)" = "D_la"))
              
-             popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std", 
+             popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std", # zmienne wyświetlane w popupie
                         "H: " = "H", "D (white-black): " = "D_wb", "D (white-asian): " = "D_wa", 
                         "D (white-latin): " = "D_wl", "D (black-latin): " = "D_bl", 
                         "D (black-asian): " = "D_ba", "D (latin-asian): " = "D_la")
              
-                tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
-                                                                                                                   "OpenStreetMap" = "OpenStreetMap",
-                                                                                                                   "Esri" = "Esri.WorldGrayCanvas")) +
+                tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + # określenie parametrów mapy interaktywnej
                  tm_fill(title = isolate(paste0(input$variable_unit, br(), " in ", input$year, " | ", input$unit)),
-                        col = var, 
+                         col = var, 
                          palette = "YlGn",
                          id = "NAME",
                          popup.vars = popup,
-                         popup.format=list(digits=2)) + tm_borders() 
-                #leaflet::providers
-             
-             }
+                         popup.format=list(digits=2)) + tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                                                                                    "OpenStreetMap" = "OpenStreetMap",
+                                                                                    "Esri" = "Esri.WorldGrayCanvas"))
+     }
           
+          ### opcje mapy przy wyborze pliku z jednym wskaźnikiem dla wszystkich jednostek agregacji 
+          # Entropia
           else if (isolate(input$indicator_button) == 1){
-            
             if (isolate(input$index) == "Entropy"){
               input$run
-              
               tmap_mode("view")
               layer <- layer()
               var <- isolate(switch(input$variable_index, 
@@ -669,19 +694,18 @@ server <- function(input, output,session) {
                                        "Entropy std |ALL AGGREGATION UNITS" = "Entropy_std"))
               popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std")
               
-             
-              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
-                                                                                      "OpenStreetMap" = "OpenStreetMap",
-                                                                                      "Esri" = "Esri.WorldGrayCanvas")) +
+              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + 
                 tm_fill(title = isolate(paste0(input$variable_index, br(), " in ", input$year)),
                         col = var, 
                         palette = "YlGn",
                         id = "NAME",
                         popup.vars = popup,
-                        popup.format=list(digits=2)) + tm_borders()
+                        popup.format=list(digits=2)) + tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                                                                                   "OpenStreetMap" = "OpenStreetMap",
+                                                                                   "Esri" = "Esri.WorldGrayCanvas"))
             }
             
-            
+            # Wskaźnik niepodobieństwa D
             else if (isolate(input$index) == "Index of dissimilarity"){
               input$run
               tmap_mode("view")
@@ -724,19 +748,18 @@ server <- function(input, output,session) {
                          "black-asian |TRACT: " = "D_ba_tract",
                          "latin-asian |TRACT: " = "D_la_tract")
               
-              
-              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
-                                                                                      "OpenStreetMap" = "OpenStreetMap",
-                                                                                      "Esri" = "Esri.WorldGrayCanvas")) +
+              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + 
                 tm_fill(title = isolate(paste0(input$index, br(), input$variable_index, br(), " in ", input$year)),
                         col = var, 
                         palette = "YlGn",
                         id = "NAME",
                         popup.vars = popup,
-                        popup.format=list(digits=2)) + tm_borders()
+                        popup.format=list(digits=2)) + tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                                                                                   "OpenStreetMap" = "OpenStreetMap",
+                                                                                   "Esri" = "Esri.WorldGrayCanvas"))
             }
             
-            
+            # Wskaźnik teorii informacji H
             else if (isolate(input$index) == "The information theory index H"){
               input$run
               tmap_mode("view")
@@ -749,27 +772,29 @@ server <- function(input, output,session) {
                          "H |GROUP OF BLOCKS: " = "H_group_blocks",
                          "H |TRACTS: " = "H_tract")
               
-              
-              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
-                                                                                      "OpenStreetMap" = "OpenStreetMap",
-                                                                                      "Esri" = "Esri.WorldGrayCanvas")) +
+              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) +
                 tm_fill(title = isolate(paste0(input$variable_index, br(), " in ", input$year)),
                         col = var, 
                         palette = "YlGn",
                         id = "NAME",
                         popup.vars = popup,
-                        popup.format=list(digits=2)) + tm_borders()
-              
-            
-            }
-            }
+                        popup.format=list(digits=2)) + tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                                                                                  "OpenStreetMap" = "OpenStreetMap",
+                                                                                  "Esri" = "Esri.WorldGrayCanvas")) 
+                }
+              }
         })
         
           
     
-   # output$plot <- renderPlotly({
+         
+         
+         
+         
+         
+   ##### UTWORZENIE OBIEKTU REAKTYWNEGO W CELU WYGENEROWANIA HISTOGRAMU
       plot <- reactive({
-      plot_theme <- theme(
+      plot_theme <- theme( # ustawienie stylu każdegow wykresu
         panel.grid.major.y = element_blank(),
         plot.background = element_rect(fill = "#252525"),
         panel.background = element_rect(fill = "#252525"), 
@@ -788,10 +813,10 @@ server <- function(input, output,session) {
       
       layer <- layer() 
       
-      if (isolate(input$aggr_button) == 1){
-        
-        
-        var <- isolate(switch(input$variable_unit, 
+      
+      ### opcje histogramu przy wyborze pliku ze wszystkimi wskaźnikami dla jednej jednostki agregacji
+      if (isolate(input$aggr_button) == 1){ 
+        var <- isolate(switch(input$variable_unit, # obiekt podmieniający wybór z listy wskaźników na nazwę kolumny
                               "Entropy" = "Entropy", 
                               "Entropy std" = "Entropy_std",
                               "The information theory index H" = "H", 
@@ -801,7 +826,7 @@ server <- function(input, output,session) {
                               "Index of dissimilarity (black-latin)" = "D_bl", 
                               "Index of dissimilarity (black-asian)" = "D_ba",
                               "Index of dissimilarity (latin-asian)" = "D_la"))
-        
+        # pola ze statystykami
         output$text_mean <- renderText({paste0("mean: ", round(mean(layer[[var]], na.rm = TRUE), 2)) })
         output$text_sd <- renderText({paste0("sd: ", round(sd(layer[[var]], na.rm = TRUE), 2)) })
         output$text_min <- renderText({paste0("min.: ", round(min(layer[[var]], na.rm = TRUE), 2)) })
@@ -809,18 +834,19 @@ server <- function(input, output,session) {
         output$text_median <- renderText({paste0("median: ", round(median(layer[[var]], na.rm = TRUE), 2)) })
         output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(layer[[var]], probs = 0.75, na.rm = TRUE), 2)) })
         
-        index <- layer[[var]]
-        g <- ggplot(layer(), aes(index)) +#paste(#'<span style = " font-weight:bold"> Count: </span>',
-                                                               #'<span>', count ,'</span>',
-                                                               #'</br></br><span style = " font-weight:bold"> index value: </span>',
-                                                               #'<span>', round(var, 2) ,'</span>')) + 
-        geom_histogram(bins = 80, fill = '#367d59') + 
-          plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_unit, " in ", input$year))
-        ggplotly(g) %>% config(displayModeBar = F)
+        index <- layer[[var]] # warstwa do wyświetlenia
+        g <- ggplot(layer(), aes(index)) + # obiekt zawierający wykres
+             geom_histogram(bins = 80, fill = '#477676') + 
+             plot_theme + labs(x = var, 
+                            y = "Count", 
+                            title = isolate(paste0(input$variable_unit, " in ", input$year)))
         
-        
-        
+        ggplotly(g) %>% config(displayModeBar = F) # ustawienie interaktywności wykresu
       }
+      
+      
+      ### opcje histogramu przy wyborze pliku z jednym wskaźnikiem dla wszystkich jednostek agregacji 
+        # Entropia
       else if (isolate(input$indicator_button) == 1){
         if (isolate(input$index) == "Entropy"){
           
@@ -836,12 +862,15 @@ server <- function(input, output,session) {
           output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(layer[[var]], probs = 0.75, na.rm = TRUE), 2)) })
           
           index <- layer[[var]]
-          g <- ggplot(layer, aes(index)) + geom_histogram(bins = 80, fill = '#367d59') + 
-            plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_index, " in ", input$year))
+          g <- ggplot(layer, aes(index)) + geom_histogram(bins = 80, fill = '#477676') + 
+            plot_theme + labs(x = var, 
+                              y = "Count", 
+                              title = isolate(paste0(input$variable_index, " in ", input$year)))
+          
           ggplotly(g)%>% config(displayModeBar = F)
         }
         
-        
+        # Wskaźnik niepodobieństwa D
         else if (isolate(input$index) == "Index of dissimilarity"){
           var <- isolate(switch(input$variable_index, 
                                 "white-black |BLOCKS" = "D_wb_block",
@@ -871,12 +900,15 @@ server <- function(input, output,session) {
           output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(layer[[var]], probs = 0.75, na.rm = TRUE), 2)) })
           
           index <- layer[[var]]
-          g <- ggplot(layer, aes(index)) + geom_histogram(bins = 80, fill = '#367d59') + 
-            plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_index, " in ", input$year))
+          g <- ggplot(layer, aes(index)) + geom_histogram(bins = 80, fill = '#477676') + 
+            plot_theme + labs(x = var, 
+                              y = "Count", 
+                              title = isolate(paste0(input$variable_index, " in ", input$year)))
+          
           ggplotly(g)%>% config(displayModeBar = F)
         }
         
-        
+        # Wskaźnik teorii informacji H
         else if (isolate(input$index) == "The information theory index H"){
           
           var <- isolate(switch(input$variable_index, 
@@ -892,40 +924,127 @@ server <- function(input, output,session) {
           output$text_quantile <- renderText({paste0("quantile (0.75): ", round(quantile(layer[[var]], probs = 0.75, na.rm = TRUE), 2)) })
           
           index <- layer[[var]]
-          g <- ggplot(layer, aes(index)) + geom_histogram(bins = 80, fill = '#367d59') + 
-            plot_theme + labs(x = var, y = "Count", title = paste0(input$variable_index, " in ", input$year))
+          g <- ggplot(layer, aes(index)) + geom_histogram(bins = 80, fill = '#477676') + 
+            plot_theme + labs(x = var, 
+                              y = "Count", 
+                              title = isolate(paste0(input$variable_index, " in ", input$year)))
+          
           ggplotly(g)%>% config(displayModeBar = F)
-
-        }
-      }
-        }) 
+        }}
+      }) 
       
+      ###### RENDEROWANIE HISTOGRAMU
       output$plot <- renderPlotly({
         print(plot())
       })
       
-    table_dataset_1<- eventReactive(input$run,{
-      layer() %>% st_drop_geometry()
-    })
-    
-    # output$table <- DT::renderDataTable(DT::datatable(table_dataset_1(), options = list(
-    #     rownames = FALSE,
-    #     pageLength = 12,
-    #    # autoWidth = TRUE,
-    #     scrollX = TRUE,
-    #     #columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
-    #     lengthMenu = c(6, 12))))
-    
-    
+      
+      
+      ##### UTWORZENIE OBIEKTU REAKTYWNEGO W CELU WYGENEROWANIA WYKRESU ROZRZUTU
+      scatter_plot <- reactive({
+        plot_theme <- theme( # ustawienie stylu
+          panel.grid.major.y = element_blank(),
+          plot.background = element_rect(fill = "#252525"),
+          panel.background = element_rect(fill = "#252525"), 
+          axis.title = element_text(size = 15,
+                                    color = "#dddddd"), 
+          plot.title = element_text(size = 18,
+                                    color = "#dddddd",
+                                    vjust = 2,
+                                    hjust = 0.5), 
+          legend.background = element_rect(color = "#222222", 
+                                           fill = "#777777"),  
+          legend.title = element_text(size = 13),
+          legend.text = element_text(size = 12),
+          axis.text = element_text(size = 12, 
+                                   color = "#dddddd"))
+        
+        layer <- layer() 
+        ### opcje histogramu przy wyborze pliku ze wszystkimi wskaźnikami dla jednej jednostki agregacji
+        if (isolate(input$index) == "Entropy"){
+          shinyjs::disable(id = "scatter_input") # dezaktywacja wyboru ze względu na identyczne wartości entropii w każdej jednostce agregacji
+        }
+        
+        
+        ### opcje histogramu przy wyborze pliku z jednym wskaźnikiem dla wszystkich jednostek agregacji
+          # Wskaźnik niepodobieństwa D
+        else if (isolate(input$index) == "Index of dissimilarity"){
+          shinyjs::enable(id = "scatter_input")
+          var <- isolate(switch(input$variable_index, # obiekt podmieniający wybór z listy wskaźników na nazwę kolumny
+                                "white-black |BLOCKS" = "D_wb_block",
+                                "white-asian |BLOCKS" = "D_wa_block",
+                                "white-latin |BLOCKS" = "D_wl_block",
+                                "black-latin |BLOCKS" = "D_bl_block",
+                                "black-asian |BLOCKS" = "D_ba_block",
+                                "latin-asian |BLOCKS" = "D_la_block",
+                                "white-black |GROUP OF BLOCKS" = "D_wb_group_blocks",
+                                "white-asian |GROUP OF BLOCKS" = "D_wa_group_blocks",
+                                "white-latin |GROUP OF BLOCKS" = "D_wl_group_blocks",
+                                "black-latin |GROUP OF BLOCKS" = "D_bl_group_blocks",
+                                "black-asian |GROUP OF BLOCKS" = "D_ba_group_blocks",
+                                "latin-asian |GROUP OF BLOCKS" = "D_la_group_blocks",
+                                "white-black |TRACT" = "D_wb_tract",
+                                "white-asian |TRACT" = "D_wa_tract",
+                                "white-latin |TRACT" = "D_wl_tract",
+                                "black-latin |TRACT" = "D_bl_tract",
+                                "black-asian |TRACT" = "D_ba_tract",
+                                "latin-asian |TRACT" = "D_la_tract"))
+        # przypisanie plików z nazwami kolumn w celu odpowiedniego podstawienia do wykresu
+        sub <- substr(var, 1, 5)
+        x <- layer[[var]]
+        y_sub <- paste0(sub, input$scatter_input)
+        y <- layer[[y_sub]]
+        
+        g <- ggplot(layer, aes(x=x, y=y)) + geom_smooth(method=lm) + plot_theme + geom_bin2d(bins = 40) + # opcje wykresu rozrzutu
+          scale_fill_gradient(low = "#2f5151", high = "#dfecec") + labs(x = var, 
+                                                                        y = y_sub, 
+                                                                        title = isolate(paste0("Comparison of ", input$index, " in ", input$year)))
+        ggplotly(g)%>% config(displayModeBar = F) 
+        }
+        
+        
+        # Wskaźnik teorii informacji H
+        else if (isolate(input$index) == "The information theory index H"){
+          shinyjs::enable(id = "scatter_input")
+          var <- isolate(switch(input$variable_index, 
+                                "H |BLOCKS" = "H_block",
+                                "H |GROUP OF BLOCKS" = "H_group_blocks",
+                                "H |TRACTS" = "H_tract"))
+        
+          sub <- substr(var, 1, 5)
+          x <- layer[[var]]
+          y_sub <- paste0(sub, input$scatter_input)
+          y <- layer[[y_sub]]
+          
+          g <- ggplot(layer, aes(x=x, y=y)) + geom_smooth(method=lm) + plot_theme + geom_bin2d(bins = 40) + 
+            scale_fill_gradient(low = "#2f5151", high = "#dfecec") + labs(x = var, 
+                                                                          y = y_sub, 
+                                                                          title = isolate(paste0("comparison of ", input$index, " in ", input$year)))
+          ggplotly(g)%>% config(displayModeBar = F) 
+          }
+      })
+      
+      
+      
+      # RENDEROWANIE WYKRESU ROZRZUTU
+      output$scatter_plot <- renderPlotly({
+        print(scatter_plot())
+      })
+      
+      
+      
+  
+  ### utworzenie obiektu reaktywnego, który zostanie wyświetlony w tabeli oraz pobrany  
     datasetInput <- eventReactive(input$show,{
-           if (input$dataset_button_1 == 1){
+           if (input$dataset_button_1 == 1){ # wybór pliku z pierwszej sekcji w zależności od zaznaczenia
             switch(input$dataset_1,
            "Blocks - 1990" = shp_block_1990, "Blocks - 2000" = shp_block_2000, "Blocks - 2010" = shp_block_2010, "Blocks - 2020" = shp_block_2020,
            "Groups of blocks - 1990" = shp_grp_blocks_1990, "Groups of blocks - 2000" = shp_grp_blocks_2000, "Groups of blocks - 2010" = shp_grp_blocks_2010, "Groups of blocks - 2020" = shp_grp_blocks_2020,
            "Tracts - 1990" = shp_tract_1990, "Tracts - 2000" = shp_tract_2000, "Tracts - 2010" = shp_tract_2010, "Tracts - 2020" = shp_tract_2020)
-    #dataset <- dataset %>% st_drop_geometry()
-      }
-       else if (input$dataset_button_2 == 1){
+           #dataset <- dataset %>% st_drop_geometry()
+           }
+      
+       else if (input$dataset_button_2 == 1){ # wybór pliku z drugiej sekcji w zależności od zaznaczenia
         switch(input$dataset_2,
         "Entropy - 1990" = shp_ind_ent_1990, "Entropy - 2000" = shp_ind_ent_2000, "Entropy - 2010" = shp_ind_ent_2010, "Entropy - 2020" = shp_ind_ent_2020,
         "Index of dissimilarity - 1990"  = shp_ind_D_1990, "Index of dissimilarity - 2000" = shp_ind_D_2000,
@@ -933,10 +1052,28 @@ server <- function(input, output,session) {
         "The information theory index H - 1990" = shp_ind_H_1990, "The information theory index H - 2000" = shp_ind_H_2000, 
         "The information theory index H - 2010" = shp_ind_H_2010, "The information theory index H - 2020" = shp_ind_H_2020)
       }
-      
     })
+    
+    ## porzucenie geometrii wybranego pliku w celu poprawnego wyświetlenia w tabeli
+    table_dataset_2 <- eventReactive(input$show,{
+      datasetInput() %>% st_drop_geometry()
+    })
+    
+    ## wyrenderowanie tabeli
+    output$table_dt <- DT::renderDataTable(DT::datatable(table_dataset_2(), options = list(
+      rownames = FALSE,
+      pageLength = 12,
+      scrollX = TRUE,
+      lengthMenu = c(6, 12))
+      ))
+    
+    
+    
+    
+    
+    
+    ###  przypisanie opcji pobrania tabeli jako .csv
     output$download_csv <- downloadHandler(
-      
         filename = function() {
           if (input$dataset_button_1 == 1){
             paste0(input$dataset_1, ".csv", sep = "")
@@ -946,11 +1083,14 @@ server <- function(input, output,session) {
           }
         },
         content = function(file) {
-            datasetInput <- datasetInput() %>% st_drop_geometry()
+            datasetInput <- datasetInput() %>% st_drop_geometry() 
             write.csv(datasetInput, file, row.names = FALSE)
         }
     )
     
+    
+    
+    ###  przypisanie opcji pobrania tabeli jako .gpkg
     output$download_gpkg <- downloadHandler(
         filename = function() {
           if (input$dataset_button_1 == 1){
@@ -965,6 +1105,9 @@ server <- function(input, output,session) {
         }
     )
     
+    
+    
+    ###  przypisanie opcji pobrania histogramu jako .png
     output$save_png<- downloadHandler(
       filename = function() {
         if (isolate(input$aggr_button) == 1){
@@ -975,21 +1118,14 @@ server <- function(input, output,session) {
         }
       },
       content = function(file) {
-        #ggsave(file, plot = plot(), device = "png")
         export(plot(), file=file)
       }
     )
-     table_dataset_2 <- eventReactive(input$show,{
-       datasetInput() %>% st_drop_geometry()
-     })
     
-    output$table_dt <- DT::renderDataTable(DT::datatable(table_dataset_2(), options = list(
-      rownames = FALSE,
-      pageLength = 12,
-      scrollX = TRUE,
-      #autoWidth = TRUE,
-     # columnDefs = list(list(visible=FALSE, targets= c(1, 2:5, 8:10, 20))),
-      lengthMenu = c(6, 12))))
+    
+
+    
+    ## opcje ukrycia instrukcji po wyrenderowaniu mapy i wykresów
     observeEvent(input$run,{hide("instruction_1")})
     observeEvent(input$run,{hide("instruction_2")})
     observeEvent(input$show,{hide("instruction_3")})
@@ -1000,6 +1136,6 @@ server <- function(input, output,session) {
 }
 
 
-# Run the app ----
+# uruchomienie aplikacji
 shinyApp(ui, server)
-#runApp()
+
