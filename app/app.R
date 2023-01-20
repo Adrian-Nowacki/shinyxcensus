@@ -1,18 +1,14 @@
 
 #wczytanie pakietów
 library(rsconnect)
-library(webshot)
 library(shiny)
 library(dplyr)
 library(sf)
 library(tmap)
 library(DT)
-library(shinydashboard)
-library(shinyWidgets)
 library(shinyjs)
 library(ggplot2)
 library(plotly)
-library(leaflet)
 # wczytanie danych obejmujących wszystkie wskaźniki dla wybranej jednostki agregacji
 shp_block_1990 <- st_read("data/census_shp/shp_block_1990.gpkg")
 shp_block_2000 <- st_read("data/census_shp/shp_block_2000.gpkg")
@@ -194,11 +190,13 @@ ui <- navbarPage(id = "navbar",
                                                                                  choices = c("block",
                                                                                              "group_blocks",
                                                                                              "tract"),
-                                                                                 selected = "block")
+                                                                                 selected = "tract")
                                                             ),
                                                        column(2)),
                                                      
-                                                     plotlyOutput("scatter_plot", height = "480px", width = "770px"))
+                                                     plotlyOutput("scatter_plot", height = "480px", width = "770px"),
+                                                     downloadButton('save_scatter_png', 'Save as .png',
+                                                                    style = "visibility:hidden"))
                                                 )
                                           )
                                     )
@@ -480,6 +478,7 @@ server <- function(input, output,session) {
         if(input$aggr_button == 1){
             shinyjs::disable(id = "index")
             shinyjs::disable(id = "variable_index")
+            shinyjs::disable(id = "scatter_input") 
             shinyjs::enable(id = "unit")
             shinyjs::enable(id = "variable_unit")
             updateCheckboxInput(
@@ -491,6 +490,7 @@ server <- function(input, output,session) {
             shinyjs::enable(id = "variable_index")
             shinyjs::disable(id = "unit")
             shinyjs::disable(id = "variable_unit")
+            shinyjs::disable(id = "scatter_input") 
             updateCheckboxInput(
                 inputId = "aggr_button",
                 value = FALSE
@@ -500,6 +500,7 @@ server <- function(input, output,session) {
         if(input$indicator_button == 0){
             shinyjs::disable(id = "index")
             shinyjs::disable(id = "variable_index")
+            shinyjs::disable(id = "scatter_input") 
             shinyjs::enable(id = "unit")
             shinyjs::enable(id = "variable_unit")
             updateCheckboxInput(
@@ -511,6 +512,7 @@ server <- function(input, output,session) {
             shinyjs::enable(id = "variable_index")
             shinyjs::disable(id = "unit")
             shinyjs::disable(id = "variable_unit")
+            shinyjs::disable(id = "scatter_input") 
             updateCheckboxInput(
                 inputId = "aggr_button",
                 value = FALSE
@@ -522,7 +524,8 @@ server <- function(input, output,session) {
                 shinyjs::disable(id = "index")
                 shinyjs::disable(id = "variable_index")
                 shinyjs::disable(id = "unit")
-                shinyjs::disable(id = "variable_unit")}
+                shinyjs::disable(id = "variable_unit")
+                shinyjs::disable(id = "scatter_input") }
         })
     
     
@@ -662,7 +665,7 @@ server <- function(input, output,session) {
     
     ######### RENDEROWANIE MAPY INTERAKTYWNEJ
          output$map <- renderTmap({
-           
+           palette <- c("#f8fcc1", "#74b496", "#2f5151")
            ### opcje mapy przy wyborze pliku ze wszystkimi wskaźnikami dla jednej jednostki agregacji
            if (isolate(input$aggr_button) == 1){ 
              input$run
@@ -684,13 +687,13 @@ server <- function(input, output,session) {
                         "D (white-latin): " = "D_wl", "D (black-latin): " = "D_bl", 
                         "D (black-asian): " = "D_ba", "D (latin-asian): " = "D_la")
              
-                tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + # określenie parametrów mapy interaktywnej
+                tm_shape(layer) + tm_view(set.view = c(-95, 40, 4.5)) + # określenie parametrów mapy interaktywnej
                  tm_fill(title = isolate(paste0(input$variable_unit, br(), " in ", input$year, " | ", input$unit)),
                          col = var, 
-                         palette = "YlGn",
+                         palette = palette,
                          id = "NAME",
                          popup.vars = popup,
-                         popup.format=list(digits=2)) + tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                         popup.format=list(digits=2)) + tm_view(leaflet.options = c(zoomSnap=0.01)) +  tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
                                                                                     "OpenStreetMap" = "OpenStreetMap",
                                                                                     "Esri" = "Esri.WorldGrayCanvas"))
      }
@@ -707,13 +710,13 @@ server <- function(input, output,session) {
                                        "Entropy std |ALL AGGREGATION UNITS" = "Entropy_std"))
               popup <- c("Entropy: " = "Entropy", "Entropy std: " = "Entropy_std")
               
-              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + 
+              tm_shape(layer) + tm_view(set.view = c(-95, 40, 4.5)) + 
                 tm_fill(title = isolate(paste0(input$variable_index, br(), " in ", input$year)),
                         col = var, 
-                        palette = "YlGn",
+                        palette = palette,
                         id = "NAME",
                         popup.vars = popup,
-                        popup.format=list(digits=2)) + tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                        popup.format=list(digits=2)) + tm_view(leaflet.options = c(zoomSnap=0.01)) + tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
                                                                                    "OpenStreetMap" = "OpenStreetMap",
                                                                                    "Esri" = "Esri.WorldGrayCanvas"))
             }
@@ -761,13 +764,13 @@ server <- function(input, output,session) {
                          "black-asian |TRACT: " = "D_ba_tract",
                          "latin-asian |TRACT: " = "D_la_tract")
               
-              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) + 
+              tm_shape(layer) + tm_view(set.view = c(-95, 40, 4.5)) + 
                 tm_fill(title = isolate(paste0(input$index, br(), input$variable_index, br(), " in ", input$year)),
                         col = var, 
-                        palette = "YlGn",
+                        palette = palette,
                         id = "NAME",
                         popup.vars = popup,
-                        popup.format=list(digits=2)) + tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                        popup.format=list(digits=2)) + tm_view(leaflet.options = c(zoomSnap=0.01)) + tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
                                                                                    "OpenStreetMap" = "OpenStreetMap",
                                                                                    "Esri" = "Esri.WorldGrayCanvas"))
             }
@@ -785,13 +788,13 @@ server <- function(input, output,session) {
                          "H |GROUP OF BLOCKS: " = "H_group_blocks",
                          "H |TRACTS: " = "H_tract")
               
-              tm_shape(layer) + tm_view(set.view = c(-120, 50, 3.2)) +
+              tm_shape(layer) + tm_view(set.view = c(-95, 40, 4.5)) +
                 tm_fill(title = isolate(paste0(input$variable_index, br(), " in ", input$year)),
                         col = var, 
-                        palette = "YlGn",
+                        palette = palette,
                         id = "NAME",
                         popup.vars = popup,
-                        popup.format=list(digits=2)) + tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
+                        popup.format=list(digits=2)) + tm_view(leaflet.options = c(zoomSnap=0.01)) + tm_borders() + tm_basemap(c("Carto Dark" = "CartoDB.DarkMatter",
                                                                                   "OpenStreetMap" = "OpenStreetMap",
                                                                                   "Esri" = "Esri.WorldGrayCanvas")) 
                 }
@@ -978,7 +981,6 @@ server <- function(input, output,session) {
         }
         
         else if (isolate(input$indicator_button) == 1){ 
-          shinyjs::enable(selector = '.nav-tabs a[data-value="Scatter plot"')
           ### opcje histogramu przy wyborze pliku ze wszystkimi wskaźnikami dla jednej jednostki agregacji
             if (isolate(input$index) == "Entropy"){
               shinyjs::disable(id = "scatter_input") # dezaktywacja wyboru ze względu na identyczne wartości entropii w każdej jednostce agregacji
@@ -1014,8 +1016,7 @@ server <- function(input, output,session) {
             x <- layer[[var]]
             y_sub <- paste0(sub, input$scatter_input)
             y <- layer[[y_sub]]
-            
-            g <- ggplot(layer, aes(x=x, y=y)) + geom_smooth(method=lm) + plot_theme + geom_bin2d(bins = 40) + # opcje wykresu rozrzutu
+            g <- ggplot(layer, aes(x=x, y=y)) + geom_smooth(color = "#c88484") + plot_theme + geom_bin2d(bins = 40) + # opcje wykresu rozrzutu
               scale_fill_gradient(low = "#2f5151", high = "#dfecec") + labs(x = var, 
                                                                             y = y_sub, 
                                                                             title = isolate(paste0("Comparison of ", input$index, " in ", input$year)))
@@ -1032,12 +1033,12 @@ server <- function(input, output,session) {
                                     "H |GROUP OF BLOCKS" = "H_group_blocks",
                                     "H |TRACTS" = "H_tract"))
             
-              sub <- substr(var, 1, 5)
+              sub <- substr(var, 1, 2)
               x <- layer[[var]]
               y_sub <- paste0(sub, input$scatter_input)
               y <- layer[[y_sub]]
               
-              g <- ggplot(layer, aes(x=x, y=y)) + geom_smooth(method=lm) + plot_theme + geom_bin2d(bins = 40) + 
+              g <- ggplot(layer, aes(x=x, y=y)) + geom_smooth(color = "#c88484") + plot_theme + geom_bin2d(bins = 40) + 
                 scale_fill_gradient(low = "#2f5151", high = "#dfecec") + labs(x = var, 
                                                                               y = y_sub, 
                                                                               title = isolate(paste0("comparison of ", input$index, " in ", input$year)))
@@ -1133,10 +1134,10 @@ server <- function(input, output,session) {
     output$save_png<- downloadHandler(
       filename = function() {
         if (isolate(input$aggr_button) == 1){
-          paste0(input$variable_unit, "_", input$year, ".png", sep = "")
+          paste0(input$variable_unit, "_", input$year, "_hist", ".png", sep = "")
         }
         else if (isolate(input$indicator_button) == 1){
-          paste0(input$variable_index, "_", input$year, ".png", sep = "")
+          paste0(input$index, "_", input$year, "_hist", ".png", sep = "")
         }
       },
       content = function(file) {
@@ -1145,6 +1146,16 @@ server <- function(input, output,session) {
     )
     
     
+    
+    ###  przypisanie opcji pobrania wykresu rozrzutu jako .png
+    output$save_scatter_png<- downloadHandler(
+      filename = function() {
+          paste0(input$index, "_", input$year, "_scatter", ".png", sep = "")
+      },
+      content = function(file) {
+        export(scatter_plot(), file=file)
+      }
+    )
 
     
     ## opcje ukrycia instrukcji po wyrenderowaniu mapy i wykresów
@@ -1154,6 +1165,23 @@ server <- function(input, output,session) {
     observeEvent(input$run,
                   runjs('document.getElementById("save_png").style.visibility = "visible";')
                  )
+    observeEvent(input$run,{
+      if (isolate(input$aggr_button) == 1){ 
+        runjs('document.getElementById("save_scatter_png").style.visibility = "hidden";')
+      }
+      
+      else if (isolate(input$indicator_button) == 1){ 
+        if (isolate(input$index) == "Entropy"){
+          runjs('document.getElementById("save_scatter_png").style.visibility = "hidden";')
+        }
+        else if (isolate(input$index) == "Index of dissimilarity"){
+          runjs('document.getElementById("save_scatter_png").style.visibility = "visible";')
+        }
+        else if (isolate(input$index) == "The information theory index H"){
+          runjs('document.getElementById("save_scatter_png").style.visibility = "visible";')
+        }
+      }
+    })
                  
 }
 
