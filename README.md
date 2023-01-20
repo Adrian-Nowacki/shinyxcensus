@@ -11,9 +11,9 @@
 
 ## About
 *The aim of the app was to visualize and share a database containing racial-ethnic segregation and differentiation indicators calculated for each county in the USA 
-[for the years: 1990, 2000, 2010 and 2020].*
+for the years: 1990, 2000, 2010 and 2020.*
 
-These indicators were calculated for 3 levels of aggregation: **census blocks**, **groups of blocks** and **census areas**. The application allows to view county spatial data 
+These indicators were calculated for 3 levels of aggregation: $${\color{lightblue}**census  \space blocks**}$$, **groups of blocks** and **census areas**. The application allows to view county spatial data 
 combined with the resulting tabular data. It enables visualization of data in the form of an interactive map, interactive charts and a table. This app also allows 
 to download shared data in tabular and spatial form.
 
