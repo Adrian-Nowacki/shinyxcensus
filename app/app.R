@@ -146,7 +146,8 @@ ui <- navbarPage(id = "navbar",
                               mainPanel(id = "mainpanel",
                                         tabsetPanel(id = "tabsetpanel",
                                             
-                                              tabPanel("Interactive map", tmapOutput("map", height = "600px"), # panel z mapą interaktywną
+                                              tabPanel("Interactive map", 
+                                                       tmapOutput("map", height = "600px"), # panel z mapą interaktywną
                                                      fluidRow(id = "instruction_1", # instrukcja użycia, gdy mapa jest nieaktywna
                                                               style = "margin-top: -570px; font-size:16px; color:#ffffff",
                                                               h3("On the left, there is a side panel divided into two sections:"),
@@ -228,7 +229,7 @@ ui <- navbarPage(id = "navbar",
                                            downloadButton('download_gpkg', 'Download .gpkg')
                               ),
                               mainPanel(id = "dt_mainpanel", # panel główny ukazujący podgląd tabeli
-                                        tabsetPanel(
+                                        tabsetPanel(id = "tabsetpanel_dt",
                                           tabPanel("Table", DT::dataTableOutput("table_dt", height = "600px"),
                                                    fluidRow(id = "instruction_3",
                                                             style = "margin-top: -570px; font-size:16px; color:#ffffff",
@@ -340,7 +341,7 @@ ui <- navbarPage(id = "navbar",
                          #plot{
                               margin-left:auto;
                               margin-right:auto;
-                              margin-top:50px;
+                              margin-top:30px;
                          }
                          #scatter_plot{
                               margin-top: 30px; 
@@ -386,11 +387,17 @@ ui <- navbarPage(id = "navbar",
                               width: 1100px;
                               color: #bbbbbb;
                          }
-                         #tabsetpanel a {
+                         #dt_mainpanel{
+                              margin-top:20px;
+                              width: 1100px;
+                              color: #bbbbbb;
+                         }
+                         #tabsetpanel a, #tabsetpanel_dt a{
                               color:#ffffff;
                               background-color:#444444;
                          }
-                         #tabsetpanel a:hover,  #tabsetpanel a:active, #tabsetpanel a:focus{
+                         #tabsetpanel a:hover,  #tabsetpanel a:active, #tabsetpanel a:focus, 
+                         #tabsetpanel_dt a:hover, #tabsetpanel_dt a:active, #tabsetpanel_dt a:focus{
                               color:#ffffff;
                               background-color:#777777;
                          }
@@ -424,7 +431,13 @@ ui <- navbarPage(id = "navbar",
                               font-size: 0.4;
                          }
                          #table_dt{
-                              color:#dddddd;
+                              color:#dddddd!important;
+                         }
+                         #table_dt label{
+                              color:#dddddd!important;
+                         }
+                         .dataTables_info{
+                              color:#dddddd!important;
                          }
                          #table_dt th{
                               color:#dddddd;
@@ -960,68 +973,77 @@ server <- function(input, output,session) {
                                    color = "#dddddd"))
         
         layer <- layer() 
-        ### opcje histogramu przy wyborze pliku ze wszystkimi wskaźnikami dla jednej jednostki agregacji
-        if (isolate(input$index) == "Entropy"){
-          shinyjs::disable(id = "scatter_input") # dezaktywacja wyboru ze względu na identyczne wartości entropii w każdej jednostce agregacji
+        if (isolate(input$aggr_button) == 1){ 
+          shinyjs::disable(id = "scatter_input") 
         }
         
+        else if (isolate(input$indicator_button) == 1){ 
+          shinyjs::enable(selector = '.nav-tabs a[data-value="Scatter plot"')
+          ### opcje histogramu przy wyborze pliku ze wszystkimi wskaźnikami dla jednej jednostki agregacji
+            if (isolate(input$index) == "Entropy"){
+              shinyjs::disable(id = "scatter_input") # dezaktywacja wyboru ze względu na identyczne wartości entropii w każdej jednostce agregacji
+               }
         
-        ### opcje histogramu przy wyborze pliku z jednym wskaźnikiem dla wszystkich jednostek agregacji
-          # Wskaźnik niepodobieństwa D
-        else if (isolate(input$index) == "Index of dissimilarity"){
-          shinyjs::enable(id = "scatter_input")
-          var <- isolate(switch(input$variable_index, # obiekt podmieniający wybór z listy wskaźników na nazwę kolumny
-                                "white-black |BLOCKS" = "D_wb_block",
-                                "white-asian |BLOCKS" = "D_wa_block",
-                                "white-latin |BLOCKS" = "D_wl_block",
-                                "black-latin |BLOCKS" = "D_bl_block",
-                                "black-asian |BLOCKS" = "D_ba_block",
-                                "latin-asian |BLOCKS" = "D_la_block",
-                                "white-black |GROUP OF BLOCKS" = "D_wb_group_blocks",
-                                "white-asian |GROUP OF BLOCKS" = "D_wa_group_blocks",
-                                "white-latin |GROUP OF BLOCKS" = "D_wl_group_blocks",
-                                "black-latin |GROUP OF BLOCKS" = "D_bl_group_blocks",
-                                "black-asian |GROUP OF BLOCKS" = "D_ba_group_blocks",
-                                "latin-asian |GROUP OF BLOCKS" = "D_la_group_blocks",
-                                "white-black |TRACT" = "D_wb_tract",
-                                "white-asian |TRACT" = "D_wa_tract",
-                                "white-latin |TRACT" = "D_wl_tract",
-                                "black-latin |TRACT" = "D_bl_tract",
-                                "black-asian |TRACT" = "D_ba_tract",
-                                "latin-asian |TRACT" = "D_la_tract"))
-        # przypisanie plików z nazwami kolumn w celu odpowiedniego podstawienia do wykresu
-        sub <- substr(var, 1, 5)
-        x <- layer[[var]]
-        y_sub <- paste0(sub, input$scatter_input)
-        y <- layer[[y_sub]]
-        
-        g <- ggplot(layer, aes(x=x, y=y)) + geom_smooth(method=lm) + plot_theme + geom_bin2d(bins = 40) + # opcje wykresu rozrzutu
-          scale_fill_gradient(low = "#2f5151", high = "#dfecec") + labs(x = var, 
-                                                                        y = y_sub, 
-                                                                        title = isolate(paste0("Comparison of ", input$index, " in ", input$year)))
-        ggplotly(g)%>% config(displayModeBar = F) 
+            
+            ### opcje histogramu przy wyborze pliku z jednym wskaźnikiem dla wszystkich jednostek agregacji
+              # Wskaźnik niepodobieństwa D
+            else if (isolate(input$index) == "Index of dissimilarity"){
+              shinyjs::enable(id = "scatter_input")
+              
+              var <- isolate(switch(input$variable_index, # obiekt podmieniający wybór z listy wskaźników na nazwę kolumny
+                                    "white-black |BLOCKS" = "D_wb_block",
+                                    "white-asian |BLOCKS" = "D_wa_block",
+                                    "white-latin |BLOCKS" = "D_wl_block",
+                                    "black-latin |BLOCKS" = "D_bl_block",
+                                    "black-asian |BLOCKS" = "D_ba_block",
+                                    "latin-asian |BLOCKS" = "D_la_block",
+                                    "white-black |GROUP OF BLOCKS" = "D_wb_group_blocks",
+                                    "white-asian |GROUP OF BLOCKS" = "D_wa_group_blocks",
+                                    "white-latin |GROUP OF BLOCKS" = "D_wl_group_blocks",
+                                    "black-latin |GROUP OF BLOCKS" = "D_bl_group_blocks",
+                                    "black-asian |GROUP OF BLOCKS" = "D_ba_group_blocks",
+                                    "latin-asian |GROUP OF BLOCKS" = "D_la_group_blocks",
+                                    "white-black |TRACT" = "D_wb_tract",
+                                    "white-asian |TRACT" = "D_wa_tract",
+                                    "white-latin |TRACT" = "D_wl_tract",
+                                    "black-latin |TRACT" = "D_bl_tract",
+                                    "black-asian |TRACT" = "D_ba_tract",
+                                    "latin-asian |TRACT" = "D_la_tract"))
+            # przypisanie plików z nazwami kolumn w celu odpowiedniego podstawienia do wykresu
+            sub <- substr(var, 1, 5)
+            x <- layer[[var]]
+            y_sub <- paste0(sub, input$scatter_input)
+            y <- layer[[y_sub]]
+            
+            g <- ggplot(layer, aes(x=x, y=y)) + geom_smooth(method=lm) + plot_theme + geom_bin2d(bins = 40) + # opcje wykresu rozrzutu
+              scale_fill_gradient(low = "#2f5151", high = "#dfecec") + labs(x = var, 
+                                                                            y = y_sub, 
+                                                                            title = isolate(paste0("Comparison of ", input$index, " in ", input$year)))
+            ggplotly(g)%>% config(displayModeBar = F) 
+            }
+            
+            
+            # Wskaźnik teorii informacji H
+            else if (isolate(input$index) == "The information theory index H"){
+              shinyjs::enable(id = "scatter_input")
+              
+              var <- isolate(switch(input$variable_index, 
+                                    "H |BLOCKS" = "H_block",
+                                    "H |GROUP OF BLOCKS" = "H_group_blocks",
+                                    "H |TRACTS" = "H_tract"))
+            
+              sub <- substr(var, 1, 5)
+              x <- layer[[var]]
+              y_sub <- paste0(sub, input$scatter_input)
+              y <- layer[[y_sub]]
+              
+              g <- ggplot(layer, aes(x=x, y=y)) + geom_smooth(method=lm) + plot_theme + geom_bin2d(bins = 40) + 
+                scale_fill_gradient(low = "#2f5151", high = "#dfecec") + labs(x = var, 
+                                                                              y = y_sub, 
+                                                                              title = isolate(paste0("comparison of ", input$index, " in ", input$year)))
+              ggplotly(g)%>% config(displayModeBar = F) 
+            }
         }
-        
-        
-        # Wskaźnik teorii informacji H
-        else if (isolate(input$index) == "The information theory index H"){
-          shinyjs::enable(id = "scatter_input")
-          var <- isolate(switch(input$variable_index, 
-                                "H |BLOCKS" = "H_block",
-                                "H |GROUP OF BLOCKS" = "H_group_blocks",
-                                "H |TRACTS" = "H_tract"))
-        
-          sub <- substr(var, 1, 5)
-          x <- layer[[var]]
-          y_sub <- paste0(sub, input$scatter_input)
-          y <- layer[[y_sub]]
-          
-          g <- ggplot(layer, aes(x=x, y=y)) + geom_smooth(method=lm) + plot_theme + geom_bin2d(bins = 40) + 
-            scale_fill_gradient(low = "#2f5151", high = "#dfecec") + labs(x = var, 
-                                                                          y = y_sub, 
-                                                                          title = isolate(paste0("comparison of ", input$index, " in ", input$year)))
-          ggplotly(g)%>% config(displayModeBar = F) 
-          }
       })
       
       
