@@ -63,7 +63,7 @@ install.packages(c("shiny", "dplyr", "sf", "tmap",
                    "DT", "shinyjs", "ggplot2", "plotly"))
                    
 library(shiny)
-runGitHub("shinyxcensus, "anowacki")
+runGitHub("shinyxcensus", "Adrian-Nowacki")
 ```
 
 ## Tech
