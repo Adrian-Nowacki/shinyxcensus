@@ -81,7 +81,7 @@ runGitHub("shinyxcensus", "Adrian-Nowacki")
 * **tmap** – visualizes spatial data in the form of all kinds of maps
 * **DT** – displays data frames and matrixes in the form of interactive tables, with the possibility of sorting, filtering or searching
 * **shinyjs** – enables the implementation of operations from the JavaScript language in order to improve the application with particular functions
-* **ggplot2** – allows you to visualize data using charts
+* **ggplot2** – allows to visualize data using charts
 * **plotly** – creates interactive plots
 
 
