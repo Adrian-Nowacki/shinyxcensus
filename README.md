@@ -2,13 +2,17 @@
 <img src="./images/logo_5.png" width="200">
 
 ### *Application visualizing  the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units*
+
 <br />
+
 ## Table of contents
 * [About](#about)
 * [Features](#features)
 * [Tech](#tech)
 * [Setup](#setup)
+
 <br />
+
 ## About
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The aim of the app was to visualize and share a database containing racial-ethnic segregation and differentiation indicators calculated for each county in the USA 
 for the years: **$\textcolor{lightgreen}{1990,\ 2000,\ 2010\ and\ 2020}$**.
@@ -30,7 +34,9 @@ racial structure of the entire area. Smaller units are more racially and ethnica
 As a result, the value of the segregation index decreases with the size of aggregation units. For census areas that are divided into census block groups and census 
 blocks, these values are the smallest. This means that, given a larger aggregation unit, there is a less even distribution of racial and ethnic groups within its 
 area.
+
 <br />
+
 ## Features
 * **visualization of calculated indicators in the form of an interactive map**
 
