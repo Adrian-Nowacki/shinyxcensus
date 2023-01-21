@@ -7,6 +7,7 @@ library(sf)
 library(tmap)
 library(DT)
 library(shinyjs)
+library(shinyWidgets)
 library(ggplot2)
 library(plotly)
 # wczytanie danych obejmujących wszystkie wskaźniki dla wybranej jednostki agregacji
