@@ -57,7 +57,7 @@ area.
 
 <br />
 
-* **displaying the table with the possibility of downloading in the form of .csv and .gpkg**
+* **table with the possibility of downloading in the form of .csv and .gpkg**
 
 <img src="./images/panel_pobierania.png" width="650">
 
