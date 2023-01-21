@@ -34,7 +34,7 @@ area.
 ## Features
 * **visualization of calculated indicators in the form of an interactive map**
 
-<img src="./images/shiny_panel_mapy.png" width="650" style = "width:800px!important">
+<img src="./images/shiny_panel_mapy.png" width="650" style = "right:0px!important;">
 
 <br />
 
