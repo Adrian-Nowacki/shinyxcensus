@@ -2,7 +2,7 @@
 <img src="./images/logo_5.png" width="200">
 
 ### *Application visualizing  the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units*
-
+https://adryanqe.shinyapps.io/shinyxcensus/
 <br />
 
 ## Table of contents
