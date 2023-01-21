@@ -8,8 +8,9 @@
 ## Table of contents
 * [About](#about)
 * [Features](#features)
-* [Tech](#tech)
 * [Setup](#setup)
+* [Tech](#tech)
+
 
 <br />
 
