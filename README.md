@@ -67,10 +67,10 @@ area.
 
 ```
 install.packages(c("shiny", "dplyr", "sf", "tmap", 
-                   "DT", "shinyjs", "ggplot2", "plotly"))
+                   "DT", "shinyjs", "shinyWidgets", "ggplot2", "plotly"))
                    
 library(shiny)
-runGitHub("shinyxcensus", "Adrian-Nowacki")
+runGitHub("shinyxcensus", "Adrian-Nowacki", subdir = "app/")
 ```
 
 ## Tech
@@ -81,6 +81,7 @@ runGitHub("shinyxcensus", "Adrian-Nowacki")
 * **tmap** – visualizes spatial data in the form of all kinds of maps
 * **DT** – displays data frames and matrixes in the form of interactive tables, with the possibility of sorting, filtering or searching
 * **shinyjs** – enables the implementation of operations from the JavaScript language in order to improve the application with particular functions
+* **shinyWidgets** - provides sets of custom widgets for improving the application interface
 * **ggplot2** – allows to visualize data using charts
 * **plotly** – creates interactive plots
 
