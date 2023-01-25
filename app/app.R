@@ -1,6 +1,5 @@
 
 #wczytanie pakietów
-library(rsconnect)
 library(shiny)
 library(dplyr)
 library(sf)
@@ -59,8 +58,8 @@ ind_objects <- list(entrophy = entrophy, d_index = d_index, h_index = h_index)
 
 # zdefinowanie wyglądu oraz struktury aplikacji
 ui <- navbarPage(id = "navbar",
-                 title = div(img(src='logo_5.png', width = "32px", height = "32px"), "🇸‌🇭‌🇮‌🇳‌🇾‌🇽‌🇨‌🇪‌🇳‌🇸‌🇺‌🇸‌", #tutył aplikacji w navibarze
-                             style = "margin-top:-2px;font-weight:bold!important; text-shadow: #222 1px 1px 1px;"),
+                 title = div(img(src='logo_5.png', width = "32px", height = "32px"), "shinyxcensus", #tutył aplikacji w navibarze
+                             style = "margin-top:-2px;font-weight:bold!important; text-shadow: #222 1px 1px 1px; font-family: Candara; font-size:18px"),
                 
                  
                  windowTitle = HTML("shinyxcensus</title><link rel='icon' type='png' href='logo_5.png'>"), #tytuł aplikacji na zakładce

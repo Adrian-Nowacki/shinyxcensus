@@ -30,11 +30,7 @@ library(tmap)
     tract_2020 = read.csv("../us_race/2020/nhgis0105_ds248_2020_tract.csv")
     
    
-    
-# zmiana nazw kolumn z "FMS" do "FYF"
-# names(tract_2000)[31:39]<- paste0("FYF00", 1:9)
-# names(tract_2000)[40:44]<- paste0("FYF0", 10:14)
-
+    ### stworzenie listy obejmującej wszystkie wczytane pliki
 
      all_files = list(block_1990, grp_blocks_1990, tract_1990, block_2000, grp_blocks_2000, 
                       tract_2000, block_2010, grp_blocks_2010, tract_2010, block_2020, 
@@ -43,7 +39,7 @@ library(tmap)
     
     
 
-#  #  #  #  #  #  #  #  #  #  #  #  #  #  REKLASYFIKACJA
+#  #  #  #  #  #  #  #  #  #  #  #  #  #  FUNKCJA REKLASYFIKUJĄCA DANE DO 6 KATEGORII RASOWO-ETNICZNYCH
 
 
 reclass <- function(x) { 
@@ -56,7 +52,7 @@ reclass <- function(x) {
                      latin = ET2006 + ET2007 + ET2008 + ET2009 + ET2010)
     x <- x[, c(1:2, 14, 22, 37: ncol(x))]
   }
-  else if(ncol(x) == 27){  #| ncol(x) == 44){
+  else if(ncol(x) == 27){ 
     x <- x %>% mutate(white = FYF001,
                       black = FYF002,
                       american = FYF003, 
@@ -95,6 +91,7 @@ reclass <- function(x) {
   
 }
 
+# WYKONANIE REKLASYFIKACJI
 
 reclassify <- function(){
   for (i in length(all_files)){
@@ -120,14 +117,14 @@ reclassify()
 #  #  #  #  #  #  #  #  #  #  #  #  #  #  WCZYTANIE FUNKCJI OBLICZAJĄCYCH WSKAŹNIKI
 
 #  #  # ENTROPIA
-entropy_funct = function(proc) {
+entropy_calc = function(proc) {
   entropy = -sum(ifelse(proc > 0, proc * log(proc, base = exp(1)), 0)) # obliczenie entropii
   return(entropy)
 } 
 
  
 #  #  # ENTROPIA STANDARYZOWANA
-entropy_std_funct = function(proc) {
+entropy_std_calc = function(proc) {
   entropy = - sum(ifelse(proc > 0, proc * log(proc, base = exp(1)), 0)) # obliczenie entropii
   entropy_std = entropy / log(length(proc), base = exp(1))              # wykonanie standaryzacji
   return(entropy_std)
@@ -135,21 +132,21 @@ entropy_std_funct = function(proc) {
 
 
 #  #  # WSKAŹNIK NIEPODOBIEŃSTWA D
-d_index = function(x, y) {                                             # x, y - liczba osob dla 1 i 2 jednostki spisowej
+d_index_calc = function(x, y) {                                             # x, y - liczba osob dla 1 i 2 jednostki spisowej
   d = sum(abs(x / sum(x, na.rm=TRUE) - y / sum(y, na.rm=TRUE))) / 2
   return(d)
 }
 
 
 #  #  # WSKAŹNIK TEORII INFORMACJI H
-h_index <- function(races) {
+h_index_calc <- function(races) {
   races_all = apply(races, 2, sum, na.rm=TRUE)                         # liczba osob w calym obszarze w podziale na grupy rasowo-etniczne
   pop = sum(races_all, na.rm=TRUE)                                     # liczba osob dla calego obszaru
   pop_i = apply(races, 1, sum, na.rm=TRUE)                             # liczba osob dla kazdej jednostki spisowej
   proc = races / pop_i                                                 # procent osob dla danej grupy w kazdej jednostce spisowej
   proc_all = races_all / sum(races_all, na.rm = TRUE)                  # procent osob dla danej grupy dla calego obszaru
-  ent_i = apply(proc, 1, entropy_funct)                                # entropia dla kazdej jednostki spisowej
-  ent = entropy_funct(proc_all)                                        # entropia dla calego obszaru
+  ent_i = apply(proc, 1, entropy_calc)                                # entropia dla kazdej jednostki spisowej
+  ent = entropy_calc(proc_all)                                        # entropia dla calego obszaru
   h_ind = sum(pop_i * (ent - ent_i) / (ent * pop), na.rm=TRUE)         # obliczenie wskaznika H
   return(h_ind)
 }
@@ -162,17 +159,17 @@ h_index <- function(races) {
 
 list_race <- c("white", "black", "american", "asian", "other", "latin") # lista ras
 
-index_entropia <- function(x){
+entropy_aggr <- function(x){
   grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)          # pogrupowanie danych wedlug kodu hrabstwa i stanu
   splt <- group_split(grpd )                                            # rozdzielenie pogrupowanych danych na ramki danych
   races <- lapply(splt, function(splt) splt[!(names(splt) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))]) # wyszczegolnienie kolumn tylko z rasami
   races_all <- lapply(races, colSums, na.rm = TRUE)                     # liczba osob dla kazdego hrabstwa w podziale na grupy rasowo-etniczne
   pop <- lapply(races_all, sum)                                         # liczba osob dla calego hrabstwa
   perc <- Map("/", races_all, pop)                                      # procent osob dla danej grupy w hrabstwie
-  ent  <- lapply(perc, entropy_funct)                                   # obliczenie entropii dla kazdego hrabstwa
+  ent  <- lapply(perc, entropy_calc)                                   # obliczenie entropii dla kazdego hrabstwa
   
   # entropia standaryzowana
-  Ent_std_index <- lapply(perc, entropy_std_funct)                      
+  Ent_std_index <- lapply(perc, entropy_std_calc)                      
   ent_std_table <- do.call(rbind.data.frame, Ent_std_index)            
   
   # tabela
@@ -184,19 +181,19 @@ index_entropia <- function(x){
   Ent_indexes <- cbind(county_num, Ent_indexes)                         # ramka danych z kodem stanu, hrabstwa oraz dwoma wskaznikami
 }
 
-index_H <- function(x){
+h_index_aggr <- function(x){
   grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)          # pogrupowanie danych wedlug kodu hrabstwa i stanu
   splt <- group_split(grpd)
   races <- lapply(splt, function(splt) splt[!(names(splt) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
   
-  h_indexes <- lapply(races, h_index)
+  h_indexes <- lapply(races, h_index_calc)
   
   h_indexes <- do.call(rbind.data.frame, h_indexes)
   colnames(h_indexes) <- "H"
   h_indexes <- round(h_indexes, 4)                                      # ramka danych ze wskaznikiem H dla kazdego hrabstwa
 }
 
-index_D <- function(x){
+d_index_aggr <- function(x){
   grpd <- x %>% group_by(COUNTYA, STATEA) %>% arrange(COUNTYA)          # pogrupowanie danych wedlug kodu hrabstwa i stanu
   splt <- group_split(grpd)
   races <- lapply(splt, function(splt) splt[!(names(splt) %in% c("GISJOIN", "YEAR", "COUNTYA", "STATEA"))])
@@ -207,12 +204,12 @@ index_D <- function(x){
   other <- sapply(races, function(x) x%>% select(other))
   latin <- sapply(races, function(x) x%>% select(latin))
   
-  D_wb <- as.data.frame(mapply(d_index, white, black))
-  D_wa <- as.data.frame(mapply(d_index, white, asian))
-  D_wl <- as.data.frame(mapply(d_index, white, latin))
-  D_bl <- as.data.frame(mapply(d_index, black, latin))
-  D_ba <- as.data.frame(mapply(d_index, black, asian))
-  D_la <- as.data.frame(mapply(d_index, latin, asian))
+  D_wb <- as.data.frame(mapply(d_index_calc, white, black))
+  D_wa <- as.data.frame(mapply(d_index_calc, white, asian))
+  D_wl <- as.data.frame(mapply(d_index_calc, white, latin))
+  D_bl <- as.data.frame(mapply(d_index_calc, black, latin))
+  D_ba <- as.data.frame(mapply(d_index_calc, black, asian))
+  D_la <- as.data.frame(mapply(d_index_calc, latin, asian))
   
   D_indexes <- cbind(D_wb, D_wa, D_wl, D_bl, D_ba, D_la)
   colnames(D_indexes) <- c("D_wb", "D_wa", "D_wl", "D_bl", "D_ba", "D_la")
@@ -228,11 +225,11 @@ all_files <- list(block_1990, block_2000, block_2010, block_2020, grp_blocks_199
                   grp_blocks_2010, grp_blocks_2000, tract_1990, tract_2000, tract_2010, tract_2000)
 
 
-indexes <- function(){
+auto_calc <- function(){
   for (i in length(all_files)){
-    ent_list <- lapply(all_files[1:i], index_entropia)                   # utworzenie list z ramkami danych poszczegolnych wskaznikow dla kazdego hrabstwa
-    H_list <- lapply(all_files[1:i], index_H)
-    D_list <- lapply(all_files[1:i], index_D)
+    ent_list <- lapply(all_files[1:i], entropy_aggr)                   # utworzenie list z ramkami danych poszczegolnych wskaznikow dla kazdego hrabstwa
+    H_list <- lapply(all_files[1:i], h_index_aggr)
+    D_list <- lapply(all_files[1:i], d_index_aggr)
     list<- mapply(function(a, b, c) {                                    # polaczenie kazdej z trzech ramek danych ze wskaznikami w jedna ramke
       binded <- cbind(a, b, c)
     }, ent_list, H_list, D_list, SIMPLIFY = FALSE)
@@ -251,7 +248,7 @@ indexes <- function(){
     tract_2020 <<- as.data.frame(list[12])
   }
 }
-indexes()       
+auto_calc()       
 
 # write.csv(tract_1990, "counties_csv/tract_1990.csv")
 # write.csv(tract_2000, "counties_csv/tract_2000.csv")
