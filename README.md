@@ -24,7 +24,7 @@ to download shared data in tabular and spatial form.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The racial-ethnic structure can be described by two concepts – **$\textcolor{lightgreen}{racial\ differentiation\ and\ racial\ segregation}$**. Racial diversity, a concept that describes a measure 
 of the relative heterogeneity of the racial-ethnic structure of a population in a given area (White, 1986), is measured by **$\textcolor{lightgreen}{entropy}$**. It allows to determine the level
-of population mixing in a given area. **$\textcolor{lightgreen}{The\ index\ of\ dissimilarity\ D}$** (index of dissimilarity) and **$\textcolor{lightgreen}{the\ information\ theory\ index\ H}$** (information theory index H) make it 
+of population mixing in a given area. **$\textcolor{lightgreen}{The\ index\ of\ dissimilarity\ D}$** and **$\textcolor{lightgreen}{the\ information\ theory\ index\ H}$** make it 
 possible to determine racial segregation, i.e. a measure of the spatial distribution of two or more groups living separately from each other in different parts of the 
 entire area (Massey and Denton, 1988). The concepts of racial differentiation and racial segregation are summarized in a variety of indicators (Reardon and Firebough, 
 2002), but these are the most widely used. Their use gives the opportunity to learn about the trend of changes in the racial and ethnic diversity of the society for 
@@ -75,14 +75,14 @@ runGitHub("shinyxcensus", "Adrian-Nowacki", subdir = "app/")
 
 ## Tech
 
-* **shiny** – creates interactive applications
-* **dplyr** – manipulates data frames using e.g. filtering, grouping, ordering or combining functions
-* **sf** – handles spatial data through (setting a coordinate system, reading and writing files, or working on geometry)
-* **tmap** – visualizes spatial data in the form of all kinds of maps
-* **DT** – displays data frames and matrixes in the form of interactive tables, with the possibility of sorting, filtering or searching
-* **shinyjs** – enables the implementation of operations from the JavaScript language in order to improve the application with particular functions
-* **shinyWidgets** - provides sets of custom widgets for improving the application interface
-* **ggplot2** – allows to visualize data using charts
-* **plotly** – creates interactive plots
+* ***shiny*** – creates interactive applications
+* ***dplyr*** – manipulates data frames using e.g. filtering, grouping, ordering or combining functions
+* ***sf*** – handles spatial data through (setting a coordinate system, reading and writing files, or working on geometry)
+* ***tmap*** – visualizes spatial data in the form of all kinds of maps
+* ***DT*** – displays data frames and matrixes in the form of interactive tables, with the possibility of sorting, filtering or searching
+* ***shinyjs*** – enables the implementation of operations from the JavaScript language in order to improve the application with particular functions
+* ***shinyWidgets*** - provides sets of custom widgets for improving the application interface
+* ***ggplot2*** – allows to visualize data using charts
+* ***plotly*** – creates interactive plots
 
 
