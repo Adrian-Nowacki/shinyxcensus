@@ -69,15 +69,17 @@ ui <- navbarPage(id = "navbar",
                           fluidRow(style = "
                           background: 
                             radial-gradient(ellipse at top, #477676, transparent),
-                            radial-gradient(ellipse at bottom, #2a3c3c, transparent);",
+                            radial-gradient(ellipse at bottom, #2a3c3c, transparent);
+                            height:94vh;
+                            overflow-y:hidden!important;",
                                    
                                    column(2),
                                    column(8,
                                           img(src='logo_5.png', width = "150px", height = "150px", align = "center", style = "margin-top:150px;"),
-                                          style = "height:800px!important; text-align:center; font-family: Trebuchet MS; color: #DDD;",
+                                          style = "height:94vh!important; text-align:center; font-family: Trebuchet MS; color: #DDD;",
                                           h2("🆂🅷🅸🅽🆈🆇🅲🅴🅽🆂🆄🆂",
                                              style = "font-weight:bold!important; text-shadow: #222 1px 1px 1px;"),
-                                          h4("Application visualizing the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units", 
+                                          h4("App for comparing racial segregation and divirsity measures for different sizes of aggregation units", 
                                              style = "text-shadow: #222 1px 1px 1px; margin-top:50px;"
                                           ),
                                    ),
@@ -146,7 +148,7 @@ ui <- navbarPage(id = "navbar",
                                                        tmapOutput("map", height = "600px"), # panel z mapą interaktywną
                                                      fluidRow(id = "instruction_1", # instrukcja użycia, gdy mapa jest nieaktywna
                                                               style = "margin-top: -570px; font-size:16px; color:#ffffff",
-                                                              h3("On the left, there is a side panel divided into two sections:"),
+                                                              h3("Side panel is divided into two sections:"),
                                                               p("- the first one allows you to select a layer covering", span("all indicators for the selected aggregation unit", style = "font-weight:bold; color:#5f8484")),
                                                               p("- the second one allows you to select", span("one indicator for all aggregation units", style = "font-weight:bold; color:#5f8484")),
                                                               br(),
@@ -156,7 +158,7 @@ ui <- navbarPage(id = "navbar",
                                                               p("For more information on aggregation units and indices of racial differentiation and racial segregation, see the 'About' tab", style = "color:#cccccc; font-size:12px"))),
                                            
                                              tabPanel("Statistics", # panel ze statystykami oraz histogramem
-                                                     fluidRow(style = "margin-top: 30px; text-size: 18px;text-align: center; color: #eeeeee; background-color:#444444;",
+                                                     fluidRow(style = "margin-top: 30px; font-size: 16px;text-align: center; color: #eeeeee; background-color:#444444;",
                                                               column(4,
                                                                      textOutput("text_mean"),
                                                                      textOutput("text_sd")),
@@ -231,7 +233,7 @@ ui <- navbarPage(id = "navbar",
                                           tabPanel("Table", DT::dataTableOutput("table_dt", height = "600px"),
                                                    fluidRow(id = "instruction_3",
                                                             style = "margin-top: -570px; font-size:16px; color:#ffffff",
-                                                            h3("On the left, there is a side panel divided into two datasets:"),
+                                                            h3("Side panel is divided into two datasets:"),
                                                             p("- the first one allows you to show and download a table covering", span("all indicators for the selected aggregation unit", style = "font-weight:bold; color:#5f8484")),
                                                             p("- the second one allows you to show and download a table covering", span("one indicator for all aggregation units", style = "font-weight:bold; color:#5f8484")),
                                                             br(),
@@ -252,30 +254,25 @@ ui <- navbarPage(id = "navbar",
                             radial-gradient(ellipse at bottom, #2a3c3c, transparent);",
                                    column(1),
                                    column(10,
-                                     style = "margin-top:30px;height:1200px!important; font-size:16px; text-align:justify; font-family: Trebuchet MS; color: #DDD;",
-                                     p("The aim of the app was to visualize and share a database containing racial-ethnic segregation and differentiation indicators calculated for each county in the USA for the years: 1990, 2000, 2010 and 2020."),
+                                     style = "margin-top:30px;height:1300px!important; font-size:16px; text-align:justify; font-family: Trebuchet MS; color: #DDD;",
+                                     p("The aim of the app was to visualize and share a database containing racial segregation and diversity metrics calculated for each county in the USA for the years: 1990, 2000, 2010 and 2020."),
                                      br(),
-                                     p("These indicators were calculated for 3 levels of aggregation: census blocks, groups of blocks
-                                       and census areas. The application allows to view county spatial data combined with the resulting 
-                                       tabular data. It enables visualization of data in the form of an interactive map, interactive charts 
-                                       and a table. This app also allows to download shared data in tabular and spatial form."),
+                                     p("These metrics were calculated for 3 levels of aggregation units: census blocks, blocks groups and census trants. The app allows to view county spatial data combined with the resulting tabular data. It enables visualization of data in the form of an interactive map, interactive charts and a table. This app also allows to download resulted data in tabular and spatial form."),
                                      br(), br(),
-                                     p("1. Measures of racial differentiation", style = "color:#ffffff; font-weight:bold;"),
-                                     p("These measures are used to determine the level of racial and ethnic heterogeneity of the population structure in the analyzed area. 
-                                       The values of racial differentiation measures are independent of the adopted division into spatial units and have the same value for all 
-                                       aggregation units in a given year. The most commonly used measures are:"),
+                                     p("1. Measures of racial diversity", style = "color:#ffffff; font-weight:bold;"),
+                                     p("These measures are used to determine the level of ethnoracial heterogeneity of the population in the analyzed area. The values of racial diversity measures are independent of the adopted division into spatial units and have the same value for all aggregation units in a given year. The most commonly used measures are:"),
                                          column(1),
                                          column(11,
-                                         p("• ", span("Entropy", style = "font-weight:bold; color:#111111;"), " - informs about the level of racial-ethnic mixing of the population structure in the study area. Its maximum value depends on the number of racial and ethnic groups inhabiting a given area - the more groups considered, the higher the maximum value of entropy. Due to the reclassification of data to 6 categories, the calculated measure assumes the highest possible value of 1.79. The lower the entropy index, the greater the dominance of a single racial-ethnic group - the higher it is, the more equal the share of all groups."),
-                                         p("• ", span("Standardized entropy", style = "font-weight:bold; color:#111111;"), "– a measure used for comparative purposes, with an adopted unified range of values ​​from 0 to 1, which is obtained as a result of dividing by the maximum entropy value."),
+                                         p("• ", span("Entropy", style = "font-weight:bold; color:#111111;"), " - informs about the level of ethnoracial mixing of the population in the study area. Its maximum value depends on the number of ethnoracial groups lving in a given area (the more groups considered, the higher the maximum value of entropy). The app uses data reclassified to 6 categories, that gives the highest possible value of 1.79. The lowest value of entropy corresponds to the area dominated by one ethnoracial group. The highest value of entropy corresponds to equal share of all groups. "),
+                                         p("• ", span("Standardized entropy", style = "font-weight:bold; color:#111111;"), "– a measure used for comparative purposes, with range of values ​​from 0 to 1, which is obtained as a result of dividing entropy by the maximum entropy value."),
                                          br(),br()
                                          ),
-                                     p("2. Indicators of racial segregation", style = "color:#ffffff; font-weight:bold;"),
-                                     p("These measures measure the extent to which two or more groups live separately from each other in different parts of the city (Massey & Denton, 1988). They describe the level of spatial distribution of particular races and ethnic groups in a given geographical area. The values ​​of segregation indicators - in contrast to racial differentiation indicators - depend on the adopted division into aggregation units and require dividing the area into smaller component areas. Commonly used indicators of racial segregation are:"),
+                                     p("2. Measures of racial segregation", style = "color:#ffffff; font-weight:bold;"),
+                                     p("These metrics measure the extent to which two or more groups live separately from each other in different parts of the city (Massey & Denton, 1988). They describe the level of spatial distribution of particular ethnoracial groups in a given geographical area. Calculating segregation metrics require dividing the area into smaller component areas. The values ​​of segregation metrics - in contrast to racial diversity metrics - depend on the adopted division into aggregation units. Commonly used racial segregation metrics are:"),
                                          column(1),
                                          column(11,
-                                                p("• ", span("Index of dissimilarity", style = "font-weight:bold; color:#111111;"), "– used to measure the integration or relative separation of two groups within neighborhoods of a single city or metropolitan area, as well as within individual constituent census areas. In the work, the index was presented in relation to counties and calculated on the basis of the blocks, groups of blocks and census areas included in it. The index takes values ​​from 0 to 1, where 0 means complete integration (even distribution) of both groups, and 1 – complete segregation, i.e. a given spatial unit is inhabited by only one group. It tells you the percentage of the group that would need to move between units to equalize the size of the other group (i.e. both subgroups would be fully integrated)."),
-                                                p("• ", span("Information theory index H", style = "font-weight:bold; color:#111111;"), "measures the difference between the entropy (racial diversity) of the entire area and the entropy of individual census areas in relation to the diversity of the entire area (Fig. 2). Its range is from 0 to 1, where 0 means the same racial and ethnic structure of the census area as compared to the entire area, i.e. full integration of all groups - while the value of 1 indicates that the census area is inhabited by one racial and ethnic group (full segregation)."),
+                                                p("• ", span("Index of dissimilarity (D)", style = "font-weight:bold; color:#111111;"), "– measures the integration or relative separation of two groups within neighborhoods of a single area (city, metropolitan area, county). This app presents the value of D in the county and were calculated dividing county into blocks, blocks group and census tracts. The index of dissimilarity vary ​from 0 to 1, where 0 means complete integration (even distribution) of both groups, and 1 – complete segregation, i.e. a given spatial unit is inhabited by only one group. Index of dissimilarity is interpreted in terms of the percentage of the group that would need to move between units to equalize the size of the other group (i.e. both subgroups would be fully integrated)."),
+                                                p("• ", span("Information theory index (H)", style = "font-weight:bold; color:#111111;"), "- measures the difference between the entropy (racial diversity) of the entire area and the entropy of individual census areas in relation to the diversity of the entire area. Its range is from 0 to 1, where 0 means the same ethoracial composition of the census area as compared to the entire area, i.e. full integration of all groups - while the value of 1 indicates that the census area is inhabited by one ethnoracial group (full segregation)."),
                                          br(),br()
                                                 ),
                                      tags$a(img(src='github-sign.png', width = "60px", height = "60px", align = "center", style = "margin-left: 47.5%; 
@@ -296,8 +293,9 @@ ui <- navbarPage(id = "navbar",
                      HTML('
                          #sidebar {
                               background-color: #2f5151;
-                              width:360px;
-                              height:740px!important;
+                              width:20vw;
+                              min-width:250px!important;
+                              height:94vh;
                               border:none!important;
                               border-right:1px solid #eeeeee!important;
                               color:#ffffff!important;
@@ -335,6 +333,7 @@ ui <- navbarPage(id = "navbar",
                          body {
                               radial-gradient(ellipse at top, #477676, transparent),
                               radial-gradient(ellipse at bottom, #2a3c3c, transparent);
+                              font-size:calc(12px + 0.1vw);
                          }
                          #plot{
                               margin-left:auto;
@@ -380,10 +379,11 @@ ui <- navbarPage(id = "navbar",
                               background-image: none !important;
                          }
                          #mainpanel {
-                              margin-left:-100px;
                               margin-top:20px;
-                              width: 1100px;
+                              min-width:900px!important;
+                              width: 70vw;
                               color: #bbbbbb;
+                              margin-left:-100px;
                          }
                          #dt_mainpanel{
                               margin-top:20px;
@@ -406,9 +406,10 @@ ui <- navbarPage(id = "navbar",
                          }
                          #dt_sidebar {
                               background-color: #2f5151;
-                              width:360px;
+                              width:20vw;
+                              min-width:250px!important;
                               color:#ffffff!important;
-                              height:740px!important;
+                              height:94vh;
                               border:none!important;
                               border-right:1px solid #eeeeee!important;
                          }
@@ -456,16 +457,71 @@ ui <- navbarPage(id = "navbar",
                          }
                          #download_csv {
                               float:left;
+                              width:45%;
+                              font-size:calc(9px + 0.1vw);
                          }
                          #download_gpkg {
                               float:right;
+                              width:45%;
+                              font-size:calc(9px + 0.1vw);
                          }
                          body, label, input, button, select { 
-                            letter-spacing: -0.2px;
-                         }'
+                              letter-spacing: -0.2px;
+                         }
+                         
+                        
+                         @media screen and (max-width: 600px){
+                               
+                               #sidebar {
+                                     width:100vw;
+                                     border-right:none!important;
+                                     border-bottom:1px solid #eeeeee!important;
+                                     height:100%;
+                               }
+                               #dt_sidebar {
+                                     width:100vw;
+                                     border-right:none!important;
+                                     border-bottom:1px solid #eeeeee!important;
+                                     height:30em!important;
+                               }
+                               #mainpanel, #dt_mainpanel {
+                                     width:100vw!important;
+                                     margin-left:8px!important;
+                                     min-width:0!important;
+                                      overflow-x: scroll!important;
+                               }
+                               .nav {
+                                     margin-bottom:10px!important;
+                               }
+                               #instruction_1, #instruction_3{
+                                     width:100vw!important;
+                                     padding-left:25px;
+                                     padding-right:15px;
+                                     overflow-x: hidden!important; 
+                               }
+                               .col-sm-8 {
+                                     padding-right:0px!important;
+                               }
+                               .leaflet-control{
+                                     margin:0px!important;
+                               }
+                               .legend, .leaflet-control-zoom, .leaflet-control-layers {
+                                     transform:scale(0.8);
+                               }
+                               .leaflet-popup {
+                                     font-size: 85%;
+                               }
+                               #scatter_plot, #plot {
+                                     overflow-x: scroll!important;
+                                     width:150vw!important;
+                                     height:calc(150vw/1.6)!important;
+                               }
+                              
+                         }
+                          '
                           )
                  )),
-                 shinyjs::useShinyjs()
+                 shinyjs::useShinyjs(), collapsible = TRUE
 )
 
 
