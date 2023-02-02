@@ -155,10 +155,10 @@ ui <- navbarPage(id = "navbar",
                                                               p("1. Select the indicator and year you are interested in"),
                                                               p("2. Click 'Run'"), 
                                                               br(),
-                                                              p("For more information on aggregation units and indices of racial differentiation and racial segregation, see the 'About' tab", style = "color:#cccccc; font-size:12px"))),
+                                                              p("For more information on aggregation units and measures of racial differentiation and racial segregation, see the 'About' tab", style = "color:#cccccc; font-size:12px"))),
                                            
                                              tabPanel("Statistics", # panel ze statystykami oraz histogramem
-                                                     fluidRow(style = "margin-top: 30px; font-size: 16px;text-align: center; color: #eeeeee; background-color:#444444;",
+                                                     fluidRow(style = "margin-top: 30px; font-size: 12px;text-align: center; color: #eeeeee; background-color:#444444;",
                                                               column(4,
                                                                      textOutput("text_mean"),
                                                                      textOutput("text_sd")),
@@ -182,18 +182,19 @@ ui <- navbarPage(id = "navbar",
                                                      downloadButton('save_png', 'Save as .png',
                                                                     style = "visibility:hidden")),
                                             tabPanel("Scatter plot", # panel z wykresem rozrzutu
-                                                     fluidRow(
-                                                       column(8,style = "margin-top: 25px; font-size: 18px;text-align: center; color: #eeeeee;",
-                                                              p("compare the value of the selected indicator with another aggregation unit for the same year:")
+                                                     fluidRow(id = "instruction_2",
+                                                       column(8,style = "margin-top: 25px; font-size: 16px; color: #eeeeee;",
+                                                              p("compare the value of the selected indicator with another aggregation unit for the same year:", style = "margin-bottom:15px;"),
+                                                              p("To make it possible, choose one of the segregation measures: Index of dissimilarity or The information theory index, in the second section of the panel. The plot may show indicator values higher than 1, due to equal ranges of values for visual purposes.", style = "color:#cccccc; font-size:12px")
                                                               ),
-                                                       column(2,
-                                                              selectInput("scatter_input", 
-                                                                                 label = "",
-                                                                                 choices = c("block",
-                                                                                             "group_blocks",
-                                                                                             "tract"),
-                                                                                 selected = "tract")
-                                                            ),
+                                                        column(2,
+                                                               selectInput("scatter_input", 
+                                                                                  label = "",
+                                                                                  choices = c("block",
+                                                                                              "group_blocks",
+                                                                                              "tract"),
+                                                                                  selected = "tract")
+                                                             ),
                                                        column(2)),
                                                      
                                                      plotlyOutput("scatter_plot", height = "480px", width = "770px"),
@@ -493,14 +494,16 @@ ui <- navbarPage(id = "navbar",
                                .nav {
                                      margin-bottom:10px!important;
                                }
-                               #instruction_1, #instruction_3{
+                               #instruction_1 {
                                      width:100vw!important;
-                                     padding-left:25px;
+                                     padding-left:30px;
                                      padding-right:15px;
                                      overflow-x: hidden!important; 
                                }
-                               .col-sm-8 {
-                                     padding-right:0px!important;
+                               #instruction_2 {
+                                     padding-left:30px;
+                                     overflow-x: hidden!important; 
+                                     text-align:justify!important;
                                }
                                .leaflet-control{
                                      margin:0px!important;
@@ -516,7 +519,9 @@ ui <- navbarPage(id = "navbar",
                                      width:150vw!important;
                                      height:calc(150vw/1.6)!important;
                                }
-                              
+                              h4 {
+                              padding:10px;
+                              }
                          }
                           '
                           )
@@ -1216,7 +1221,7 @@ server <- function(input, output,session) {
     
     ## opcje ukrycia instrukcji po wyrenderowaniu mapy i wykresów
     observeEvent(input$run,{hide("instruction_1")})
-    observeEvent(input$run,{hide("instruction_2")})
+    #observeEvent(input$run,{hide("instruction_2")})
     observeEvent(input$show,{hide("instruction_3")})
     observeEvent(input$run,
                   runjs('document.getElementById("save_png").style.visibility = "visible";')
