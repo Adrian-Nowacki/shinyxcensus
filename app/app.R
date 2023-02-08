@@ -1248,5 +1248,4 @@ server <- function(input, output,session) {
 
 
 # uruchomienie aplikacji
-shinyApp(ui, server)
-
+runApp("app")
