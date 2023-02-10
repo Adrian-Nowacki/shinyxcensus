@@ -22,8 +22,8 @@ https://adryanqe.shinyapps.io/shinyxcensus/
 
 
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The racial-ethnic structure can be described by two concepts – **$\textcolor{lightgreen}{racial\ diversity\ and\ racial\ segregation}$**. Racial diversity, a concept that describes a measure 
-of the relative heterogeneity of the racial-ethnic structure of a population in a given area, is measured by **$\textcolor{lightgreen}{entropy}$**. It allows to determine the level
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The ethnoracial composition can be described by two concepts – **$\textcolor{lightgreen}{racial\ diversity\ and\ racial\ segregation}$**. Racial diversity, a concept that describes a measure 
+of the relative heterogeneity of the ethnoracial composition of a population in a given area, is measured by **$\textcolor{lightgreen}{entropy}$**. It allows to determine the level
 of population mixing in a given area. **$\textcolor{lightgreen}{The\ index\ of\ dissimilarity\ D}$** and **$\textcolor{lightgreen}{the\ information\ theory\ index\ H}$** make it 
 possible to determine racial segregation, i.e. a measure of the spatial distribution of two or more groups living separately from each other in different parts of the 
 entire area. The concepts of racial diversity and racial segregation are summarized in a variety of measures, but these are the most widely used. Their use gives the opportunity to learn about the trend of changes in the racial and ethnic diversity of the society for 
