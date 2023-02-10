@@ -18,7 +18,7 @@ https://adryanqe.shinyapps.io/shinyxcensus/
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The aim of the app was to visualize and share a database containing racial segregation and diversity metrics calculated for each county in the USA for the years: **$\textcolor{lightgreen}{1990,\ 2000,\ 2010\ and\ 2020}$**.
 
 
-These metrics were calculated for 3 levels of aggregation units: **$\textcolor{lightgreen}{census\ blocks,\ blocks\ groups\ and\ census\ tracts}$**. The app allows to view county spatial data combined with the resulting tabular data. It enables visualization of data in the form of an interactive map, interactive charts and a table. This app also allows to download resulted data in tabular and spatial form.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These metrics were calculated for 3 levels of aggregation units: **$\textcolor{lightgreen}{census\ blocks,\ blocks\ groups\ and\ census\ tracts}$**. The app allows to view county spatial data combined with the resulting tabular data. It enables visualization of data in the form of an interactive map, interactive charts and a table. This app also allows to download resulted data in tabular and spatial form.
 
 
 
