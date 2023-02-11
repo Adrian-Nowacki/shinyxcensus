@@ -1,7 +1,7 @@
 # shinyxcensus
 <img src="./images/logo_5.png" width="200">
 
-### *Application visualizing  the values of racial-ethnic segregation and differentiation indicators for individual sizes of aggregation units*
+### *App for comparing racial segregation and divirsity measures for different sizes of aggregation units*
 https://adryanqe.shinyapps.io/shinyxcensus/
 <br />
 
@@ -15,22 +15,21 @@ https://adryanqe.shinyapps.io/shinyxcensus/
 <br />
 
 ## About
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The aim of the app was to visualize and share a database containing racial-ethnic segregation and differentiation indicators calculated for each county in the USA 
-for the years: **$\textcolor{lightgreen}{1990,\ 2000,\ 2010\ and\ 2020}$**.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The aim of the app was to visualize and share a database containing racial segregation and diversity metrics calculated for each county in the USA for the years: **$\textcolor{lightgreen}{1990,\ 2000,\ 2010\ and\ 2020}$**.
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These indicators were calculated for 3 levels of aggregation: **$\textcolor{lightgreen}{census\ blocks,\ groups\ of\ blocks\ and\ census\ areas}$**. The application allows to view county spatial data 
-combined with the resulting tabular data. It enables visualization of data in the form of an interactive map, interactive charts and a table. This app also allows 
-to download shared data in tabular and spatial form.
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The racial-ethnic structure can be described by two concepts – **$\textcolor{lightgreen}{racial\ differentiation\ and\ racial\ segregation}$**. Racial diversity, a concept that describes a measure 
-of the relative heterogeneity of the racial-ethnic structure of a population in a given area (White, 1986), is measured by **$\textcolor{lightgreen}{entropy}$**. It allows to determine the level
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These metrics were calculated for 3 levels of aggregation units: **$\textcolor{lightgreen}{census\ blocks,\ blocks\ groups\ and\ census\ tracts}$**. The app allows to view county spatial data combined with the resulting tabular data. It enables visualization of data in the form of an interactive map, interactive charts and a table. This app also allows to download resulted data in tabular and spatial form.
+
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The ethnoracial composition can be described by two concepts – **$\textcolor{lightgreen}{racial\ diversity\ and\ racial\ segregation}$**. Racial diversity, a concept that describes a measure 
+of the relative heterogeneity of the ethnoracial composition of a population in a given area, is measured by **$\textcolor{lightgreen}{entropy}$**. It allows to determine the level
 of population mixing in a given area. **$\textcolor{lightgreen}{The\ index\ of\ dissimilarity\ D}$** and **$\textcolor{lightgreen}{the\ information\ theory\ index\ H}$** make it 
 possible to determine racial segregation, i.e. a measure of the spatial distribution of two or more groups living separately from each other in different parts of the 
-entire area (Massey and Denton, 1988). The concepts of racial differentiation and racial segregation are summarized in a variety of indicators (Reardon and Firebough, 
-2002), but these are the most widely used. Their use gives the opportunity to learn about the trend of changes in the racial and ethnic diversity of the society for 
+entire area. The concepts of racial diversity and racial segregation are summarized in a variety of measures, but these are the most widely used. Their use gives the opportunity to learn about the trend of changes in the racial and ethnic diversity of the society for 
 the study areas and allows to assess how this situation may change in the coming years.
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The values of segregation indicators depend on the adopted division into aggregation units. These measures compare the racial structure of an individual with the 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The values of segregation metrics depend on the adopted division into aggregation units. These measures compare the racial structure of an individual with the 
 racial structure of the entire area. Smaller units are more racially and ethnically homogeneous, and therefore their structure differs from that of the entire area. 
 As a result, the value of the segregation index decreases with the size of aggregation units. For census areas that are divided into census block groups and census 
 blocks, these values are the smallest. This means that, given a larger aggregation unit, there is a less even distribution of racial and ethnic groups within its 
@@ -39,19 +38,19 @@ area.
 <br />
 
 ## Features
-* **visualization of calculated indicators in the form of an interactive map**
+* **visualization of calculated metrics in the form of an interactive map**
 
 <img src="./images/shiny_panel_mapy.png" width="650">
 
 <br />
 
-* **indicator statistics and a histogram of values**
+* **statistics and a histogram of values**
 
 <img src="./images/panel_statystyk.png" width="650">
 
 <br />
 
-* **scatter plot of the indicator values for two sizes of aggregation units in the selected year**
+* **scatter plot of the metric values for two sizes of aggregation units in the selected year**
 
 <img src="./images/panel_rozrzutu.png" width="650">
 
